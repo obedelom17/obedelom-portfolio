@@ -141,11 +141,11 @@ export function HeroSection() {
               
               {/* Avatar */}
               <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-primary to-secondary p-1">
-                <img
-                  src="/images/photo-obed.jpg"
-                  alt="Obed Elom AGBEBAVI"
-                  className="w-full h-full rounded-full object-cover"
-                />
+                <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
+                  <span className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    AEO
+                  </span>
+                </div>
               </div>
 
               {/* Floating badges */}
