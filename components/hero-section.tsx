@@ -139,35 +139,7 @@ export function HeroSection() {
               </Button>
             </motion.div>
 
-            {/* Floating badges */}
-            <motion.div
-              className="mt-12 flex justify-center gap-4 flex-wrap"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.8 }}
-            >
-              <motion.div
-                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-              >
-                <span className="text-primary">IAI-Togo</span>
-              </motion.div>
-              <motion.div
-                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.5 }}
-              >
-                <span className="text-secondary">Genie Logiciel</span>
-              </motion.div>
-              <motion.div
-                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1 }}
-              >
-                <span className="text-foreground">Full-Stack</span>
-              </motion.div>
-            </motion.div>
+
           </motion.div>
         </div>
 
