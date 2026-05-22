@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Heart } from "lucide-react"
 
 export function Footer() {
   return (
@@ -24,10 +23,6 @@ export function Footer() {
             >
               obedelom.dev
             </a>
-            <span className="mx-2">·</span>
-            <span className="flex items-center gap-1">
-              Fait avec <Heart className="w-4 h-4 text-red-500 fill-red-500" /> à Lomé
-            </span>
           </p>
         </motion.div>
       </div>
