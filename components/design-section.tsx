@@ -3,23 +3,24 @@
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef, useState } from "react"
+import Image from "next/image"
 import { Palette, ZoomIn, X } from "lucide-react"
 
 const designs = [
   {
     title: "Flyer Burger Fast-food",
     description: "Fond jaune/orange, visuels appétissants, prix FCFA",
-    color: "from-yellow-500/20 to-orange-500/20",
+    image: "/images/flyer-burger.jpg",
   },
   {
     title: "Carte de visite Boutique Bio",
     description: "Mockup rouge bordeaux/jaune, format professionnel",
-    color: "from-red-800/20 to-yellow-600/20",
+    image: "/images/carte-visite.jpg",
   },
   {
     title: "Flyer Activités C.A.S MathFinEco School",
     description: "Fond sport rouge, typographie dynamique",
-    color: "from-red-500/20 to-red-700/20",
+    image: "/images/flyer-cas.png",
   },
 ]
 
@@ -59,13 +60,13 @@ export function DesignSection() {
             >
               <div className="relative overflow-hidden rounded-xl border border-border hover:border-secondary/50 transition-all duration-300">
                 {/* Design Preview */}
-                <div
-                  className={`aspect-[4/3] bg-gradient-to-br ${design.color} flex items-center justify-center relative`}
-                >
-                  <div className="text-center p-6">
-                    <Palette className="w-12 h-12 text-secondary mx-auto mb-3 opacity-50" />
-                    <p className="text-lg font-semibold text-foreground">{design.title}</p>
-                  </div>
+                <div className="aspect-[4/3] relative">
+                  <Image
+                    src={design.image}
+                    alt={design.title}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
 
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-secondary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -106,18 +107,21 @@ export function DesignSection() {
             >
               <X className="w-8 h-8" />
             </button>
-            <div
-              className={`aspect-[4/3] bg-gradient-to-br ${designs[selectedDesign].color} rounded-xl flex items-center justify-center`}
-            >
-              <div className="text-center p-8">
-                <Palette className="w-20 h-20 text-secondary mx-auto mb-4 opacity-50" />
-                <h3 className="text-2xl font-bold text-foreground mb-2">
-                  {designs[selectedDesign].title}
-                </h3>
-                <p className="text-muted-foreground">
-                  {designs[selectedDesign].description}
-                </p>
-              </div>
+            <div className="aspect-[4/3] relative rounded-xl overflow-hidden">
+              <Image
+                src={designs[selectedDesign].image}
+                alt={designs[selectedDesign].title}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="text-center mt-4">
+              <h3 className="text-xl font-bold text-foreground">
+                {designs[selectedDesign].title}
+              </h3>
+              <p className="text-muted-foreground">
+                {designs[selectedDesign].description}
+              </p>
             </div>
           </motion.div>
         </motion.div>

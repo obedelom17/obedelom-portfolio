@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
-import { useRef } from "react"
+import { useRef, useState } from "react"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ExternalLink, Github } from "lucide-react"
+import { ExternalLink, Github, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Project {
   title: string
@@ -15,6 +16,7 @@ interface Project {
   status: string
   statusColor: string
   features: string[]
+  images: string[]
   links?: {
     demo?: string
     github?: string
@@ -35,6 +37,7 @@ const projects: Project[] = [
       "Authentification",
       "Panier & Livraison",
     ],
+    images: ["/images/obistyle-hero.png", "/images/obistyle-admin.png"],
     links: {
       github: "https://github.com/obedelom17",
     },
@@ -52,8 +55,64 @@ const projects: Project[] = [
       "Alertes Stock Faible",
       "Statistiques",
     ],
+    images: ["/images/restau-dashboard.png", "/images/restau-stats.png"],
   },
 ]
+
+function ProjectCarousel({ images, title }: { images: string[]; title: string }) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  const nextImage = () => {
+    setCurrentIndex((prev) => (prev + 1) % images.length)
+  }
+
+  const prevImage = () => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
+  }
+
+  return (
+    <div className="relative h-48 overflow-hidden">
+      <Image
+        src={images[currentIndex]}
+        alt={`${title} - Image ${currentIndex + 1}`}
+        fill
+        className="object-cover object-top transition-all duration-300"
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              prevImage()
+            }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background rounded-full p-1 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              nextImage()
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background rounded-full p-1 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+            {images.map((_, idx) => (
+              <div
+                key={idx}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  idx === currentIndex ? "bg-primary" : "bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 export function ProjectsSection() {
   const ref = useRef(null)
@@ -83,11 +142,9 @@ export function ProjectsSection() {
               transition={{ duration: 0.6, delay: index * 0.2 }}
             >
               <Card className="bg-card border-border hover:border-primary/50 transition-all duration-300 overflow-hidden group h-full">
-                {/* Project Image Placeholder */}
-                <div className="relative h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <div className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {project.title}
-                  </div>
+                {/* Project Image Carousel */}
+                <div className="relative">
+                  <ProjectCarousel images={project.images} title={project.title} />
                   <Badge
                     variant="outline"
                     className={`absolute top-4 right-4 ${project.statusColor}`}

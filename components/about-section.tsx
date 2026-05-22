@@ -43,10 +43,12 @@ export function AboutSection() {
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-xl opacity-30" />
-              <div className="relative w-64 h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/30 flex items-center justify-center">
-                <span className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  AEO
-                </span>
+              <div className="relative w-64 h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border-2 border-primary/30 overflow-hidden">
+                <img
+                  src="/images/photo-obed.jpg"
+                  alt="Obed Elom AGBEBAVI"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </motion.div>
