@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, ExternalLink, Mail } from "lucide-react"
+import { ArrowDown, ExternalLink, Mail, Code2, Palette, Globe } from "lucide-react"
 
 function AnimatedCounter({ end, duration = 2 }: { end: number; duration?: number }) {
   const [count, setCount] = useState(0)
@@ -36,6 +36,12 @@ const stats = [
   { value: 1, label: "passion" },
 ]
 
+const highlights = [
+  { icon: Code2, label: "Full-Stack", color: "text-primary" },
+  { icon: Palette, label: "Designer", color: "text-secondary" },
+  { icon: Globe, label: "Lomé, Togo", color: "text-muted-foreground" },
+]
+
 export function HeroSection() {
   return (
     <section
@@ -46,67 +52,73 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
       <div className="absolute top-1/4 -left-32 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-secondary/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
+        <div className="flex flex-col items-center text-center">
+          {/* Main Content */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
+            className="max-w-4xl"
           >
             <motion.h1
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              <span className="text-foreground">Bonjour, je suis </span>
+              <span className="text-foreground">Bonjour, je suis</span>
+              <br />
               <span className="text-primary text-glow-cyan">Obed</span>
-              <span className="ml-2">👋</span>
+              <span className="ml-3">👋</span>
             </motion.h1>
 
-            <motion.p
-              className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-8"
+            {/* Highlights */}
+            <motion.div
+              className="flex flex-wrap justify-center gap-6 mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              <span className="text-primary">Développeur Full-Stack</span>
-              <span className="mx-2">·</span>
-              <span className="text-secondary">Designer Graphique</span>
-              <span className="mx-2">·</span>
-              <span>Lomé, Togo</span>
-            </motion.p>
+              {highlights.map((item, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <item.icon className={`w-5 h-5 ${item.color}`} />
+                  <span className={`text-lg md:text-xl font-medium ${item.color}`}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </motion.div>
 
             {/* Animated Stats */}
             <motion.div
-              className="flex flex-wrap justify-center lg:justify-start gap-6 mb-10"
+              className="flex flex-wrap justify-center gap-8 md:gap-12 mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <span className="text-2xl md:text-3xl font-bold text-primary">
+                  <span className="text-3xl md:text-4xl font-bold text-primary">
                     <AnimatedCounter end={stat.value} />
                   </span>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-sm md:text-base text-muted-foreground">{stat.label}</p>
                 </div>
               ))}
             </motion.div>
 
             {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 neon-cyan"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 neon-cyan px-8"
                 asChild
               >
                 <a href="#projets">
@@ -117,7 +129,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground"
+                className="border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground px-8"
                 asChild
               >
                 <a href="#contact">
@@ -126,44 +138,36 @@ export function HeroSection() {
                 </a>
               </Button>
             </motion.div>
-          </motion.div>
 
-          {/* Right Content - Avatar */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex justify-center lg:justify-end"
-          >
-            <div className="relative">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-full blur-2xl opacity-50" />
-              
-              {/* Avatar */}
-              <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-primary to-secondary p-1">
-                <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
-                  <span className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    AEO
-                  </span>
-                </div>
-              </div>
-
-              {/* Floating badges */}
+            {/* Floating badges */}
+            <motion.div
+              className="mt-12 flex justify-center gap-4 flex-wrap"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.8 }}
+            >
               <motion.div
-                className="absolute -top-4 -right-4 bg-card border border-border rounded-full px-4 py-2 text-sm"
-                animate={{ y: [0, -10, 0] }}
+                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
+                animate={{ y: [0, -8, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
               >
                 <span className="text-primary">IAI-Togo</span>
               </motion.div>
               <motion.div
-                className="absolute -bottom-4 -left-4 bg-card border border-border rounded-full px-4 py-2 text-sm"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1.5 }}
+                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 0.5 }}
               >
-                <span className="text-secondary">Full-Stack</span>
+                <span className="text-secondary">Genie Logiciel</span>
               </motion.div>
-            </div>
+              <motion.div
+                className="bg-card border border-border rounded-full px-5 py-2 text-sm"
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: 1 }}
+              >
+                <span className="text-foreground">Full-Stack</span>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
 
