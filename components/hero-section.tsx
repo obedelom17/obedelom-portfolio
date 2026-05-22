@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowDown, ExternalLink, Mail, Code2, Palette, Globe } from "lucide-react"
+import { ArrowDown, ExternalLink, Mail, Code2, Globe } from "lucide-react"
 
 function AnimatedCounter({ end, duration = 2 }: { end: number; duration?: number }) {
   const [count, setCount] = useState(0)
@@ -38,8 +38,7 @@ const stats = [
 
 const highlights = [
   { icon: Code2, label: "Full-Stack", color: "text-primary" },
-  { icon: Palette, label: "Designer", color: "text-secondary" },
-  { icon: Globe, label: "Lomé, Togo", color: "text-muted-foreground" },
+  { icon: Globe, label: "Lome, Togo", color: "text-muted-foreground" },
 ]
 
 export function HeroSection() {
@@ -72,7 +71,6 @@ export function HeroSection() {
               <span className="text-foreground">Bonjour, je suis</span>
               <br />
               <span className="text-primary text-glow-cyan">Obed</span>
-              <span className="ml-3">👋</span>
             </motion.h1>
 
             {/* Highlights */}

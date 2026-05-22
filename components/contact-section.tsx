@@ -171,7 +171,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Localisation</p>
-                  <p className="text-foreground font-medium">Lomé, Togo 📍</p>
+                  <p className="text-foreground font-medium">Lome, Togo</p>
                 </div>
               </div>
             </div>
