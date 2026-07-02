@@ -32,7 +32,7 @@ export function HeroSection() {
 
   const stats = [
     { value: 5, label: t.hero.stats.certifications },
-    { value: 5, label: t.hero.stats.projects },   // ✅ mis à jour : 5 projets
+    { value: 8, label: t.hero.stats.projects },   // ✅ mis à jour : 8 projets
     { value: 3, label: t.hero.stats.languages },
     { value: 1, label: t.hero.stats.passion },
   ]
