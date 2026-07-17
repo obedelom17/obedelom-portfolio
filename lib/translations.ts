@@ -102,13 +102,13 @@ export const translations = {
           features: ["Piège SSH/Telnet", "Journalisation Sessions", "Analyse Attaques", "Surveillance Réseau"],
         },
         {
-          title: "ObedFacture IA",
+          title: "ElomFacture IA",
           description:
-            "Application web de capture intelligente de factures avec OCR et IA. Traite photos ou PDFs, extrait automatiquement les données (montants, dates, fournisseurs), génère JSON structuré pour intégration comptable. Optimisé pour le contexte togolais.",
+            "Application web de capture intelligente de factures avec OCR et IA. Traite photos ou PDFs, extrait automatiquement les données (montants, dates, fournisseurs, numero de compte SYSCOHADA), génère JSON structuré pour intégration comptable. Optimisé pour le contexte togolais. Plan comptable SYSCOHADA révisé intégré",
           features: ["OCR IA Groq", "Upload Photos/PDFs", "Extraction Données", "Export JSON/CSV"],
         },
         {
-          title: "ObedPaie",
+          title: "ElomPaie",
           description:
             "SaaS complet de gestion de paie pour entreprises togolaises. Calcul automatique salaires, retenues SYSCOHADA, génération bulletins PDF, export comptable Sage. Authentification sécurisée, dashboard analytique multi-utilisateurs. Conforme CGI-OTR 2025.",
           features: ["Calcul Paie SYSCOHADA", "Bulletins PDF", "Export Sage", "Dashboard Analytics"],
@@ -281,13 +281,13 @@ export const translations = {
           features: ["SSH/Telnet Trap", "Session Logging", "Attack Analysis", "Network Monitoring"],
         },
         {
-          title: "ObedFacture IA",
+          title: "ElomFacture IA",
           description:
-            "AI-powered invoice capture app with OCR. Processes photos or PDFs, auto-extracts data (amounts, dates, suppliers), generates structured JSON for accounting integration. Optimized for the Togolese context.",
+            "AI-powered invoice capture app with OCR. Processes photos or PDFs, auto-extracts data (amounts, dates, suppliers, SYSCOHADA account number), generates structured JSON for accounting integration. Optimized for the Togolese context. Integrated Revised SYSCOHADA Chart of Accounts",
           features: ["Groq AI OCR", "Photo/PDF Upload", "Data Extraction", "JSON/CSV Export"],
         },
         {
-          title: "ObedPaie",
+          title: "ElomPaie",
           description:
             "Complete payroll management SaaS for Togolese businesses. Automatic salary calculation, SYSCOHADA deductions, PDF payslip generation, Sage accounting export. Secure auth, multi-user analytics dashboard. CGI-OTR 2025 compliant.",
           features: ["SYSCOHADA Payroll", "PDF Payslips", "Sage Export", "Analytics Dashboard"],
