@@ -58,14 +58,14 @@ const projectsData = [
     statusColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     statusKey: "Production" as const,
     images: ["/images/1783025811861_image.png"],
-    links: { demo: "https://obedfactureia.vercel.app", github: "https://github.com/obedelom17/obedfacture.git" },
+    links: { demo: "https://elomfactureia.vercel.app", github: "https://github.com/obedelom17/elomfacture.git" },
   },
   {
     stack: ["React", "TypeScript", "Supabase", "Vercel"],
     statusColor: "bg-green-500/20 text-green-400 border-green-500/30",
     statusKey: "Production" as const,
     images: ["/images/1783025828459_image.png"],
-    links: { demo: "https://obedpaie.vercel.app", github: "https://github.com/obedelom17/obedpaie.git" },
+    links: { demo: "https://elompaie.vercel.app", github: "https://github.com/obedelom17/elompaie.git" },
   },
   {
     stack: ["Next.js", "React", "Tailwind CSS", "Vercel"],
