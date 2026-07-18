@@ -58,7 +58,7 @@ const projectsData = [
     statusColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     statusKey: "Production" as const,
     images: ["/images/1783025811861_image.png"],
-    links: { demo: "https://elomfactureia.vercel.app", github: "https://github.com/obedelom17/elomfacture.git" },
+    links: { demo: "https://elomfacture.vercel.app", github: "https://github.com/obedelom17/elomfacture.git" },
   },
   {
     stack: ["React", "TypeScript", "Supabase", "Vercel"],
