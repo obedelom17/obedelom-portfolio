@@ -17,28 +17,27 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 - Présentation, projets, compétences, parcours, certifications et formulaire de contact
 - Bascule français / anglais, mémorisée dans le navigateur
 - Visionneuse d'images pour les captures de projets et les certificats
-- Espace d'administration protégé (`/admin`) : ajout, modification, suppression et réordonnancement des projets, certifications et étapes du parcours, avec téléversement d'images
+- Espace d'administration protégé par mot de passe (`/admin`) : gestion des projets, certifications et étapes du parcours, avec téléversement d'images
 - Contenu bilingue saisi directement dans l'administration
-- Mise à jour du site en quelques secondes après chaque modification
-- Données de secours intégrées : le site reste fonctionnel si Supabase n'est pas configuré
+- Publication automatique : chaque modification crée un commit et Vercel redéploie le site
 
 ### Technologies
 
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS 4
-- Supabase (base PostgreSQL, authentification, stockage d'images)
 - EmailJS (formulaire de contact)
 - Déploiement sur Vercel
+- Contenu stocké dans des fichiers JSON du dépôt, modifiés par l'administration via l'API GitHub (aucun service externe de base de données)
 
 ### Structure
 
 ```
-app/                 Pages, layout, route /admin et API de revalidation
+app/                 Pages, layout, route /admin et API d'administration
 components/site/     Sections du site public
 components/admin/    Interface d'administration
-lib/                 Types, données de départ, traductions, accès Supabase
-public/              Images, CV
-supabase/schema.sql  Tables, règles de sécurité et stockage
+data/                Projets, certifications et parcours (JSON)
+lib/                 Types, traductions, accès GitHub, authentification
+public/              Images, logos des technologies, CV, images téléversées
 ```
 
 ### Installation locale
@@ -51,7 +50,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Le site s'ouvre sur http://localhost:3000. Sans variables Supabase, il affiche les données de départ.
+Le site s'ouvre sur http://localhost:3000.
 
 ### Variables d'environnement
 
@@ -60,23 +59,29 @@ Le site s'ouvre sur http://localhost:3000. Sans variables Supabase, il affiche l
 | `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | Identifiant du service EmailJS |
 | `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` | Identifiant du modèle EmailJS |
 | `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | Clé publique EmailJS |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé anonyme (anon public) Supabase |
-| `NEXT_PUBLIC_ADMIN_EMAIL` | Email du seul compte autorisé à administrer |
+| `ADMIN_PASSWORD` | Mot de passe de l'administration |
+| `SESSION_SECRET` | Chaîne aléatoire longue qui signe la session (facultatif, sinon dérivée du mot de passe) |
+| `GITHUB_TOKEN` | Jeton GitHub autorisé à écrire dans le dépôt |
+| `GITHUB_REPO` | Dépôt au format `utilisateur/nom` |
+| `GITHUB_BRANCH` | Branche déployée par Vercel (par défaut `main`) |
+
+### Fonctionnement de l'administration
+
+La page `/admin` permet d'ajouter, modifier, supprimer et réordonner les projets, les certifications et les étapes du parcours, avec téléversement d'images. Chaque enregistrement crée un commit dans le dépôt GitHub (fichiers `data/*.json` et `public/uploads/`). Vercel détecte le commit et redéploie le site : les changements apparaissent en 1 à 2 minutes.
 
 ### Activer l'administration
 
-1. Créer un projet sur https://supabase.com.
-2. Ouvrir SQL Editor, coller le contenu de `supabase/schema.sql` et l'exécuter. Si votre email administrateur n'est pas `agbebaviobedelom@gmail.com`, le remplacer dans le fichier avant l'exécution.
-3. Dans Authentication > Users, créer un utilisateur avec cet email et un mot de passe. Désactiver les inscriptions publiques dans Authentication > Sign In / Providers.
-4. Dans Project Settings > API, copier l'URL et la clé `anon public`.
-5. Ajouter les trois variables Supabase dans Vercel (Settings > Environment Variables), puis redéployer.
-6. Ouvrir `/admin`, se connecter, puis cliquer sur « Importer les données de départ » dans chaque onglet pour charger les contenus actuels.
+1. Sur GitHub : Settings > Developer settings > Personal access tokens > Fine-grained tokens > Generate new token.
+2. Limiter le jeton au seul dépôt `obedelom-portfolio`, avec la permission Repository permissions > Contents : Read and write. Copier le jeton.
+3. Dans Vercel : Settings > Environment Variables, ajouter `ADMIN_PASSWORD` (mot de passe long), `SESSION_SECRET` (chaîne aléatoire), `GITHUB_TOKEN`, `GITHUB_REPO` (`obedelom17/obedelom-portfolio`) et `GITHUB_BRANCH` (`main`).
+4. Redéployer le projet.
+5. Ouvrir `/admin` et se connecter avec `ADMIN_PASSWORD`.
 
 ### Sécurité
 
-- Lecture publique, écriture réservée à l'email administrateur : appliqué côté base de données par des règles RLS, pas seulement dans l'interface.
-- La clé `anon` est publique par conception ; seules les règles RLS protègent les données.
+- Le mot de passe et le jeton GitHub restent côté serveur ; ils ne sont jamais envoyés au navigateur.
+- La session est un cookie HttpOnly, SameSite strict, signé et valable 12 heures.
+- Toutes les routes d'écriture vérifient la session. Le jeton GitHub ne doit avoir accès qu'à ce dépôt.
 - La page `/admin` n'est pas indexée par les moteurs de recherche.
 
 ### Scripts
@@ -109,28 +114,27 @@ Live site: https://obedelom-portfolio.vercel.app
 - Introduction, education, projects, skills, journey, certifications and contact form
 - French / English switch, remembered in the browser
 - Image viewer for project screenshots and certificates
-- Protected admin area (`/admin`): add, edit, delete and reorder projects, certifications and journey entries, with image upload
+- Password-protected admin area (`/admin`): manage projects, certifications and journey entries, with image upload
 - Bilingual content entered directly in the admin
-- Site updates within seconds after each change
-- Built-in fallback data: the site keeps working if Supabase is not configured
+- Automatic publishing: each change creates a commit and Vercel redeploys the site
 
 ### Tech stack
 
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS 4
-- Supabase (PostgreSQL database, authentication, image storage)
 - EmailJS (contact form)
 - Deployed on Vercel
+- Content stored in JSON files in the repository, edited by the admin through the GitHub API (no external database service)
 
 ### Structure
 
 ```
-app/                 Pages, layout, /admin route and revalidation API
+app/                 Pages, layout, /admin route and admin API
 components/site/     Public site sections
 components/admin/    Admin interface
-lib/                 Types, seed data, translations, Supabase access
-public/              Images, resume
-supabase/schema.sql  Tables, security rules and storage
+data/                Projects, certifications and journey (JSON)
+lib/                 Types, translations, GitHub access, authentication
+public/              Images, technology logos, resume, uploaded images
 ```
 
 ### Local setup
@@ -143,7 +147,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The site opens at http://localhost:3000. Without Supabase variables, it shows the seed data.
+The site opens at http://localhost:3000.
 
 ### Environment variables
 
@@ -152,23 +156,29 @@ The site opens at http://localhost:3000. Without Supabase variables, it shows th
 | `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | EmailJS service ID |
 | `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` | EmailJS template ID |
 | `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | EmailJS public key |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon public key |
-| `NEXT_PUBLIC_ADMIN_EMAIL` | Email of the only account allowed to administer |
+| `ADMIN_PASSWORD` | Admin area password |
+| `SESSION_SECRET` | Long random string that signs the session (optional, derived from the password otherwise) |
+| `GITHUB_TOKEN` | GitHub token allowed to write to the repository |
+| `GITHUB_REPO` | Repository as `user/name` |
+| `GITHUB_BRANCH` | Branch deployed by Vercel (default `main`) |
+
+### How the admin works
+
+The `/admin` page lets you add, edit, delete and reorder projects, certifications and journey entries, with image upload. Each save creates a commit in the GitHub repository (`data/*.json` files and `public/uploads/`). Vercel detects the commit and redeploys the site: changes appear within 1 to 2 minutes.
 
 ### Enabling the admin area
 
-1. Create a project at https://supabase.com.
-2. Open SQL Editor, paste the contents of `supabase/schema.sql` and run it. If your admin email is not `agbebaviobedelom@gmail.com`, replace it in the file first.
-3. In Authentication > Users, create a user with that email and a password. Disable public sign-ups in Authentication > Sign In / Providers.
-4. In Project Settings > API, copy the URL and the `anon public` key.
-5. Add the three Supabase variables in Vercel (Settings > Environment Variables), then redeploy.
-6. Open `/admin`, sign in, then click "Importer les données de départ" in each tab to load the current content.
+1. On GitHub: Settings > Developer settings > Personal access tokens > Fine-grained tokens > Generate new token.
+2. Restrict the token to the `obedelom-portfolio` repository only, with Repository permissions > Contents: Read and write. Copy the token.
+3. In Vercel: Settings > Environment Variables, add `ADMIN_PASSWORD` (a long password), `SESSION_SECRET` (a random string), `GITHUB_TOKEN`, `GITHUB_REPO` (`obedelom17/obedelom-portfolio`) and `GITHUB_BRANCH` (`main`).
+4. Redeploy the project.
+5. Open `/admin` and sign in with `ADMIN_PASSWORD`.
 
 ### Security
 
-- Public read, writes restricted to the admin email: enforced at the database level with RLS policies, not only in the interface.
-- The `anon` key is public by design; only the RLS policies protect the data.
+- The password and the GitHub token stay on the server and are never sent to the browser.
+- The session is an HttpOnly, SameSite strict, signed cookie valid for 12 hours.
+- All write routes check the session. The GitHub token should only have access to this repository.
 - The `/admin` page is excluded from search engine indexing.
 
 ### Scripts

@@ -4,9 +4,7 @@ import { useState, type ReactNode } from "react"
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react"
 import { Button, Field, ImageField, TextArea, TextInput } from "./ui"
 import { PROJECT_STATUSES, type Certification, type JourneyItem, type Project, type ProjectStatus } from "@/lib/types"
-import { useTable } from "./use-table"
-import { sortCertifications, sortJourney, sortProjects } from "@/lib/sort"
-import { seedCertifications, seedJourney, seedProjects } from "@/lib/seed"
+import type { Collection } from "./use-collection"
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   production: "En production",
@@ -24,14 +22,16 @@ function Shell({
   count,
   onAdd,
   error,
-  loading,
+  saving,
+  published,
   children,
 }: {
   title: string
   count: number
   onAdd: () => void
   error: string | null
-  loading: boolean
+  saving: boolean
+  published: boolean
   children: ReactNode
 }) {
   return (
@@ -48,7 +48,12 @@ function Shell({
         </Button>
       </div>
       {error && <p className="mt-4 border-l-2 border-red-700 pl-3 text-sm text-red-700">{error}</p>}
-      {loading && <p className="mt-6 text-sm text-muted">Chargement…</p>}
+      {saving && <p className="mt-6 text-sm text-muted">Enregistrement dans GitHub…</p>}
+      {!saving && published && !error && (
+        <p className="mt-6 border-l-2 border-accent pl-3 text-sm">
+          Enregistré. Le site se met à jour dans 1 à 2 minutes, après le redéploiement de Vercel.
+        </p>
+      )}
       <div className="mt-6">{children}</div>
     </div>
   )
@@ -130,29 +135,6 @@ function Editor({
   )
 }
 
-function SeedBanner({ onImport }: { onImport: () => void }) {
-  const [busy, setBusy] = useState(false)
-  return (
-    <div className="mb-10 border border-accent p-5">
-      <p className="font-medium">Base vide</p>
-      <p className="mt-1 text-sm text-muted">
-        Importez vos projets, certifications et étapes de parcours actuels pour les modifier ensuite depuis cette interface.
-      </p>
-      <Button
-        className="mt-4"
-        disabled={busy}
-        onClick={async () => {
-          setBusy(true)
-          await onImport()
-          setBusy(false)
-        }}
-      >
-        {busy ? "Import en cours…" : "Importer les données de départ"}
-      </Button>
-    </div>
-  )
-}
-
 /* ---------- Projets ---------- */
 
 type ProjectDraft = {
@@ -182,8 +164,7 @@ const emptyProject: ProjectDraft = {
   code_url: "",
 }
 
-export function ProjectsPanel({ token }: { token: string | undefined }) {
-  const t = useTable<Project>("projects", sortProjects, token)
+export function ProjectsPanel({ col: t }: { col: Collection<Project> }) {
   const [draft, setDraft] = useState<ProjectDraft | null>(null)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -288,10 +269,7 @@ export function ProjectsPanel({ token }: { token: string | undefined }) {
   }
 
   return (
-    <Shell title="Projets" count={t.rows.length} onAdd={() => setDraft({ ...emptyProject })} error={t.error} loading={t.loading}>
-      {!t.loading && t.rows.length === 0 && (
-        <SeedBanner onImport={() => t.importRows(seedProjects)} />
-      )}
+    <Shell title="Projets" count={t.rows.length} onAdd={() => setDraft({ ...emptyProject })} error={t.error} saving={t.saving} published={t.published}>
       <ul>
         {t.rows.map((p, i) => (
           <Row
@@ -313,8 +291,7 @@ export function ProjectsPanel({ token }: { token: string | undefined }) {
 
 type CertDraft = { id?: string; title_fr: string; title_en: string; year: string; images: string[] }
 
-export function CertificationsPanel({ token }: { token: string | undefined }) {
-  const t = useTable<Certification>("certifications", sortCertifications, token)
+export function CertificationsPanel({ col: t }: { col: Collection<Certification> }) {
   const [draft, setDraft] = useState<CertDraft | null>(null)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -372,9 +349,9 @@ export function CertificationsPanel({ token }: { token: string | undefined }) {
       count={t.rows.length}
       onAdd={() => setDraft({ title_fr: "", title_en: "", year: String(new Date().getFullYear()), images: [] })}
       error={t.error}
-      loading={t.loading}
+      saving={t.saving}
+      published={t.published}
     >
-      {!t.loading && t.rows.length === 0 && <SeedBanner onImport={() => t.importRows(seedCertifications)} />}
       <ul>
         {t.rows.map((c, i) => (
           <Row
@@ -411,8 +388,7 @@ type JourneyDraft = {
   description_en: string
 }
 
-export function JourneyPanel({ token }: { token: string | undefined }) {
-  const t = useTable<JourneyItem>("journey", sortJourney, token)
+export function JourneyPanel({ col: t }: { col: Collection<JourneyItem> }) {
   const [draft, setDraft] = useState<JourneyDraft | null>(null)
   const [saving, setSaving] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -485,9 +461,9 @@ export function JourneyPanel({ token }: { token: string | undefined }) {
         })
       }
       error={t.error}
-      loading={t.loading}
+      saving={t.saving}
+      published={t.published}
     >
-      {!t.loading && t.rows.length === 0 && <SeedBanner onImport={() => t.importRows(seedJourney)} />}
       <p className="mb-4 text-xs text-muted">
         Le site affiche les étapes de la plus récente à la plus ancienne. Les flèches réordonnent les étapes d'une même année.
       </p>

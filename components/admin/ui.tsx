@@ -2,8 +2,19 @@
 
 import { useRef, useState, type ReactNode } from "react"
 import { ImagePlus, Loader2, X } from "lucide-react"
-import { getBrowserSupabase, STORAGE_BUCKET } from "@/lib/supabase"
 import { compressToWebp, slugify } from "@/lib/image"
+
+// Aperçus locaux des images téléversées, disponibles avant le redéploiement du site.
+const previews = new Map<string, string>()
+
+function toBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(new Error("Lecture du fichier impossible"))
+    reader.readAsDataURL(blob)
+  })
+}
 
 export function Field({
   label,
@@ -70,20 +81,22 @@ export function ImageField({
 
   const upload = async (files: FileList | null) => {
     if (!files || files.length === 0) return
-    const supabase = getBrowserSupabase()
-    if (!supabase) return
     setBusy(true)
     setError(null)
     try {
       const added: string[] = []
       for (const file of Array.from(files)) {
         const blob = await compressToWebp(file)
-        const path = `${folder}/${Date.now()}-${slugify(file.name)}.webp`
-        const { error: upErr } = await supabase.storage
-          .from(STORAGE_BUCKET)
-          .upload(path, blob, { contentType: "image/webp", upsert: false })
-        if (upErr) throw upErr
-        added.push(supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl)
+        const dataUrl = await toBase64(blob)
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folder, name: slugify(file.name), data: dataUrl.split(",")[1] }),
+        })
+        const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string }
+        if (!res.ok || !json.url) throw new Error(json.error ?? `Erreur ${res.status}`)
+        previews.set(json.url, dataUrl)
+        added.push(json.url)
       }
       onChange(multiple ? [...images, ...added] : added.slice(0, 1))
     } catch (e) {
@@ -109,7 +122,7 @@ export function ImageField({
           {images.map((src, i) => (
             <li key={src + i} className="relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="h-20 w-28 border border-line object-cover object-top" />
+              <img src={previews.get(src) ?? src} alt="" className="h-20 w-28 border border-line object-cover object-top" />
               <button
                 type="button"
                 onClick={() => onChange(images.filter((_, j) => j !== i))}

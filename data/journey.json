@@ -1,0 +1,83 @@
+[
+  {
+    "id": "journey-1",
+    "year": "2024",
+    "title_fr": "BAC D",
+    "title_en": "High School Diploma (BAC D)",
+    "description_fr": "MathFinEco International School",
+    "description_en": "MathFinEco International School",
+    "sort_order": 1
+  },
+  {
+    "id": "journey-2",
+    "year": "2024",
+    "title_fr": "Entrée à l'IAI-Togo",
+    "title_en": "Joined IAI-Togo",
+    "description_fr": "Génie Logiciel",
+    "description_en": "Software Engineering",
+    "sort_order": 2
+  },
+  {
+    "id": "journey-3",
+    "year": "2024",
+    "title_fr": "Cisco CCNA 1",
+    "title_en": "Cisco CCNA 1",
+    "description_fr": "Introduction to Networks",
+    "description_en": "Introduction to Networks",
+    "sort_order": 3
+  },
+  {
+    "id": "journey-4",
+    "year": "2025",
+    "title_fr": "Cisco CCNA 2",
+    "title_en": "Cisco CCNA 2",
+    "description_fr": "Switching, Routing & Wireless Essentials",
+    "description_en": "Switching, Routing & Wireless Essentials",
+    "sort_order": 4
+  },
+  {
+    "id": "journey-5",
+    "year": "2025",
+    "title_fr": "RestauManager",
+    "title_en": "RestauManager",
+    "description_fr": "Projet académique Java",
+    "description_en": "Academic Java project",
+    "sort_order": 5
+  },
+  {
+    "id": "journey-6",
+    "year": "2025",
+    "title_fr": "Lancement d'ObiStyle",
+    "title_en": "ObiStyle launch",
+    "description_fr": "E-commerce Next.js",
+    "description_en": "Next.js e-commerce",
+    "sort_order": 6
+  },
+  {
+    "id": "journey-7",
+    "year": "2025",
+    "title_fr": "Gestion Patrimoine",
+    "title_en": "Gestion Patrimoine",
+    "description_fr": "Plateforme web Django et Leaflet",
+    "description_en": "Django and Leaflet web platform",
+    "sort_order": 7
+  },
+  {
+    "id": "journey-8",
+    "year": "2025",
+    "title_fr": "HoneyPot Cowrie",
+    "title_en": "HoneyPot Cowrie",
+    "description_fr": "Projet de cybersécurité sous Linux",
+    "description_en": "Linux cybersecurity project",
+    "sort_order": 8
+  },
+  {
+    "id": "journey-9",
+    "year": "2026",
+    "title_fr": "Troisième année à l'IAI-Togo",
+    "title_en": "Third year at IAI-Togo",
+    "description_fr": "En cours",
+    "description_en": "Ongoing",
+    "sort_order": 9
+  }
+]

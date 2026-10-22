@@ -1,0 +1,248 @@
+[
+  {
+    "id": "project-1",
+    "title": "Gestion Patrimoine",
+    "description_fr": "Plateforme web sécurisée pour inventorier, localiser et gérer les actifs d'entreprise (terrains, bâtiments) avec coordonnées GPS. Cartographie interactive, navigation, import GPX et export PDF.",
+    "description_en": "Secure web platform to inventory, locate and manage company assets (land, buildings) with GPS coordinates. Interactive mapping, navigation, GPX import and PDF export.",
+    "features_fr": [
+      "Carte interactive",
+      "Navigation GPS",
+      "Import GPX",
+      "Export PDF"
+    ],
+    "features_en": [
+      "Interactive map",
+      "GPS navigation",
+      "GPX import",
+      "PDF export"
+    ],
+    "stack": [
+      "Next.js",
+      "Django",
+      "Leaflet",
+      "PostgreSQL"
+    ],
+    "status": "completed",
+    "images": [
+      "/images/gestion-patrimoine-hero.webp",
+      "/images/gestion-patrimoine-map.webp",
+      "/images/gestion-patrimoine-add.webp",
+      "/images/gestion-patrimoine-pdf.webp"
+    ],
+    "demo_url": "https://gestion-patrimoine-b3hj.onrender.com/",
+    "code_url": "https://github.com/obedelom17/Gestion-Patrimoine",
+    "sort_order": 1
+  },
+  {
+    "id": "project-2",
+    "title": "ObiStyle",
+    "description_fr": "Boutique en ligne de vêtements et pagnes africains. Interface moderne avec panneau d'administration, authentification, panier et livraison internationale. Conçue mobile-first.",
+    "description_en": "Online store for African clothing and pagne fabrics. Modern interface with admin panel, authentication, cart and international delivery. Built mobile-first.",
+    "features_fr": [
+      "Panneau d'administration",
+      "Authentification",
+      "Panier et livraison"
+    ],
+    "features_en": [
+      "Admin panel",
+      "Authentication",
+      "Cart and delivery"
+    ],
+    "stack": [
+      "Next.js",
+      "Supabase",
+      "Vercel"
+    ],
+    "status": "in_progress",
+    "images": [
+      "/images/obistyle-hero.webp",
+      "/images/obistyle-admin.webp"
+    ],
+    "demo_url": "https://obistyle.vercel.app/",
+    "code_url": "https://github.com/obedelom17/obistyle",
+    "sort_order": 2
+  },
+  {
+    "id": "project-3",
+    "title": "RestauManager",
+    "description_fr": "Application de bureau pour la gestion d'un restaurant. Tableau de bord avec indicateurs (produits, stock faible, revenus), gestion des catégories, des stocks et des commandes, statistiques par période.",
+    "description_en": "Desktop application for restaurant management. Dashboard with indicators (products, low stock, revenue), category, stock and order management, statistics by period.",
+    "features_fr": [
+      "Tableau de bord",
+      "Gestion des stocks",
+      "Alertes de stock faible",
+      "Statistiques"
+    ],
+    "features_en": [
+      "Dashboard",
+      "Stock management",
+      "Low stock alerts",
+      "Statistics"
+    ],
+    "stack": [
+      "Java Swing",
+      "Architecture MVC"
+    ],
+    "status": "academic",
+    "images": [
+      "/images/restau-dashboard.webp",
+      "/images/restau-stats.webp"
+    ],
+    "demo_url": null,
+    "code_url": "https://github.com/obedelom17/TPPOOJAVA",
+    "sort_order": 3
+  },
+  {
+    "id": "project-4",
+    "title": "ObedGPT",
+    "description_fr": "Application web d'IA multimodale. Chat, vision, audio, exécution de code et synthèse vocale via l'API Groq. Rendu Markdown et KaTeX, proxy sécurisé sur Vercel.",
+    "description_en": "Multimodal AI web application. Chat, vision, audio, code execution and text-to-speech through the Groq API. Markdown and KaTeX rendering, secure proxy on Vercel.",
+    "features_fr": [
+      "Chat IA",
+      "Vision et audio",
+      "Exécution de code",
+      "Synthèse vocale"
+    ],
+    "features_en": [
+      "AI chat",
+      "Vision and audio",
+      "Code execution",
+      "Text-to-speech"
+    ],
+    "stack": [
+      "React",
+      "Groq API",
+      "Vite",
+      "Vercel"
+    ],
+    "status": "in_progress",
+    "images": [
+      "/images/obedgpt-hero.webp"
+    ],
+    "demo_url": "https://obedgpt.vercel.app/",
+    "code_url": "https://github.com/obedelom17/obedgpt",
+    "sort_order": 4
+  },
+  {
+    "id": "project-5",
+    "title": "HoneyPot Cowrie",
+    "description_fr": "Déploiement d'un honeypot SSH/Telnet avec Cowrie sous Linux pour capturer et analyser les tentatives d'intrusion. Journalisation des sessions, analyse du comportement des attaquants et surveillance réseau.",
+    "description_en": "Deployment of an SSH/Telnet honeypot with Cowrie on Linux to capture and analyze intrusion attempts. Session logging, attacker behavior analysis and network monitoring.",
+    "features_fr": [
+      "Piège SSH/Telnet",
+      "Journalisation des sessions",
+      "Analyse des attaques",
+      "Surveillance réseau"
+    ],
+    "features_en": [
+      "SSH/Telnet trap",
+      "Session logging",
+      "Attack analysis",
+      "Network monitoring"
+    ],
+    "stack": [
+      "Cowrie",
+      "Linux",
+      "Python",
+      "Kali Linux"
+    ],
+    "status": "security",
+    "images": [
+      "/images/honeypot-hero.webp"
+    ],
+    "demo_url": null,
+    "code_url": null,
+    "sort_order": 5
+  },
+  {
+    "id": "project-6",
+    "title": "ElomFacture IA",
+    "description_fr": "Capture intelligente de factures par OCR et IA. Traite des photos ou des PDF, extrait montants, dates, fournisseurs et numéros de compte SYSCOHADA, et produit un JSON structuré pour la comptabilité. Plan comptable SYSCOHADA révisé intégré.",
+    "description_en": "Intelligent invoice capture with OCR and AI. Processes photos or PDFs, extracts amounts, dates, suppliers and SYSCOHADA account numbers, and outputs structured JSON for accounting. Revised SYSCOHADA chart of accounts built in.",
+    "features_fr": [
+      "OCR par IA",
+      "Photos et PDF",
+      "Extraction de données",
+      "Export JSON et CSV"
+    ],
+    "features_en": [
+      "AI OCR",
+      "Photos and PDFs",
+      "Data extraction",
+      "JSON and CSV export"
+    ],
+    "stack": [
+      "React",
+      "TypeScript",
+      "Groq API",
+      "Vercel"
+    ],
+    "status": "production",
+    "images": [
+      "/images/elomfacture-hero.webp"
+    ],
+    "demo_url": "https://elomfacture.vercel.app",
+    "code_url": "https://github.com/obedelom17/elomfacture",
+    "sort_order": 6
+  },
+  {
+    "id": "project-7",
+    "title": "ElomPaie",
+    "description_fr": "Application de gestion de paie pour entreprises togolaises. Calcul des salaires et retenues SYSCOHADA, bulletins PDF, export comptable Sage, authentification sécurisée et tableau de bord multi-utilisateurs. Conforme au CGI-OTR 2025.",
+    "description_en": "Payroll management application for Togolese businesses. Salary and SYSCOHADA deduction calculation, PDF payslips, Sage accounting export, secure authentication and multi-user dashboard. Compliant with CGI-OTR 2025.",
+    "features_fr": [
+      "Calcul de paie SYSCOHADA",
+      "Bulletins PDF",
+      "Export Sage",
+      "Tableau de bord"
+    ],
+    "features_en": [
+      "SYSCOHADA payroll",
+      "PDF payslips",
+      "Sage export",
+      "Dashboard"
+    ],
+    "stack": [
+      "React",
+      "TypeScript",
+      "Supabase",
+      "Vercel"
+    ],
+    "status": "production",
+    "images": [
+      "/images/elompaie-hero.webp"
+    ],
+    "demo_url": "https://elompaie.vercel.app",
+    "code_url": "https://github.com/obedelom17/elompaie",
+    "sort_order": 7
+  },
+  {
+    "id": "project-8",
+    "title": "Les Délices de Norbert",
+    "description_fr": "Site de commande en ligne pour un restaurant togolais de Lomé. Menu interactif, panier, paiement PayGateGlobal. Design qui valorise la cuisine traditionnelle, responsive mobile-first.",
+    "description_en": "Online ordering website for a local restaurant in Lomé. Interactive menu, cart, PayGateGlobal payment. Design that showcases traditional Togolese cuisine, responsive mobile-first.",
+    "features_fr": [
+      "Menu interactif",
+      "Panier et commandes",
+      "Paiement PayGateGlobal"
+    ],
+    "features_en": [
+      "Interactive menu",
+      "Cart and orders",
+      "PayGateGlobal payment"
+    ],
+    "stack": [
+      "Next.js",
+      "React",
+      "Tailwind CSS",
+      "Vercel"
+    ],
+    "status": "production",
+    "images": [
+      "/images/delices-norbert-hero.webp"
+    ],
+    "demo_url": "https://lesdelicesdenorbert.vercel.app",
+    "code_url": "https://github.com/obedelom17/lesdelicesdenorbert",
+    "sort_order": 8
+  }
+]

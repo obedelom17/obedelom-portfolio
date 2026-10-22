@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cert-1",
+    "title_fr": "Cisco CCNA 1 – Introduction to Networks",
+    "title_en": "Cisco CCNA 1 – Introduction to Networks",
+    "year": "2024",
+    "image_url": "/images/certifications/ccna-presentation-reseaux.webp",
+    "sort_order": 1
+  },
+  {
+    "id": "cert-2",
+    "title_fr": "Cisco CCNA 2 – Switching, Routing & Wireless Essentials",
+    "title_en": "Cisco CCNA 2 – Switching, Routing & Wireless Essentials",
+    "year": "2025",
+    "image_url": "/images/certifications/ccna-switching-routing.webp",
+    "sort_order": 2
+  },
+  {
+    "id": "cert-3",
+    "title_fr": "English Language Certificate – Youth Level 1",
+    "title_en": "English Language Certificate – Youth Level 1",
+    "year": "2024",
+    "image_url": "/images/certifications/english-language-center.webp",
+    "sort_order": 3
+  },
+  {
+    "id": "cert-4",
+    "title_fr": "Utilisation d'ordinateurs et équipements mobiles",
+    "title_en": "Computer and Mobile Device Usage",
+    "year": "2024",
+    "image_url": "/images/certifications/utilisation-ordinateurs.webp",
+    "sort_order": 4
+  },
+  {
+    "id": "cert-5",
+    "title_fr": "Sensibilisation au numérique",
+    "title_en": "Digital Awareness",
+    "year": "2024",
+    "image_url": "/images/certifications/sensibilisation-numerique.webp",
+    "sort_order": 5
+  }
+]
