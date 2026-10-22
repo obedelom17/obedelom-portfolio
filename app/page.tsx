@@ -1,29 +1,39 @@
-import { Navbar } from "@/components/navbar"
-import { HeroSection } from "@/components/hero-section"
-import { AboutSection } from "@/components/about-section"
-import { SkillsSection } from "@/components/skills-section"
-import { ProjectsSection } from "@/components/projects-section"
-import { DesignSection } from "@/components/design-section"
-import { TimelineSection } from "@/components/timeline-section"
-import { CertificationsSection } from "@/components/certifications-section"
-import { ContactSection } from "@/components/contact-section"
-import { Footer } from "@/components/footer"
-import { ScrollToTop } from "@/components/scroll-to-top"
+import { getPortfolioData } from "@/lib/data"
+import { Header } from "@/components/site/header"
+import { Hero } from "@/components/site/hero"
+import { About } from "@/components/site/about"
+import { Projects } from "@/components/site/projects"
+import { Skills } from "@/components/site/skills"
+import { Journey } from "@/components/site/journey"
+import { Certifications } from "@/components/site/certifications"
+import { Contact } from "@/components/site/contact"
+import { Footer } from "@/components/site/footer"
 
-export default function Home() {
+export const revalidate = 60
+
+export default async function Home() {
+  const data = await getPortfolioData()
+  const firstYear = data.journey.length
+    ? Math.min(...data.journey.map((j) => parseInt(j.year, 10)).filter((n) => !Number.isNaN(n)))
+    : 2024
+
   return (
-    <main className="min-h-screen bg-background">
-      <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <SkillsSection />
-      <ProjectsSection />
-      <DesignSection />
-      <TimelineSection />
-      <CertificationsSection />
-      <ContactSection />
+    <>
+      <Header />
+      <main>
+        <Hero
+          projectCount={data.projects.length}
+          certificationCount={data.certifications.length}
+          firstYear={Number.isFinite(firstYear) ? firstYear : 2024}
+        />
+        <About />
+        <Projects projects={data.projects} />
+        <Skills />
+        <Journey items={data.journey} />
+        <Certifications items={data.certifications} />
+        <Contact />
+      </main>
       <Footer />
-      <ScrollToTop />
-    </main>
+    </>
   )
 }
