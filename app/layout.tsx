@@ -7,14 +7,14 @@ const siteUrl = "https://obedelom-portfolio.vercel.app"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "AGBEBAVI Elom Obed | Développeur Full-Stack",
+  title: "AGBEBAVI Elom Obed | Ingénieur en informatique",
   description:
-    "Portfolio de AGBEBAVI Elom Obed, développeur full-stack à Lomé, Togo. Applications web de facturation, de paie et de commerce en ligne avec Next.js, React et Django.",
-  keywords: ["développeur full-stack", "Togo", "Lomé", "Next.js", "React", "Django", "SYSCOHADA", "portfolio"],
+    "Portfolio de AGBEBAVI Elom Obed, ingénieur en informatique à Lomé, Togo. Développement logiciel, applications web, bases de données, réseaux et sécurité.",
+  keywords: ["ingénieur en informatique", "développeur full-stack", "Togo", "Lomé", "Next.js", "React", "Django", "SYSCOHADA", "portfolio"],
   authors: [{ name: "AGBEBAVI Elom Obed" }],
   openGraph: {
-    title: "AGBEBAVI Elom Obed | Développeur Full-Stack",
-    description: "Développeur full-stack à Lomé, Togo. Applications web pour les entreprises togolaises.",
+    title: "AGBEBAVI Elom Obed | Ingénieur en informatique",
+    description: "Ingénieur en informatique à Lomé, Togo. Solutions logicielles de la conception au déploiement.",
     type: "website",
     locale: "fr_FR",
     url: siteUrl,

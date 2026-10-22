@@ -15,7 +15,7 @@ export function Certifications({ items }: { items: Certification[] }) {
   const images = withImage.map((c) => c.image_url as string)
 
   return (
-    <Section id="certifications" index="05" label={t.certifications.label} title={t.certifications.title}>
+    <Section id="certifications" index="06" label={t.certifications.label} title={t.certifications.title}>
       {items.length === 0 ? (
         <p className="text-muted">{t.certifications.empty}</p>
       ) : (

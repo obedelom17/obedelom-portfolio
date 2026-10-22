@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og"
 
-export const alt = "AGBEBAVI Elom Obed | Développeur Full-Stack"
+export const alt = "AGBEBAVI Elom Obed | Ingénieur en informatique"
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -26,7 +26,7 @@ export default function Image() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 112, lineHeight: 1, letterSpacing: -3, display: "flex" }}>AGBEBAVI Elom Obed</div>
           <div style={{ fontSize: 44, marginTop: 28, color: "#1a3c2e", fontStyle: "italic", display: "flex" }}>
-            Développeur full-stack
+            Ingénieur en informatique
           </div>
         </div>
         <div style={{ display: "flex", fontSize: 24, color: "#6b6b66", fontFamily: "monospace" }}>

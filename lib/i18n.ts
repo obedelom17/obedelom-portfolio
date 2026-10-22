@@ -5,6 +5,7 @@ export const dictionary = {
     nav: {
       projects: "Projets",
       skills: "Compétences",
+      education: "Formation",
       journey: "Parcours",
       certifications: "Certifications",
       contact: "Contact",
@@ -15,10 +16,10 @@ export const dictionary = {
       language: "Changer la langue",
     },
     hero: {
-      kicker: "Développeur full-stack · Lomé, Togo",
-      title: ["Des applications web", "utiles,", "conçues pour les entreprises togolaises."],
+      kicker: "Ingénieur en informatique · Lomé, Togo",
+      title: ["Ingénieur en informatique,", "je conçois", "des solutions numériques fiables."],
       intro:
-        "Étudiant en Génie Logiciel à l'IAI-Togo. Je développe des outils de facturation, de paie et de commerce en ligne, de la base de données à l'interface.",
+        "Formé en Génie Logiciel à l'IAI-Togo. Développement logiciel, bases de données, réseaux et sécurité : je prends en charge un projet de la conception au déploiement.",
       projects: "Voir les projets",
       contact: "Me contacter",
       photoCaption: "AGBEBAVI Elom Obed",
@@ -26,12 +27,43 @@ export const dictionary = {
     },
     about: {
       label: "À propos",
-      text: "Étudiant en deuxième année de Génie Logiciel à l'IAI-Togo, je construis des applications web et mobiles complètes. Mon travail porte sur la comptabilité, la paie, le commerce en ligne et les réseaux, avec une attention particulière au contexte togolais.",
+      text: "Étudiant en troisième année de Génie Logiciel à l'IAI-Togo, je construis des applications web et mobiles complètes. Mon travail porte sur la comptabilité, la paie, le commerce en ligne et les réseaux, avec une attention particulière au contexte togolais.",
       facts: [
         { title: "Développement", text: "Applications web et mobiles, du back-end à l'interface." },
         { title: "Contexte local", text: "SYSCOHADA, CGI-OTR 2025, paiement en ligne au Togo." },
         { title: "Réseaux et sécurité", text: "Cisco CCNA 1 et 2, honeypot Cowrie sous Linux." },
       ],
+    },
+    formation: {
+      label: "Formation",
+      title: "Institut Africain d'Informatique",
+      caption: "IAI-Togo, Lomé, immeuble CENETI",
+      logoAlt: "Logo de l'Institut Africain d'Informatique",
+      stats: [
+        { value: "1971", label: "année de création" },
+        { value: "11", label: "États membres" },
+        { value: "3 ans", label: "premier cycle" },
+      ],
+      intro:
+        "L'Institut Africain d'Informatique est une école inter-États créée en 1971 par onze pays africains, dont le Togo, pour former les cadres informatiques du continent. Son siège est à Libreville, au Gabon. Sa représentation togolaise, l'IAI-Togo, est installée à Lomé, avec des antennes au Cameroun et au Niger. L'entrée se fait sur concours.",
+      diplomasTitle: "Diplômes et cursus",
+      diplomas: [
+        {
+          title: "Licence Professionnelle en Informatique (LPI)",
+          text: "Premier cycle de trois ans qui forme au métier d'analyste programmeur.",
+        },
+        {
+          title: "Ingénieur des Travaux Informatiques (ITI)",
+          text: "Même cycle, avec les options Génie Logiciel et Systèmes d'information, ou Administration des Systèmes et Réseaux.",
+        },
+        {
+          title: "Ingénieur Concepteur en Informatique",
+          text: "Cycle ingénieur dispensé à l'IAI de Libreville, accessible selon les conditions fixées par la Direction Générale de l'IAI.",
+        },
+      ],
+      mineTitle: "Mon parcours à l'IAI-Togo",
+      mine: "Entré en 2024 en Génie Logiciel, je suis actuellement en troisième année. Le cursus couvre le développement logiciel, les bases de données, les systèmes et les réseaux : c'est ce socle qui me permet de mener un projet de la conception au déploiement.",
+      site: "Site de l'IAI-Togo",
     },
     projects: {
       label: "Projets",
@@ -89,6 +121,7 @@ export const dictionary = {
     nav: {
       projects: "Projects",
       skills: "Skills",
+      education: "Education",
       journey: "Journey",
       certifications: "Certifications",
       contact: "Contact",
@@ -99,10 +132,10 @@ export const dictionary = {
       language: "Switch language",
     },
     hero: {
-      kicker: "Full-stack developer · Lomé, Togo",
-      title: ["Useful web", "applications,", "built for Togolese businesses."],
+      kicker: "Computer engineer · Lomé, Togo",
+      title: ["Computer engineer,", "I build", "reliable digital solutions."],
       intro:
-        "Software Engineering student at IAI-Togo. I build invoicing, payroll and online ordering tools, from the database to the interface.",
+        "Trained in Software Engineering at IAI-Togo. Software development, databases, networking and security: I take a project from design to deployment.",
       projects: "View projects",
       contact: "Contact me",
       photoCaption: "AGBEBAVI Elom Obed",
@@ -110,12 +143,43 @@ export const dictionary = {
     },
     about: {
       label: "About",
-      text: "Second-year Software Engineering student at IAI-Togo, I build complete web and mobile applications. My work covers accounting, payroll, online commerce and networking, with a focus on the Togolese context.",
+      text: "Third-year Software Engineering student at IAI-Togo, I build complete web and mobile applications. My work covers accounting, payroll, online commerce and networking, with a focus on the Togolese context.",
       facts: [
         { title: "Development", text: "Web and mobile applications, from back end to interface." },
         { title: "Local context", text: "SYSCOHADA, CGI-OTR 2025, online payment in Togo." },
         { title: "Networking and security", text: "Cisco CCNA 1 and 2, Cowrie honeypot on Linux." },
       ],
+    },
+    formation: {
+      label: "Education",
+      title: "African Institute of Computer Science",
+      caption: "IAI-Togo, Lomé, CENETI building",
+      logoAlt: "African Institute of Computer Science logo",
+      stats: [
+        { value: "1971", label: "year founded" },
+        { value: "11", label: "member states" },
+        { value: "3 years", label: "first cycle" },
+      ],
+      intro:
+        "The African Institute of Computer Science (IAI) is an inter-state school founded in 1971 by eleven African countries, including Togo, to train the continent's computing professionals. Its headquarters are in Libreville, Gabon. Its Togolese branch, IAI-Togo, is based in Lomé, alongside branches in Cameroon and Niger. Admission is by competitive exam.",
+      diplomasTitle: "Degrees and curriculum",
+      diplomas: [
+        {
+          title: "Professional Bachelor in Computer Science (LPI)",
+          text: "Three-year first cycle that trains systems analyst programmers.",
+        },
+        {
+          title: "Computer Works Engineer (ITI)",
+          text: "Same cycle, with Software Engineering and Information Systems, or Systems and Network Administration tracks.",
+        },
+        {
+          title: "Computer Design Engineer",
+          text: "Engineering cycle taught at IAI in Libreville, open under conditions set by the IAI General Management.",
+        },
+      ],
+      mineTitle: "My path at IAI-Togo",
+      mine: "I joined in 2024 in Software Engineering and I am currently in my third year. The curriculum covers software development, databases, systems and networking: this foundation lets me carry a project from design to deployment.",
+      site: "IAI-Togo website",
     },
     projects: {
       label: "Projects",

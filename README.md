@@ -8,7 +8,7 @@
 
 ## Français
 
-Portfolio personnel de AGBEBAVI Elom Obed, développeur full-stack basé à Lomé, Togo. Le site est bilingue (français et anglais), adopte un design blanc, noir et vert, et inclut un espace d'administration pour gérer les projets, les certifications et le parcours sans toucher au code.
+Portfolio personnel de AGBEBAVI Elom Obed, ingénieur en informatique basé à Lomé, Togo. Le site est bilingue (français et anglais), adopte un design blanc, noir et vert, et inclut un espace d'administration pour gérer les projets, les certifications et le parcours sans toucher au code.
 
 Site en ligne : https://obedelom-portfolio.vercel.app
 
@@ -100,13 +100,13 @@ GitHub : https://github.com/obedelom17
 
 ## English
 
-Personal portfolio of AGBEBAVI Elom Obed, a full-stack developer based in Lomé, Togo. The site is bilingual (French and English), uses a white, black and green design, and includes an admin area to manage projects, certifications and journey entries without editing code.
+Personal portfolio of AGBEBAVI Elom Obed, a computer engineer based in Lomé, Togo. The site is bilingual (French and English), uses a white, black and green design, and includes an admin area to manage projects, certifications and journey entries without editing code.
 
 Live site: https://obedelom-portfolio.vercel.app
 
 ### Features
 
-- Introduction, projects, skills, journey, certifications and contact form
+- Introduction, education, projects, skills, journey, certifications and contact form
 - French / English switch, remembered in the browser
 - Image viewer for project screenshots and certificates
 - Protected admin area (`/admin`): add, edit, delete and reorder projects, certifications and journey entries, with image upload

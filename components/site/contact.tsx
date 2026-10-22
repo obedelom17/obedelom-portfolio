@@ -33,7 +33,7 @@ export function Contact() {
   }
 
   return (
-    <Section id="contact" index="06" label={t.contact.label}>
+    <Section id="contact" index="07" label={t.contact.label}>
       <Reveal>
         <h2 className="font-serif text-4xl leading-[1.02] md:text-6xl">{t.contact.title}</h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>

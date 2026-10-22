@@ -1,15 +1,70 @@
+export type Tech = { name: string; icon: string }
+
 export type Skill = {
   key: string
-  items: string
+  items: Tech[]
   level: 1 | 2 | 3 | 4 | 5
 }
 
 export const skills: Skill[] = [
-  { key: "web", items: "HTML, CSS, JavaScript, TypeScript", level: 3 },
-  { key: "backend", items: "Python, PHP, Java (POO)", level: 3 },
-  { key: "frameworks", items: "Next.js, React, Django", level: 3 },
-  { key: "mobile", items: "Flutter, C#", level: 1 },
-  { key: "databases", items: "PostgreSQL, MySQL, Supabase", level: 3 },
-  { key: "deployment", items: "Vercel, Git, GitHub", level: 3 },
-  { key: "networks", items: "Cisco CCNA 1 et 2", level: 3 },
+  {
+    key: "web",
+    level: 3,
+    items: [
+      { name: "HTML", icon: "html5" },
+      { name: "CSS", icon: "css" },
+      { name: "JavaScript", icon: "javascript" },
+      { name: "TypeScript", icon: "typescript" },
+    ],
+  },
+  {
+    key: "backend",
+    level: 3,
+    items: [
+      { name: "Python", icon: "python" },
+      { name: "PHP", icon: "php" },
+      { name: "Java", icon: "openjdk" },
+    ],
+  },
+  {
+    key: "frameworks",
+    level: 3,
+    items: [
+      { name: "Next.js", icon: "nextdotjs" },
+      { name: "React", icon: "react" },
+      { name: "Django", icon: "django" },
+      { name: "Tailwind CSS", icon: "tailwindcss" },
+    ],
+  },
+  {
+    key: "mobile",
+    level: 1,
+    items: [
+      { name: "Flutter", icon: "flutter" },
+      { name: "C#", icon: "dotnet" },
+    ],
+  },
+  {
+    key: "databases",
+    level: 3,
+    items: [
+      { name: "PostgreSQL", icon: "postgresql" },
+      { name: "MySQL", icon: "mysql" },
+      { name: "Supabase", icon: "supabase" },
+    ],
+  },
+  {
+    key: "deployment",
+    level: 3,
+    items: [
+      { name: "Vercel", icon: "vercel" },
+      { name: "Git", icon: "git" },
+      { name: "GitHub", icon: "github" },
+    ],
+  },
+  {
+    key: "networks",
+    level: 3,
+    items: [{ name: "Cisco CCNA 1 et 2", icon: "cisco" }],
+  },
 ]

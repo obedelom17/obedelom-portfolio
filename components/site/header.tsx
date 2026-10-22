@@ -17,6 +17,7 @@ export function Header() {
   }, [])
 
   const links = [
+    { href: "#formation", label: t.nav.education },
     { href: "#projets", label: t.nav.projects },
     { href: "#competences", label: t.nav.skills },
     { href: "#parcours", label: t.nav.journey },
@@ -31,7 +32,7 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="font-serif text-xl tracking-tight" onClick={() => setOpen(false)}>
+        <a href="#top" className="font-serif text-xl" onClick={() => setOpen(false)}>
           Obed Agbebavi
         </a>
 

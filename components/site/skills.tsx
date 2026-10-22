@@ -8,14 +8,22 @@ import { Section } from "./section"
 export function Skills() {
   const { t } = useApp()
   return (
-    <Section id="competences" index="03" label={t.skills.label} title={t.skills.title}>
+    <Section id="competences" index="04" label={t.skills.label} title={t.skills.title}>
       <ul>
         {skills.map((s) => (
           <li key={s.key}>
             <Reveal>
-              <div className="grid grid-cols-12 items-baseline gap-4 border-t border-line py-5 last:border-b">
+              <div className="grid grid-cols-12 items-center gap-4 border-t border-line py-5 last:border-b">
                 <p className="label col-span-12 sm:col-span-3">{t.skills.categories[s.key]}</p>
-                <p className="col-span-9 font-serif text-xl leading-snug sm:col-span-7 md:text-2xl">{s.items}</p>
+                <ul className="col-span-9 flex flex-wrap gap-2 sm:col-span-7">
+                  {s.items.map((it) => (
+                    <li key={it.name} className="flex items-center gap-2 border border-line px-3 py-2 text-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`/tech/${it.icon}.svg`} alt="" width={20} height={20} className="h-5 w-5" />
+                      {it.name}
+                    </li>
+                  ))}
+                </ul>
                 <div
                   className="col-span-3 flex justify-end gap-1 sm:col-span-2"
                   role="img"

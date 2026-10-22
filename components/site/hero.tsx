@@ -25,7 +25,7 @@ export function Hero({
       </p>
 
       <h1 className="mt-10 max-w-5xl font-serif text-[2.6rem] leading-[1.02] sm:text-7xl lg:text-[6.2rem]">
-        {l1} <em className="not-italic text-accent">{l2}</em> {l3}
+        {l1} {l2} <em className="not-italic text-accent">{l3}</em>
       </h1>
 
       <div className="mt-16 grid gap-10 md:grid-cols-12">

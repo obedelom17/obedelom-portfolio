@@ -177,7 +177,7 @@ export const seedJourney: Seed<JourneyItem>[] = [
   { year: "2025", title_fr: "Lancement d'ObiStyle", title_en: "ObiStyle launch", description_fr: "E-commerce Next.js", description_en: "Next.js e-commerce", sort_order: 6 },
   { year: "2025", title_fr: "Gestion Patrimoine", title_en: "Gestion Patrimoine", description_fr: "Plateforme web Django et Leaflet", description_en: "Django and Leaflet web platform", sort_order: 7 },
   { year: "2025", title_fr: "HoneyPot Cowrie", title_en: "HoneyPot Cowrie", description_fr: "Projet de cybersécurité sous Linux", description_en: "Linux cybersecurity project", sort_order: 8 },
-  { year: "2026", title_fr: "Deuxième année à l'IAI-Togo", title_en: "Second year at IAI-Togo", description_fr: "En cours", description_en: "Ongoing", sort_order: 9 },
+  { year: "2026", title_fr: "Troisième année à l'IAI-Togo", title_en: "Third year at IAI-Togo", description_fr: "En cours", description_en: "Ongoing", sort_order: 9 },
 ]
 
 function withIds<T extends { id: string }>(rows: Seed<T>[], prefix: string): T[] {

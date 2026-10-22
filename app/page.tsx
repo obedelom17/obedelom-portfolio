@@ -2,6 +2,7 @@ import { getPortfolioData } from "@/lib/data"
 import { Header } from "@/components/site/header"
 import { Hero } from "@/components/site/hero"
 import { About } from "@/components/site/about"
+import { Education } from "@/components/site/education"
 import { Projects } from "@/components/site/projects"
 import { Skills } from "@/components/site/skills"
 import { Journey } from "@/components/site/journey"
@@ -27,6 +28,7 @@ export default async function Home() {
           firstYear={Number.isFinite(firstYear) ? firstYear : 2024}
         />
         <About />
+        <Education />
         <Projects projects={data.projects} />
         <Skills />
         <Journey items={data.journey} />
