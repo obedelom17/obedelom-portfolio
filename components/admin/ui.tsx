@@ -37,9 +37,9 @@ export function Button({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "solid" | "outline" | "danger" }) {
   const styles = {
-    solid: "bg-fg text-bg hover:bg-accent hover:text-accent-fg",
+    solid: "bg-fg text-bg hover:bg-accent-hover hover:text-accent-fg",
     outline: "border border-fg hover:bg-fg hover:text-bg",
-    danger: "border border-accent text-accent hover:bg-accent hover:text-accent-fg",
+    danger: "border border-red-700 text-red-700 hover:bg-red-700 hover:text-white",
   }[variant]
   return (
     <button
@@ -153,7 +153,7 @@ export function ImageField({
           Ajouter
         </Button>
       </div>
-      {error && <p className="mt-2 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
     </div>
   )
 }

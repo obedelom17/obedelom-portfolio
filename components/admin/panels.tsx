@@ -47,7 +47,7 @@ function Shell({
           </span>
         </Button>
       </div>
-      {error && <p className="mt-4 border-l-2 border-accent pl-3 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-4 border-l-2 border-red-700 pl-3 text-sm text-red-700">{error}</p>}
       {loading && <p className="mt-6 text-sm text-muted">Chargement…</p>}
       <div className="mt-6">{children}</div>
     </div>
@@ -90,7 +90,7 @@ function Row({
           if (confirm("Supprimer cet élément ?")) onDelete()
         }}
         aria-label="Supprimer"
-        className="p-2 text-muted hover:text-accent"
+        className="p-2 text-muted hover:text-red-700"
       >
         <Trash2 className="h-4 w-4" />
       </button>
@@ -117,7 +117,7 @@ function Editor({
     <div className="border border-fg bg-card p-5 sm:p-8">
       <h3 className="font-serif text-2xl">{title}</h3>
       <div className="mt-6 space-y-6">{children}</div>
-      {error && <p className="mt-6 border-l-2 border-accent pl-3 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-6 border-l-2 border-red-700 pl-3 text-sm text-red-700">{error}</p>}
       <div className="mt-8 flex gap-3">
         <Button onClick={onSave} disabled={saving}>
           {saving ? "Enregistrement…" : "Enregistrer"}

@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
-@import "@fontsource/instrument-serif";
-@import "@fontsource/instrument-serif/400-italic.css";
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --color-bg: var(--bg);
@@ -14,29 +10,21 @@
   --color-card: var(--card);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-accent-hover: var(--accent-hover);
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-serif: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  --bg: #f2eee6;
-  --fg: #16150f;
-  --muted: #6a655a;
-  --line: #d8d1c1;
-  --card: #f9f6ef;
-  --accent: #b8431c;
-  --accent-fg: #fff8f1;
-}
-
-.dark {
-  --bg: #11100d;
-  --fg: #ece7da;
-  --muted: #8f8a7c;
-  --line: #2b2a24;
-  --card: #181713;
-  --accent: #e4693a;
-  --accent-fg: #1a0d06;
+  --bg: #ffffff;
+  --fg: #0a0a0a;
+  --muted: #6b6b66;
+  --line: #e5e5e0;
+  --card: #f6f6f2;
+  --accent: #1a3c2e;
+  --accent-hover: #2d6a4f;
+  --accent-fg: #ffffff;
 }
 
 html {
@@ -62,6 +50,11 @@ body {
   outline-offset: 3px;
 }
 
+.font-serif {
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
 .label {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -78,7 +71,7 @@ body {
   transition: background-size 0.25s ease, color 0.2s ease;
 }
 .link-underline:hover {
-  color: var(--accent);
+  color: var(--accent-hover);
 }
 
 .reveal {

@@ -54,7 +54,7 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
-          {error && <p className="border-l-2 border-accent pl-3 text-sm text-accent">{error}</p>}
+          {error && <p className="border-l-2 border-red-700 pl-3 text-sm text-red-700">{error}</p>}
           <Button type="submit" disabled={busy} className="w-full">
             {busy ? "Connexion…" : "Se connecter"}
           </Button>

@@ -11,8 +11,8 @@ export default function Image() {
         style={{
           width: "100%",
           height: "100%",
-          background: "#f2eee6",
-          color: "#16150f",
+          background: "#ffffff",
+          color: "#0a0a0a",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -20,16 +20,16 @@ export default function Image() {
           fontFamily: "Georgia, serif",
         }}
       >
-        <div style={{ display: "flex", fontSize: 24, letterSpacing: 3, color: "#6a655a", fontFamily: "monospace" }}>
+        <div style={{ display: "flex", fontSize: 24, letterSpacing: 3, color: "#6b6b66", fontFamily: "monospace" }}>
           LOMÉ, TOGO
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 112, lineHeight: 1, letterSpacing: -3, display: "flex" }}>AGBEBAVI Elom Obed</div>
-          <div style={{ fontSize: 44, marginTop: 28, color: "#b8431c", fontStyle: "italic", display: "flex" }}>
+          <div style={{ fontSize: 44, marginTop: 28, color: "#1a3c2e", fontStyle: "italic", display: "flex" }}>
             Développeur full-stack
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 24, color: "#6a655a", fontFamily: "monospace" }}>
+        <div style={{ display: "flex", fontSize: 24, color: "#6b6b66", fontFamily: "monospace" }}>
           Next.js / React / Django / Supabase
         </div>
       </div>

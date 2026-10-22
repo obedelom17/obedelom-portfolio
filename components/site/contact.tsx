@@ -87,14 +87,14 @@ export function Contact() {
                 />
               </div>
               {status === "error" && (
-                <p role="alert" className="border-l-2 border-accent pl-3 text-sm text-accent">
+                <p role="alert" className="border-l-2 border-red-700 pl-3 text-sm text-red-700">
                   {f.error}
                 </p>
               )}
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="bg-fg px-8 py-3 text-sm font-medium text-bg transition-colors hover:bg-accent hover:text-accent-fg disabled:opacity-60"
+                className="bg-fg px-8 py-3 text-sm font-medium text-bg transition-colors hover:bg-accent-hover hover:text-accent-fg disabled:opacity-60"
               >
                 {status === "loading" ? f.sending : f.send}
               </button>

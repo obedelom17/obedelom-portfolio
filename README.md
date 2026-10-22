@@ -8,14 +8,14 @@
 
 ## Français
 
-Portfolio personnel de AGBEBAVI Elom Obed, développeur full-stack basé à Lomé, Togo. Le site est bilingue (français et anglais), propose un thème clair et sombre, et inclut un espace d'administration pour gérer les projets, les certifications et le parcours sans toucher au code.
+Portfolio personnel de AGBEBAVI Elom Obed, développeur full-stack basé à Lomé, Togo. Le site est bilingue (français et anglais), adopte un design blanc, noir et vert, et inclut un espace d'administration pour gérer les projets, les certifications et le parcours sans toucher au code.
 
 Site en ligne : https://obedelom-portfolio.vercel.app
 
 ### Fonctionnalités
 
 - Présentation, projets, compétences, parcours, certifications et formulaire de contact
-- Bascule français / anglais et thème clair / sombre, mémorisés dans le navigateur
+- Bascule français / anglais, mémorisée dans le navigateur
 - Visionneuse d'images pour les captures de projets et les certificats
 - Espace d'administration protégé (`/admin`) : ajout, modification, suppression et réordonnancement des projets, certifications et étapes du parcours, avec téléversement d'images
 - Contenu bilingue saisi directement dans l'administration
@@ -100,14 +100,14 @@ GitHub : https://github.com/obedelom17
 
 ## English
 
-Personal portfolio of AGBEBAVI Elom Obed, a full-stack developer based in Lomé, Togo. The site is bilingual (French and English), supports light and dark themes, and includes an admin area to manage projects, certifications and journey entries without editing code.
+Personal portfolio of AGBEBAVI Elom Obed, a full-stack developer based in Lomé, Togo. The site is bilingual (French and English), uses a white, black and green design, and includes an admin area to manage projects, certifications and journey entries without editing code.
 
 Live site: https://obedelom-portfolio.vercel.app
 
 ### Features
 
 - Introduction, projects, skills, journey, certifications and contact form
-- French / English switch and light / dark theme, remembered in the browser
+- French / English switch, remembered in the browser
 - Image viewer for project screenshots and certificates
 - Protected admin area (`/admin`): add, edit, delete and reorder projects, certifications and journey entries, with image upload
 - Bilingual content entered directly in the admin

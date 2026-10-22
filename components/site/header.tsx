@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Menu, Moon, Sun, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { useApp } from "@/components/providers"
 
 export function Header() {
-  const { t, lang, setLang, theme, toggleTheme } = useApp()
+  const { t, lang, setLang } = useApp()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -53,14 +53,6 @@ export function Header() {
             <span className={lang === "fr" ? "text-fg" : ""}>FR</span>
             <span className="mx-1">/</span>
             <span className={lang === "en" ? "text-fg" : ""}>EN</span>
-          </button>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={t.nav.theme}
-            className="p-2 text-muted transition-colors hover:text-fg"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <a
             href="/cvobed.pdf"
