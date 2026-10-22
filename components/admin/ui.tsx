@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ReactNode } from "react"
 import { ImagePlus, Loader2, X } from "lucide-react"
-import { compressToWebp, slugify } from "@/lib/image"
+import { compressToWebp } from "@/lib/image"
 
 // Aperçus locaux des images téléversées, disponibles avant le redéploiement du site.
 const previews = new Map<string, string>()
@@ -62,13 +62,11 @@ export function Button({
 }
 
 export function ImageField({
-  folder,
   images,
   onChange,
   multiple,
   label,
 }: {
-  folder: string
   images: string[]
   onChange: (next: string[]) => void
   multiple?: boolean
@@ -91,7 +89,7 @@ export function ImageField({
         const res = await fetch("/api/admin/upload", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ folder, name: slugify(file.name), data: dataUrl.split(",")[1] }),
+          body: JSON.stringify({ data: dataUrl.split(",")[1] }),
         })
         const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string }
         if (!res.ok || !json.url) throw new Error(json.error ?? `Erreur ${res.status}`)

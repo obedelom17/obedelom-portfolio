@@ -13,13 +13,3 @@ export async function compressToWebp(file: File, maxWidth = 1600, quality = 0.82
   })
 }
 
-export function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/\.[^.]+$/, "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40) || "image"
-}

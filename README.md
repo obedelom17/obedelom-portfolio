@@ -19,7 +19,7 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 - Visionneuse d'images pour les captures de projets et les certificats
 - Espace d'administration protégé par mot de passe (`/admin`) : gestion des projets, certifications et étapes du parcours, avec téléversement d'images
 - Contenu bilingue saisi directement dans l'administration
-- Publication automatique : chaque modification crée un commit et Vercel redéploie le site
+- Mise à jour immédiate du site après chaque enregistrement
 
 ### Technologies
 
@@ -27,7 +27,7 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 - Tailwind CSS 4
 - EmailJS (formulaire de contact)
 - Déploiement sur Vercel
-- Contenu stocké dans des fichiers JSON du dépôt, modifiés par l'administration via l'API GitHub (aucun service externe de base de données)
+- Neon (base PostgreSQL serverless) pour le contenu modifiable depuis l'administration
 
 ### Structure
 
@@ -35,9 +35,9 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 app/                 Pages, layout, route /admin et API d'administration
 components/site/     Sections du site public
 components/admin/    Interface d'administration
-data/                Projets, certifications et parcours (JSON)
-lib/                 Types, traductions, accès GitHub, authentification
-public/              Images, logos des technologies, CV, images téléversées
+data/                Données de départ (JSON), utilisées aussi comme secours
+lib/                 Types, traductions, accès Neon, authentification
+public/              Images, logos des technologies, CV
 ```
 
 ### Installation locale
@@ -61,27 +61,25 @@ Le site s'ouvre sur http://localhost:3000.
 | `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | Clé publique EmailJS |
 | `ADMIN_PASSWORD` | Mot de passe de l'administration |
 | `SESSION_SECRET` | Chaîne aléatoire longue qui signe la session (facultatif, sinon dérivée du mot de passe) |
-| `GITHUB_TOKEN` | Jeton GitHub autorisé à écrire dans le dépôt |
-| `GITHUB_REPO` | Dépôt au format `utilisateur/nom` |
-| `GITHUB_BRANCH` | Branche déployée par Vercel (par défaut `main`) |
+| `DATABASE_URL` | Chaîne de connexion Neon (PostgreSQL) |
 
 ### Fonctionnement de l'administration
 
-La page `/admin` permet d'ajouter, modifier, supprimer et réordonner les projets, les certifications et les étapes du parcours, avec téléversement d'images. Chaque enregistrement crée un commit dans le dépôt GitHub (fichiers `data/*.json` et `public/uploads/`). Vercel détecte le commit et redéploie le site : les changements apparaissent en 1 à 2 minutes.
+La page `/admin` permet d'ajouter, modifier, supprimer et réordonner les projets, les certifications et les étapes du parcours, avec téléversement d'images. Les données sont enregistrées dans la base Neon (tables créées automatiquement) et les images y sont stockées, puis servies par `/api/img/...`. Le site est mis à jour dès l'enregistrement. À la première connexion, les contenus actuels du dossier `data/` sont importés automatiquement. Sans `DATABASE_URL`, le site affiche ces données de départ.
 
 ### Activer l'administration
 
-1. Sur GitHub : Settings > Developer settings > Personal access tokens > Fine-grained tokens > Generate new token.
-2. Limiter le jeton au seul dépôt `obedelom-portfolio`, avec la permission Repository permissions > Contents : Read and write. Copier le jeton.
-3. Dans Vercel : Settings > Environment Variables, ajouter `ADMIN_PASSWORD` (mot de passe long), `SESSION_SECRET` (chaîne aléatoire), `GITHUB_TOKEN`, `GITHUB_REPO` (`obedelom17/obedelom-portfolio`) et `GITHUB_BRANCH` (`main`).
+1. Créer un compte et un projet sur https://neon.tech (ou, dans Vercel, Storage > Neon, qui ajoute `DATABASE_URL` automatiquement).
+2. Dans le tableau de bord Neon, copier la chaîne de connexion (Connect > Connection string).
+3. Dans Vercel : Settings > Environment Variables, ajouter `DATABASE_URL`, `ADMIN_PASSWORD` (mot de passe long) et `SESSION_SECRET` (chaîne aléatoire).
 4. Redéployer le projet.
 5. Ouvrir `/admin` et se connecter avec `ADMIN_PASSWORD`.
 
 ### Sécurité
 
-- Le mot de passe et le jeton GitHub restent côté serveur ; ils ne sont jamais envoyés au navigateur.
+- Le mot de passe et la chaîne de connexion restent côté serveur ; ils ne sont jamais envoyés au navigateur.
 - La session est un cookie HttpOnly, SameSite strict, signé et valable 12 heures.
-- Toutes les routes d'écriture vérifient la session. Le jeton GitHub ne doit avoir accès qu'à ce dépôt.
+- Toutes les routes d'écriture vérifient la session ; la base n'est jamais accessible directement depuis le navigateur.
 - La page `/admin` n'est pas indexée par les moteurs de recherche.
 
 ### Scripts
@@ -116,7 +114,7 @@ Live site: https://obedelom-portfolio.vercel.app
 - Image viewer for project screenshots and certificates
 - Password-protected admin area (`/admin`): manage projects, certifications and journey entries, with image upload
 - Bilingual content entered directly in the admin
-- Automatic publishing: each change creates a commit and Vercel redeploys the site
+- Immediate site update after each save
 
 ### Tech stack
 
@@ -124,7 +122,7 @@ Live site: https://obedelom-portfolio.vercel.app
 - Tailwind CSS 4
 - EmailJS (contact form)
 - Deployed on Vercel
-- Content stored in JSON files in the repository, edited by the admin through the GitHub API (no external database service)
+- Neon (serverless PostgreSQL) for content editable from the admin
 
 ### Structure
 
@@ -132,9 +130,9 @@ Live site: https://obedelom-portfolio.vercel.app
 app/                 Pages, layout, /admin route and admin API
 components/site/     Public site sections
 components/admin/    Admin interface
-data/                Projects, certifications and journey (JSON)
-lib/                 Types, translations, GitHub access, authentication
-public/              Images, technology logos, resume, uploaded images
+data/                Seed data (JSON), also used as a fallback
+lib/                 Types, translations, Neon access, authentication
+public/              Images, technology logos, resume
 ```
 
 ### Local setup
@@ -158,27 +156,25 @@ The site opens at http://localhost:3000.
 | `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | EmailJS public key |
 | `ADMIN_PASSWORD` | Admin area password |
 | `SESSION_SECRET` | Long random string that signs the session (optional, derived from the password otherwise) |
-| `GITHUB_TOKEN` | GitHub token allowed to write to the repository |
-| `GITHUB_REPO` | Repository as `user/name` |
-| `GITHUB_BRANCH` | Branch deployed by Vercel (default `main`) |
+| `DATABASE_URL` | Neon connection string (PostgreSQL) |
 
 ### How the admin works
 
-The `/admin` page lets you add, edit, delete and reorder projects, certifications and journey entries, with image upload. Each save creates a commit in the GitHub repository (`data/*.json` files and `public/uploads/`). Vercel detects the commit and redeploys the site: changes appear within 1 to 2 minutes.
+The `/admin` page lets you add, edit, delete and reorder projects, certifications and journey entries, with image upload. Data is saved in the Neon database (tables are created automatically) and images are stored there too, then served through `/api/img/...`. The site updates as soon as you save. On first sign-in, the current content of the `data/` folder is imported automatically. Without `DATABASE_URL`, the site shows this seed data.
 
 ### Enabling the admin area
 
-1. On GitHub: Settings > Developer settings > Personal access tokens > Fine-grained tokens > Generate new token.
-2. Restrict the token to the `obedelom-portfolio` repository only, with Repository permissions > Contents: Read and write. Copy the token.
-3. In Vercel: Settings > Environment Variables, add `ADMIN_PASSWORD` (a long password), `SESSION_SECRET` (a random string), `GITHUB_TOKEN`, `GITHUB_REPO` (`obedelom17/obedelom-portfolio`) and `GITHUB_BRANCH` (`main`).
+1. Create an account and a project at https://neon.tech (or, in Vercel, Storage > Neon, which adds `DATABASE_URL` automatically).
+2. In the Neon dashboard, copy the connection string (Connect > Connection string).
+3. In Vercel: Settings > Environment Variables, add `DATABASE_URL`, `ADMIN_PASSWORD` (a long password) and `SESSION_SECRET` (a random string).
 4. Redeploy the project.
 5. Open `/admin` and sign in with `ADMIN_PASSWORD`.
 
 ### Security
 
-- The password and the GitHub token stay on the server and are never sent to the browser.
+- The password and the connection string stay on the server and are never sent to the browser.
 - The session is an HttpOnly, SameSite strict, signed cookie valid for 12 hours.
-- All write routes check the session. The GitHub token should only have access to this repository.
+- All write routes check the session; the database is never directly reachable from the browser.
 - The `/admin` page is excluded from search engine indexing.
 
 ### Scripts

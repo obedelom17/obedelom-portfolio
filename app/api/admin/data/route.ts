@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server"
 import { adminConfigured, isAdmin } from "@/lib/auth"
-import { NotConfiguredError, githubConfig, readJsonFile } from "@/lib/github"
+import { dbEnabled, readCollection, seedOnce } from "@/lib/content"
+
+export const dynamic = "force-dynamic"
 
 export async function GET() {
   if (!adminConfigured()) return NextResponse.json({ error: "not_configured" }, { status: 503 })
   if (!(await isAdmin())) return NextResponse.json({ error: "unauthorized" }, { status: 401 })
+  if (!dbEnabled()) return NextResponse.json({ error: "db_not_configured" }, { status: 503 })
   try {
-    const { repo, branch } = githubConfig()
+    await seedOnce()
     const [projects, certifications, journey] = await Promise.all([
-      readJsonFile<unknown[]>("data/projects.json"),
-      readJsonFile<unknown[]>("data/certifications.json"),
-      readJsonFile<unknown[]>("data/journey.json"),
+      readCollection("projects"),
+      readCollection("certifications"),
+      readCollection("journey"),
     ])
-    return NextResponse.json({ projects, certifications, journey, repo, branch })
+    return NextResponse.json({ projects, certifications, journey })
   } catch (e) {
-    if (e instanceof NotConfiguredError) return NextResponse.json({ error: "github_not_configured" }, { status: 503 })
     return NextResponse.json({ error: e instanceof Error ? e.message : "error" }, { status: 502 })
   }
 }

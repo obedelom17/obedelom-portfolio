@@ -48,10 +48,10 @@ function Shell({
         </Button>
       </div>
       {error && <p className="mt-4 border-l-2 border-red-700 pl-3 text-sm text-red-700">{error}</p>}
-      {saving && <p className="mt-6 text-sm text-muted">Enregistrement dans GitHub…</p>}
+      {saving && <p className="mt-6 text-sm text-muted">Enregistrement…</p>}
       {!saving && published && !error && (
         <p className="mt-6 border-l-2 border-accent pl-3 text-sm">
-          Enregistré. Le site se met à jour dans 1 à 2 minutes, après le redéploiement de Vercel.
+          Enregistré. Le site est à jour.
         </p>
       )}
       <div className="mt-6">{children}</div>
@@ -263,7 +263,7 @@ export function ProjectsPanel({ col: t }: { col: Collection<Project> }) {
             <TextInput value={draft.code_url} onChange={(e) => set("code_url", e.target.value)} placeholder="https://github.com/" />
           </Field>
         </div>
-        <ImageField label="Captures d'écran" folder="projects" multiple images={draft.images} onChange={(v) => set("images", v)} />
+        <ImageField label="Captures d'écran" multiple images={draft.images} onChange={(v) => set("images", v)} />
       </Editor>
     )
   }
@@ -338,7 +338,7 @@ export function CertificationsPanel({ col: t }: { col: Collection<Certification>
             <TextInput value={draft.year} onChange={(e) => set("year", e.target.value)} placeholder="2026" inputMode="numeric" />
           </Field>
         </div>
-        <ImageField label="Image du certificat" folder="certifications" images={draft.images} onChange={(v) => set("images", v)} />
+        <ImageField label="Image du certificat" images={draft.images} onChange={(v) => set("images", v)} />
       </Editor>
     )
   }

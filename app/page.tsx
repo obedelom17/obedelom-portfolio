@@ -10,8 +10,10 @@ import { Certifications } from "@/components/site/certifications"
 import { Contact } from "@/components/site/contact"
 import { Footer } from "@/components/site/footer"
 
-export default function Home() {
-  const data = getPortfolioData()
+export const revalidate = 60
+
+export default async function Home() {
+  const data = await getPortfolioData()
   const firstYear = data.journey.length
     ? Math.min(...data.journey.map((j) => parseInt(j.year, 10)).filter((n) => !Number.isNaN(n)))
     : 2024

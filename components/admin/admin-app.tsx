@@ -14,8 +14,6 @@ type AdminData = {
   projects: Project[]
   certifications: Certification[]
   journey: JourneyItem[]
-  repo: string
-  branch: string
 }
 
 const tabs: { id: Tab; label: string }[] = [
@@ -125,14 +123,14 @@ function Dashboard({ data, onLogout }: { data: AdminData; onLogout: () => void }
       </div>
 
       <p className="mt-16 text-xs text-muted">
-        Chaque enregistrement crée un commit dans {data.repo} ({data.branch}). Vercel redéploie ensuite le site automatiquement.
+        Les modifications sont enregistrées dans la base Neon et visibles sur le site dès l'enregistrement.
       </p>
     </Frame>
   )
 }
 
 export function AdminApp() {
-  const [state, setState] = useState<"loading" | "out" | "in" | "no_password" | "no_github" | "error">("loading")
+  const [state, setState] = useState<"loading" | "out" | "in" | "no_password" | "no_db" | "error">("loading")
   const [data, setData] = useState<AdminData | null>(null)
   const [message, setMessage] = useState("")
 
@@ -143,7 +141,7 @@ export function AdminApp() {
       const json = (await res.json().catch(() => ({}))) as Partial<AdminData> & { error?: string }
       if (res.status === 401) return setState("out")
       if (json.error === "not_configured") return setState("no_password")
-      if (json.error === "github_not_configured") return setState("no_github")
+      if (json.error === "db_not_configured") return setState("no_db")
       if (!res.ok) {
         setMessage(json.error ?? `Erreur ${res.status}`)
         return setState("error")
@@ -174,14 +172,14 @@ export function AdminApp() {
     )
   }
 
-  if (state === "no_password" || state === "no_github") {
+  if (state === "no_password" || state === "no_db") {
     return (
       <Frame>
         <h1 className="font-serif text-4xl">Administration non configurée</h1>
         <p className="mt-4 max-w-xl text-muted">
           {state === "no_password"
             ? "Définissez ADMIN_PASSWORD dans les variables d'environnement, puis redéployez."
-            : "Définissez GITHUB_TOKEN et GITHUB_REPO dans les variables d'environnement, puis redéployez."}{" "}
+            : "Définissez DATABASE_URL (chaîne de connexion Neon) dans les variables d'environnement, puis redéployez."}{" "}
           Voir le README.
         </p>
       </Frame>
