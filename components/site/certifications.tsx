@@ -8,14 +8,14 @@ import { pick } from "@/lib/pick"
 import type { Certification } from "@/lib/types"
 import { Section } from "./section"
 
-export function Certifications({ items }: { items: Certification[] }) {
+export function Certifications({ items, index = "06" }: { items: Certification[]; index?: string }) {
   const { t, lang } = useApp()
   const [open, setOpen] = useState<number | null>(null)
   const withImage = items.filter((c) => c.image_url)
   const images = withImage.map((c) => c.image_url as string)
 
   return (
-    <Section id="certifications" index="06" label={t.certifications.label} title={t.certifications.title}>
+    <Section id="certifications" index={index} label={t.certifications.label} title={t.certifications.title}>
       {items.length === 0 ? (
         <p className="text-muted">{t.certifications.empty}</p>
       ) : (

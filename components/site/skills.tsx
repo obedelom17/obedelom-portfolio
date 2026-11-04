@@ -5,10 +5,10 @@ import { Reveal } from "@/components/reveal"
 import { skills } from "@/lib/skills"
 import { Section } from "./section"
 
-export function Skills() {
+export function Skills({ index = "04" }: { index?: string }) {
   const { t } = useApp()
   return (
-    <Section id="competences" index="04" label={t.skills.label} title={t.skills.title}>
+    <Section id="competences" index={index} label={t.skills.label} title={t.skills.title}>
       <ul>
         {skills.map((s) => (
           <li key={s.key}>

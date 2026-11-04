@@ -18,6 +18,8 @@ export type Project = {
   stack: string[]
   status: ProjectStatus
   images: string[]
+  /** Liens de vidéos (fichier .mp4/.webm, YouTube, Vimeo). Affichées avant les images. */
+  videos?: string[]
   demo_url: string | null
   code_url: string | null
   sort_order: number
@@ -42,10 +44,32 @@ export type JourneyItem = {
   sort_order: number
 }
 
+export type Internship = {
+  id: string
+  company: string
+  /** Année du stage, sert au tri (du plus récent au plus ancien). */
+  year: string
+  period: string
+  duration: string
+  location: string
+  role_fr: string
+  role_en: string
+  description_fr: string
+  description_en: string
+  missions_fr: string[]
+  missions_en: string[]
+  stack: string[]
+  website_url: string | null
+  logo_url: string | null
+  image_url: string | null
+  sort_order: number
+}
+
 export type PortfolioData = {
   projects: Project[]
   certifications: Certification[]
   journey: JourneyItem[]
+  internships: Internship[]
 }
 
 export type Lang = "fr" | "en"

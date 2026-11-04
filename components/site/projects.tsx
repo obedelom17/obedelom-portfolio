@@ -5,6 +5,8 @@ import { ArrowUpRight, Maximize2 } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
 import { Lightbox } from "@/components/lightbox"
+import { VideoPlayer, VideoThumb } from "@/components/media-player"
+import { buildMedia } from "@/lib/media"
 import { pick, pickList } from "@/lib/pick"
 import type { Project } from "@/lib/types"
 import { Section } from "./section"
@@ -13,7 +15,9 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
   const { t, lang } = useApp()
   const [current, setCurrent] = useState(0)
   const [zoom, setZoom] = useState(false)
-  const images = project.images ?? []
+  // Les vidéos passent avant les images : la première est affichée d'emblée et démarre toute seule.
+  const media = buildMedia(project.images, project.videos)
+  const active = media[current] ?? media[0]
   const features = pickList(lang, project.features_fr, project.features_en)
 
   return (
@@ -28,39 +32,62 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
 
         <div className="grid gap-8 pb-14 pt-8 lg:grid-cols-12">
           <div className="lg:col-span-7 lg:col-start-2">
-            {images.length > 0 && (
+            {media.length > 0 && active && (
               <>
-                <button
-                  type="button"
-                  onClick={() => setZoom(true)}
-                  className="group/img relative block w-full overflow-hidden border border-line bg-card"
-                  aria-label={`${t.projects.zoom} : ${project.title}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={images[current]}
-                    alt={`${project.title} ${current + 1}`}
-                    className="aspect-[16/10] w-full object-cover object-top"
-                  />
-                  <span className="absolute bottom-3 right-3 bg-bg p-2 opacity-0 transition-opacity group-hover/img:opacity-100">
-                    <Maximize2 className="h-4 w-4" />
-                  </span>
-                </button>
-                {images.length > 1 && (
-                  <div className="mt-3 flex gap-2">
-                    {images.map((src, i) => (
+                {active.kind === "video" ? (
+                  <div className="relative w-full overflow-hidden border border-line bg-black">
+                    <VideoPlayer
+                      key={active.src}
+                      item={active}
+                      title={`${project.title} ${current + 1}`}
+                      className={`aspect-[16/10] w-full ${active.embed ? "" : "object-contain"}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setZoom(true)}
+                      aria-label={`${t.projects.zoom} : ${project.title}`}
+                      className="absolute right-3 top-3 bg-bg p-2"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setZoom(true)}
+                    className="group/img relative block w-full overflow-hidden border border-line bg-card"
+                    aria-label={`${t.projects.zoom} : ${project.title}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={active.src}
+                      alt={`${project.title} ${current + 1}`}
+                      className="aspect-[16/10] w-full object-cover object-top"
+                    />
+                    <span className="absolute bottom-3 right-3 bg-bg p-2 opacity-0 transition-opacity group-hover/img:opacity-100">
+                      <Maximize2 className="h-4 w-4" />
+                    </span>
+                  </button>
+                )}
+                {media.length > 1 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {media.map((m, i) => (
                       <button
-                        key={src + i}
+                        key={m.src + i}
                         type="button"
                         onClick={() => setCurrent(i)}
-                        aria-label={`${project.title} ${i + 1}`}
+                        aria-label={`${m.kind === "video" ? t.projects.video : project.title} ${i + 1}`}
                         aria-current={i === current}
                         className={`h-12 w-20 overflow-hidden border transition-opacity ${
                           i === current ? "border-fg" : "border-line opacity-60 hover:opacity-100"
                         }`}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={src} alt="" className="h-full w-full object-cover object-top" />
+                        {m.kind === "video" ? (
+                          <VideoThumb item={m} />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={m.src} alt="" className="h-full w-full object-cover object-top" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -105,16 +132,16 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
         </div>
 
       {zoom && (
-        <Lightbox images={images} index={current} alt={project.title} onChange={setCurrent} onClose={() => setZoom(false)} />
+        <Lightbox media={media} index={current} alt={project.title} onChange={setCurrent} onClose={() => setZoom(false)} />
       )}
     </article>
   )
 }
 
-export function Projects({ projects }: { projects: Project[] }) {
+export function Projects({ projects, index = "03" }: { projects: Project[]; index?: string }) {
   const { t } = useApp()
   return (
-    <Section id="projets" index="03" label={t.projects.label} title={t.projects.title}>
+    <Section id="projets" index={index} label={t.projects.label} title={t.projects.title}>
       {projects.length === 0 ? (
         <p className="text-muted">{t.projects.empty}</p>
       ) : (

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useApp } from "@/components/providers"
 
-export function Header() {
+export function Header({ showInternships = false }: { showInternships?: boolean }) {
   const { t, lang, setLang } = useApp()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -18,6 +18,7 @@ export function Header() {
 
   const links = [
     { href: "#formation", label: t.nav.education },
+    ...(showInternships ? [{ href: "#stages", label: t.nav.internships }] : []),
     { href: "#projets", label: t.nav.projects },
     { href: "#competences", label: t.nav.skills },
     { href: "#parcours", label: t.nav.journey },
@@ -36,7 +37,7 @@ export function Header() {
           Obed Agbebavi
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Navigation principale">
+        <nav className="hidden items-center gap-5 md:flex lg:gap-8" aria-label="Navigation principale">
           {links.map((l) => (
             <a key={l.href} href={l.href} className="text-sm text-muted transition-colors hover:text-fg">
               {l.label}

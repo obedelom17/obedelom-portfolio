@@ -2,22 +2,24 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { ExternalLink, LogOut } from "lucide-react"
-import { sortCertifications, sortJourney, sortProjects } from "@/lib/sort"
-import type { Certification, JourneyItem, Project } from "@/lib/types"
+import { sortCertifications, sortInternships, sortJourney, sortProjects } from "@/lib/sort"
+import type { Certification, Internship, JourneyItem, Project } from "@/lib/types"
 import { Button, Field, TextInput } from "./ui"
-import { CertificationsPanel, JourneyPanel, ProjectsPanel } from "./panels"
+import { CertificationsPanel, InternshipsPanel, JourneyPanel, ProjectsPanel } from "./panels"
 import { useCollection } from "./use-collection"
 
-type Tab = "projects" | "certifications" | "journey"
+type Tab = "projects" | "internships" | "certifications" | "journey"
 
 type AdminData = {
   projects: Project[]
   certifications: Certification[]
   journey: JourneyItem[]
+  internships?: Internship[]
 }
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "projects", label: "Projets" },
+  { id: "internships", label: "Stages" },
   { id: "certifications", label: "Certifications" },
   { id: "journey", label: "Parcours" },
 ]
@@ -79,6 +81,7 @@ function Dashboard({ data, onLogout }: { data: AdminData; onLogout: () => void }
   const projects = useCollection<Project>("projects", data.projects, sortProjects)
   const certifications = useCollection<Certification>("certifications", data.certifications, sortCertifications)
   const journey = useCollection<JourneyItem>("journey", data.journey, sortJourney)
+  const internships = useCollection<Internship>("internships", data.internships ?? [], sortInternships)
 
   return (
     <Frame>
@@ -118,6 +121,7 @@ function Dashboard({ data, onLogout }: { data: AdminData; onLogout: () => void }
 
       <div className="mt-10">
         {tab === "projects" && <ProjectsPanel col={projects} />}
+        {tab === "internships" && <InternshipsPanel col={internships} />}
         {tab === "certifications" && <CertificationsPanel col={certifications} />}
         {tab === "journey" && <JourneyPanel col={journey} />}
       </div>

@@ -2,8 +2,15 @@
 
 import { useState, type ReactNode } from "react"
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2 } from "lucide-react"
-import { Button, Field, ImageField, TextArea, TextInput } from "./ui"
-import { PROJECT_STATUSES, type Certification, type JourneyItem, type Project, type ProjectStatus } from "@/lib/types"
+import { Button, Field, ImageField, TextArea, TextInput, VideoField } from "./ui"
+import {
+  PROJECT_STATUSES,
+  type Certification,
+  type Internship,
+  type JourneyItem,
+  type Project,
+  type ProjectStatus,
+} from "@/lib/types"
 import type { Collection } from "./use-collection"
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
@@ -147,6 +154,7 @@ type ProjectDraft = {
   stack: string
   status: ProjectStatus
   images: string[]
+  videos: string[]
   demo_url: string
   code_url: string
 }
@@ -160,6 +168,7 @@ const emptyProject: ProjectDraft = {
   stack: "",
   status: "in_progress",
   images: [],
+  videos: [],
   demo_url: "",
   code_url: "",
 }
@@ -180,6 +189,7 @@ export function ProjectsPanel({ col: t }: { col: Collection<Project> }) {
       stack: (p.stack ?? []).join(", "),
       status: p.status,
       images: p.images ?? [],
+      videos: p.videos ?? [],
       demo_url: p.demo_url ?? "",
       code_url: p.code_url ?? "",
     })
@@ -200,6 +210,7 @@ export function ProjectsPanel({ col: t }: { col: Collection<Project> }) {
       stack: csv(draft.stack),
       status: draft.status,
       images: draft.images,
+      videos: draft.videos,
       demo_url: draft.demo_url.trim() || null,
       code_url: draft.code_url.trim() || null,
     })
@@ -263,6 +274,7 @@ export function ProjectsPanel({ col: t }: { col: Collection<Project> }) {
             <TextInput value={draft.code_url} onChange={(e) => set("code_url", e.target.value)} placeholder="https://github.com/" />
           </Field>
         </div>
+        <VideoField label="Vidéos" videos={draft.videos} onChange={(v) => set("videos", v)} />
         <ImageField label="Captures d'écran" multiple images={draft.images} onChange={(v) => set("images", v)} />
       </Editor>
     )
@@ -489,6 +501,196 @@ export function JourneyPanel({ col: t }: { col: Collection<JourneyItem> }) {
               onDelete={() => t.remove(j.id)}
               onUp={prev && prev.year === j.year ? () => t.swap(j, prev) : undefined}
               onDown={next && next.year === j.year ? () => t.swap(j, next) : undefined}
+            />
+          )
+        })}
+      </ul>
+    </Shell>
+  )
+}
+
+/* ---------- Stages ---------- */
+
+type InternshipDraft = {
+  id?: string
+  company: string
+  year: string
+  period: string
+  duration: string
+  location: string
+  role_fr: string
+  role_en: string
+  description_fr: string
+  description_en: string
+  missions_fr: string
+  missions_en: string
+  stack: string
+  website_url: string
+  logo: string[]
+  photo: string[]
+}
+
+const emptyInternship = (): InternshipDraft => ({
+  company: "",
+  year: String(new Date().getFullYear()),
+  period: "",
+  duration: "",
+  location: "",
+  role_fr: "",
+  role_en: "",
+  description_fr: "",
+  description_en: "",
+  missions_fr: "",
+  missions_en: "",
+  stack: "",
+  website_url: "",
+  logo: [],
+  photo: [],
+})
+
+export function InternshipsPanel({ col: t }: { col: Collection<Internship> }) {
+  const [draft, setDraft] = useState<InternshipDraft | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const set = <K extends keyof InternshipDraft>(k: K, v: InternshipDraft[K]) =>
+    setDraft((d) => (d ? { ...d, [k]: v } : d))
+
+  const edit = (i: Internship) =>
+    setDraft({
+      id: i.id,
+      company: i.company,
+      year: i.year,
+      period: i.period ?? "",
+      duration: i.duration ?? "",
+      location: i.location ?? "",
+      role_fr: i.role_fr ?? "",
+      role_en: i.role_en ?? "",
+      description_fr: i.description_fr ?? "",
+      description_en: i.description_en ?? "",
+      missions_fr: (i.missions_fr ?? []).join("\n"),
+      missions_en: (i.missions_en ?? []).join("\n"),
+      stack: (i.stack ?? []).join(", "),
+      website_url: i.website_url ?? "",
+      logo: i.logo_url ? [i.logo_url] : [],
+      photo: i.image_url ? [i.image_url] : [],
+    })
+
+  const submit = async () => {
+    if (!draft) return
+    if (!draft.company.trim()) return setErr("Le nom de l'entreprise est obligatoire.")
+    if (!draft.year.trim()) return setErr("L'année est obligatoire.")
+    const site = draft.website_url.trim()
+    if (site && !/^https?:\/\//i.test(site)) return setErr("Le site doit commencer par https://")
+    setSaving(true)
+    setErr(null)
+    const message = await t.save({
+      id: draft.id,
+      company: draft.company.trim(),
+      year: draft.year.trim(),
+      period: draft.period.trim(),
+      duration: draft.duration.trim(),
+      location: draft.location.trim(),
+      role_fr: draft.role_fr.trim(),
+      role_en: draft.role_en.trim(),
+      description_fr: draft.description_fr.trim(),
+      description_en: draft.description_en.trim(),
+      missions_fr: lines(draft.missions_fr),
+      missions_en: lines(draft.missions_en),
+      stack: csv(draft.stack),
+      website_url: site || null,
+      logo_url: draft.logo[0] ?? null,
+      image_url: draft.photo[0] ?? null,
+    })
+    setSaving(false)
+    if (message) setErr(message)
+    else setDraft(null)
+  }
+
+  if (draft) {
+    return (
+      <Editor
+        title={draft.id ? "Modifier le stage" : "Nouveau stage"}
+        onCancel={() => {
+          setDraft(null)
+          setErr(null)
+        }}
+        onSave={submit}
+        saving={saving}
+        error={err}
+      >
+        <div className="grid gap-6 md:grid-cols-2">
+          <Field label="Entreprise">
+            <TextInput value={draft.company} onChange={(e) => set("company", e.target.value)} />
+          </Field>
+          <Field label="Année" hint="Sert à classer les stages, du plus récent au plus ancien">
+            <TextInput value={draft.year} onChange={(e) => set("year", e.target.value)} placeholder="2026" inputMode="numeric" />
+          </Field>
+          <Field label="Période" hint="Texte libre affiché sur le site">
+            <TextInput value={draft.period} onChange={(e) => set("period", e.target.value)} placeholder="Juillet à août 2026" />
+          </Field>
+          <Field label="Durée">
+            <TextInput value={draft.duration} onChange={(e) => set("duration", e.target.value)} placeholder="2 mois" />
+          </Field>
+          <Field label="Lieu">
+            <TextInput value={draft.location} onChange={(e) => set("location", e.target.value)} placeholder="Lomé, Togo" />
+          </Field>
+          <Field label="Site de l'entreprise">
+            <TextInput value={draft.website_url} onChange={(e) => set("website_url", e.target.value)} placeholder="https://" />
+          </Field>
+          <Field label="Poste (français)">
+            <TextInput value={draft.role_fr} onChange={(e) => set("role_fr", e.target.value)} placeholder="Stagiaire développeur web" />
+          </Field>
+          <Field label="Poste (anglais)">
+            <TextInput value={draft.role_en} onChange={(e) => set("role_en", e.target.value)} placeholder="Web developer intern" />
+          </Field>
+          <Field label="Présentation de l'entreprise (français)">
+            <TextArea rows={5} value={draft.description_fr} onChange={(e) => set("description_fr", e.target.value)} />
+          </Field>
+          <Field label="Présentation de l'entreprise (anglais)">
+            <TextArea rows={5} value={draft.description_en} onChange={(e) => set("description_en", e.target.value)} />
+          </Field>
+          <Field label="Missions (français)" hint="Une par ligne">
+            <TextArea rows={5} value={draft.missions_fr} onChange={(e) => set("missions_fr", e.target.value)} />
+          </Field>
+          <Field label="Missions (anglais)" hint="Une par ligne">
+            <TextArea rows={5} value={draft.missions_en} onChange={(e) => set("missions_en", e.target.value)} />
+          </Field>
+        </div>
+        <Field label="Technologies utilisées" hint="Séparées par des virgules">
+          <TextInput value={draft.stack} onChange={(e) => set("stack", e.target.value)} placeholder="Next.js, PostgreSQL, Git" />
+        </Field>
+        <ImageField label="Logo de l'entreprise" images={draft.logo} onChange={(v) => set("logo", v)} />
+        <ImageField label="Photo de l'entreprise (grande image en tête de section)" images={draft.photo} onChange={(v) => set("photo", v)} />
+      </Editor>
+    )
+  }
+
+  return (
+    <Shell
+      title="Stages"
+      count={t.rows.length}
+      onAdd={() => setDraft(emptyInternship())}
+      error={t.error}
+      saving={t.saving}
+      published={t.published}
+    >
+      <p className="mb-4 text-xs text-muted">
+        La section « Stages » apparaît sur le site dès qu'un stage est enregistré. Les stages sont affichés du plus récent au
+        plus ancien ; les flèches réordonnent ceux d'une même année.
+      </p>
+      <ul>
+        {t.rows.map((it, i) => {
+          const prev = t.rows[i - 1]
+          const next = t.rows[i + 1]
+          return (
+            <Row
+              key={it.id}
+              title={it.company}
+              meta={`${it.year}${it.role_fr || it.role_en ? ` · ${it.role_fr || it.role_en}` : ""}`}
+              onEdit={() => edit(it)}
+              onDelete={() => t.remove(it.id)}
+              onUp={prev && prev.year === it.year ? () => t.swap(it, prev) : undefined}
+              onDown={next && next.year === it.year ? () => t.swap(it, next) : undefined}
             />
           )
         })}

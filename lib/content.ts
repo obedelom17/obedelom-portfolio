@@ -2,14 +2,16 @@ import { neon, type NeonQueryFunction } from "@neondatabase/serverless"
 import projectsSeed from "@/data/projects.json"
 import certificationsSeed from "@/data/certifications.json"
 import journeySeed from "@/data/journey.json"
+import internshipsSeed from "@/data/internships.json"
 
-export const COLLECTIONS = ["projects", "certifications", "journey"] as const
+export const COLLECTIONS = ["projects", "certifications", "journey", "internships"] as const
 export type CollectionName = (typeof COLLECTIONS)[number]
 
 const SEEDS: Record<CollectionName, unknown[]> = {
   projects: projectsSeed,
   certifications: certificationsSeed,
   journey: journeySeed,
+  internships: internshipsSeed,
 }
 
 type Item = { id: string; sort_order?: number }

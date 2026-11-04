@@ -6,10 +6,10 @@ import { pick } from "@/lib/pick"
 import type { JourneyItem } from "@/lib/types"
 import { Section } from "./section"
 
-export function Journey({ items }: { items: JourneyItem[] }) {
+export function Journey({ items, index = "05" }: { items: JourneyItem[]; index?: string }) {
   const { t, lang } = useApp()
   return (
-    <Section id="parcours" index="05" label={t.journey.label} title={t.journey.title}>
+    <Section id="parcours" index={index} label={t.journey.label} title={t.journey.title}>
       {items.length === 0 ? (
         <p className="text-muted">{t.journey.empty}</p>
       ) : (

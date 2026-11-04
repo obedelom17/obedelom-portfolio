@@ -2,22 +2,30 @@
 
 import { useCallback, useEffect } from "react"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
+import type { MediaItem } from "@/lib/media"
+import { VideoPlayer } from "./media-player"
 
 export function Lightbox({
   images,
+  media,
   index,
   alt,
   onChange,
   onClose,
 }: {
-  images: string[]
+  images?: string[]
+  /** Images et vidéos mélangées ; prioritaire sur `images`. */
+  media?: MediaItem[]
   index: number
   alt: string
   onChange: (i: number) => void
   onClose: () => void
 }) {
-  const prev = useCallback(() => onChange((index - 1 + images.length) % images.length), [index, images.length, onChange])
-  const next = useCallback(() => onChange((index + 1) % images.length), [index, images.length, onChange])
+  const items: MediaItem[] = media ?? (images ?? []).map((src): MediaItem => ({ kind: "image", src }))
+  const count = items.length
+  const current = items[index]
+  const prev = useCallback(() => onChange((index - 1 + count) % count), [index, count, onChange])
+  const next = useCallback(() => onChange((index + 1) % count), [index, count, onChange])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -50,7 +58,7 @@ export function Lightbox({
       >
         <X className="h-6 w-6" />
       </button>
-      {images.length > 1 && (
+      {count > 1 && (
         <>
           <button
             type="button"
@@ -76,16 +84,28 @@ export function Lightbox({
           </button>
         </>
       )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={images[index]}
-        alt={`${alt} ${index + 1}`}
-        className="max-h-[88vh] max-w-full object-contain"
-        onClick={(e) => e.stopPropagation()}
-      />
-      {images.length > 1 && (
+      {current?.kind === "video" ? (
+        <div className="flex w-full max-w-6xl justify-center" onClick={(e) => e.stopPropagation()}>
+          <VideoPlayer
+            key={current.src}
+            item={current}
+            title={`${alt} ${index + 1}`}
+            muted={false}
+            className={current.embed ? "aspect-video w-full" : "max-h-[88vh] max-w-full bg-black"}
+          />
+        </div>
+      ) : current ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={current.src}
+          alt={`${alt} ${index + 1}`}
+          className="max-h-[88vh] max-w-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ) : null}
+      {count > 1 && (
         <p className="label absolute bottom-4 text-white/70">
-          {index + 1} / {images.length}
+          {index + 1} / {count}
         </p>
       )}
     </div>

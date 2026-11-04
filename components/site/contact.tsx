@@ -9,7 +9,7 @@ import { Section } from "./section"
 
 const EMAIL = "agbebaviobedelom@gmail.com"
 
-export function Contact() {
+export function Contact({ index = "07" }: { index?: string }) {
   const { t } = useApp()
   const formRef = useRef<HTMLFormElement>(null)
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
@@ -33,7 +33,7 @@ export function Contact() {
   }
 
   return (
-    <Section id="contact" index="07" label={t.contact.label}>
+    <Section id="contact" index={index} label={t.contact.label}>
       <Reveal>
         <h2 className="font-serif text-4xl leading-[1.02] md:text-6xl">{t.contact.title}</h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>

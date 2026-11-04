@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, type ReactNode } from "react"
-import { ImagePlus, Loader2, X } from "lucide-react"
+import { ImagePlus, Loader2, Play, X } from "lucide-react"
 import { compressToWebp } from "@/lib/image"
 
 // Aperçus locaux des images téléversées, disponibles avant le redéploiement du site.
@@ -164,6 +164,79 @@ export function ImageField({
           Ajouter
         </Button>
       </div>
+      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+    </div>
+  )
+}
+
+export function VideoField({
+  videos,
+  onChange,
+  label,
+}: {
+  videos: string[]
+  onChange: (next: string[]) => void
+  label: string
+}) {
+  const [url, setUrl] = useState("")
+  const [error, setError] = useState<string | null>(null)
+
+  const add = () => {
+    const v = url.trim()
+    if (!v) return
+    if (!/^(https?:\/\/|\/)/i.test(v)) {
+      setError("Le lien doit commencer par https:// ou par / (fichier du dossier public).")
+      return
+    }
+    setError(null)
+    onChange([...videos, v])
+    setUrl("")
+  }
+
+  return (
+    <div>
+      <span className="label">{label}</span>
+      {videos.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {videos.map((src, i) => (
+            <li key={src + i} className="flex items-center gap-3 border border-line px-3 py-2 text-sm">
+              <Play className="h-4 w-4 shrink-0" />
+              <span className="min-w-0 flex-1 truncate">{src}</span>
+              {i === 0 && <span className="label shrink-0 text-accent">En premier</span>}
+              <button
+                type="button"
+                onClick={() => onChange(videos.filter((_, j) => j !== i))}
+                aria-label="Retirer la vidéo"
+                className="shrink-0 p-1 text-muted hover:text-red-700"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              add()
+            }
+          }}
+          placeholder="https://... ou /videos/demo.mp4"
+          className="field min-w-0 flex-1"
+        />
+        <Button variant="outline" onClick={add} disabled={!url.trim()}>
+          Ajouter
+        </Button>
+      </div>
+      <span className="mt-2 block text-xs text-muted">
+        Lien YouTube ou Vimeo, lien direct vers un fichier .mp4 / .webm, ou fichier placé dans public/videos du dépôt
+        (par exemple /videos/demo.mp4). Les vidéos s'affichent avant les captures d'écran ; la première démarre
+        automatiquement, sans le son.
+      </span>
       {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
     </div>
   )

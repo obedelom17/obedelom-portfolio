@@ -16,8 +16,10 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 
 - Présentation, projets, compétences, parcours, certifications et formulaire de contact
 - Bascule français / anglais, mémorisée dans le navigateur
-- Visionneuse d'images pour les captures de projets et les certificats
-- Espace d'administration protégé par mot de passe (`/admin`) : gestion des projets, certifications et étapes du parcours, avec téléversement d'images
+- Visionneuse d'images et de vidéos pour les captures de projets et les certificats
+- Section « Stages » (entreprises où j'ai fait mes stages), présentée comme la section Formation : photo, logo, présentation, période, durée, lieu, missions et technologies. Elle n'apparaît que si au moins un stage est enregistré
+- Vidéos de projets (YouTube, Vimeo ou fichier .mp4 / .webm) affichées avant les captures d'écran ; la première démarre automatiquement, sans le son
+- Espace d'administration protégé par mot de passe (`/admin`) : gestion des projets, des stages, des certifications et des étapes du parcours, avec téléversement d'images
 - Contenu bilingue saisi directement dans l'administration
 - Mise à jour immédiate du site après chaque enregistrement
 
@@ -37,7 +39,7 @@ components/site/     Sections du site public
 components/admin/    Interface d'administration
 data/                Données de départ (JSON), utilisées aussi comme secours
 lib/                 Types, traductions, accès Neon, authentification
-public/              Images, logos des technologies, CV
+public/              Images, logos des technologies, CV, vidéos (public/videos)
 ```
 
 ### Installation locale
@@ -111,8 +113,10 @@ Live site: https://obedelom-portfolio.vercel.app
 
 - Introduction, education, projects, skills, journey, certifications and contact form
 - French / English switch, remembered in the browser
-- Image viewer for project screenshots and certificates
-- Password-protected admin area (`/admin`): manage projects, certifications and journey entries, with image upload
+- Image and video viewer for project screenshots and certificates
+- "Internships" section (companies where I did internships), presented like the Education section: photo, logo, overview, period, duration, location, missions and technologies. It only shows once at least one internship is saved
+- Project videos (YouTube, Vimeo or .mp4 / .webm file) shown before the screenshots; the first one starts automatically, muted
+- Password-protected admin area (`/admin`): manage projects, internships, certifications and journey entries, with image upload
 - Bilingual content entered directly in the admin
 - Immediate site update after each save
 
@@ -191,3 +195,15 @@ The `/admin` page lets you add, edit, delete and reorder projects, certification
 AGBEBAVI Elom Obed, Lomé, Togo
 Email: agbebaviobedelom@gmail.com
 GitHub: https://github.com/obedelom17
+
+---
+
+## Stages et vidéos / Internships and videos
+
+**Stages (FR).** Dans `/admin`, l'onglet « Stages » permet d'ajouter une entreprise (nom, année, période, durée, lieu, poste, présentation, missions, technologies, site, logo et photo). La section apparaît sur le site, entre « Formation » et « Projets », dès qu'un stage existe, avec le même style que la section Formation. Le contenu est bilingue.
+
+**Vidéos (FR).** Dans l'onglet « Projets », le champ « Vidéos » accepte un lien YouTube ou Vimeo, un lien direct vers un fichier `.mp4` / `.webm`, ou un fichier placé dans `public/videos/` du dépôt (lien `/videos/nom.mp4`). Les vidéos passent avant les captures d'écran, et la première démarre automatiquement. Les navigateurs n'autorisent la lecture automatique que sans le son : la vidéo démarre muette et le visiteur active le son avec les contrôles. Pour un fichier dans le dépôt, gardez-le léger (idéalement moins de 10 Mo, compressé en H.264) ; GitHub refuse les fichiers de plus de 100 Mo.
+
+**Internships (EN).** In `/admin`, the "Stages" tab lets you add a company (name, year, period, duration, location, role, overview, missions, technologies, website, logo and photo). The section appears between "Education" and "Projects" as soon as one internship exists, styled like the Education section. Content is bilingual.
+
+**Videos (EN).** In the "Projets" tab, the "Vidéos" field accepts a YouTube or Vimeo link, a direct link to an `.mp4` / `.webm` file, or a file placed in the repository's `public/videos/` folder (link `/videos/name.mp4`). Videos come before screenshots and the first one autoplays. Browsers only allow autoplay when muted, so the video starts muted and visitors turn sound on from the controls. For files kept in the repo, keep them small (ideally under 10 MB, H.264); GitHub rejects files over 100 MB.
