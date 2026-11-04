@@ -55,6 +55,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                   <button
                     type="button"
                     onClick={() => setZoom(true)}
+                    data-cursor={t.ui.view}
                     className="group/img relative block w-full overflow-hidden border border-line bg-card"
                     aria-label={`${t.projects.zoom} : ${project.title}`}
                   >
@@ -62,7 +63,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                     <img
                       src={active.src}
                       alt={`${project.title} ${current + 1}`}
-                      className="aspect-[16/10] w-full object-cover object-top"
+                      className="aspect-[16/10] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/img:scale-[1.04]"
                     />
                     <span className="absolute bottom-3 right-3 bg-bg p-2 opacity-0 transition-opacity group-hover/img:opacity-100">
                       <Maximize2 className="h-4 w-4" />

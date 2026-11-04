@@ -30,7 +30,8 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
                     <button
                       type="button"
                       onClick={() => setOpen(imageIndex)}
-                      className="block w-full overflow-hidden border border-line bg-card"
+                      data-cursor={t.ui.view}
+                      className="group/cert block w-full overflow-hidden border border-line bg-card"
                       aria-label={title}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -38,7 +39,7 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
                         src={c.image_url}
                         alt={title}
                         loading="lazy"
-                        className="aspect-[4/3] w-full object-cover object-top transition-transform duration-500 hover:scale-[1.03]"
+                        className="aspect-[4/3] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/cert:scale-[1.05]"
                       />
                     </button>
                   ) : (

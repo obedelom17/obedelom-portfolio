@@ -66,6 +66,7 @@ export const dictionary = {
       mine: "Entré en 2024 en Génie Logiciel, je suis actuellement en troisième année. Le cursus couvre le développement logiciel, les bases de données, les systèmes et les réseaux : c'est ce socle qui me permet de mener un projet de la conception au déploiement.",
       site: "Site de l'IAI-Togo",
     },
+    ui: { view: "Voir" },
     internships: {
       label: "Stages",
       title: "Expériences en entreprise",
@@ -195,6 +196,7 @@ export const dictionary = {
       mine: "I joined in 2024 in Software Engineering and I am currently in my third year. The curriculum covers software development, databases, systems and networking: this foundation lets me carry a project from design to deployment.",
       site: "IAI-Togo website",
     },
+    ui: { view: "View" },
     internships: {
       label: "Internships",
       title: "Work experience",

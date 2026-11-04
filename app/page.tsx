@@ -10,6 +10,8 @@ import { Journey } from "@/components/site/journey"
 import { Certifications } from "@/components/site/certifications"
 import { Contact } from "@/components/site/contact"
 import { Footer } from "@/components/site/footer"
+import { SmoothScroll } from "@/components/site/smooth-scroll"
+import { CursorBubble } from "@/components/site/cursor-bubble"
 
 export const revalidate = 60
 
@@ -25,6 +27,8 @@ export default async function Home() {
 
   return (
     <>
+      <SmoothScroll />
+      <CursorBubble />
       <Header showInternships={hasInternships} />
       <main>
         <Hero
