@@ -6,22 +6,29 @@ import { ArrowUpRight } from "lucide-react"
 const INTERACTIVE = "a, button, [role='button'], input, textarea, select, label, summary"
 
 /**
- * Curseur personnalisé, sur souris uniquement :
- * - un anneau qui suit le pointeur avec un léger retard et grossit sur les liens et boutons ;
- * - une bulle « Voir ↗ » au-dessus des éléments portant `data-cursor="Texte"`.
+ * Curseur personnalisé, sur souris uniquement. Le curseur du système est masqué : seul reste
+ * - un rond plein, inversé par rapport au fond (toujours visible), qui suit le pointeur avec du retard,
+ *   s'étire dans le sens du mouvement, grossit sur les liens et rétrécit au clic ;
+ * - une bulle « Voir ↗ » au-dessus des éléments portant `data-cursor="Texte"` ;
+ * - une lueur douce qui accompagne le pointeur sur toute la page.
  * Les positions sont recalculées à chaque image, avec un amortissement indépendant de la fréquence de l'écran.
  */
 export function CursorBubble() {
   const bubble = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
+  const spot = useRef<HTMLDivElement>(null)
   const label = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
     const b = bubble.current
     const r = ring.current
+    const s = spot.current
     const text = label.current
-    if (!b || !r || !text) return
+    if (!b || !r || !s || !text) return
+
+    const html = document.documentElement
+    html.classList.add("cursor-hidden")
 
     let x = -300
     let y = -300
@@ -29,30 +36,43 @@ export function CursorBubble() {
     let by = y
     let rx = x
     let ry = y
+    let sx = x
+    let sy = y
     let showBubble = false
     let overLink = false
+    let pressed = false
     let seen = false
     let raf = 0
     let last = 0
     let checking = false
 
-    const render = () => {
+    const state = () => (!seen || showBubble ? "hidden" : pressed ? "down" : overLink ? "link" : "idle")
+
+    const render = (stretch = 0, angle = 0) => {
       b.style.transform = `translate3d(${bx}px, ${by}px, 0)`
-      r.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
-      r.dataset.s = !seen || showBubble ? "hidden" : overLink ? "link" : "idle"
+      r.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${angle}rad) scale(${1 + stretch}, ${1 - stretch * 0.45})`
+      s.style.transform = `translate3d(${sx}px, ${sy}px, 0)`
+      r.dataset.s = state()
+      s.dataset.on = seen ? "true" : "false"
     }
 
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       const kb = 1 - Math.exp(-dt / 0.06)
-      const kr = 1 - Math.exp(-dt / 0.11)
+      const kr = 1 - Math.exp(-dt / 0.075)
+      const ks = 1 - Math.exp(-dt / 0.22)
       bx += (x - bx) * kb
       by += (y - by) * kb
       rx += (x - rx) * kr
       ry += (y - ry) * kr
-      render()
-      const moving = Math.abs(x - bx) + Math.abs(y - by) + Math.abs(x - rx) + Math.abs(y - ry) > 0.3
+      sx += (x - sx) * ks
+      sy += (y - sy) * ks
+      const dx = x - rx
+      const dy = y - ry
+      const dist = Math.hypot(dx, dy)
+      render(Math.min(dist / 110, 0.55), Math.atan2(dy, dx))
+      const moving = dist + Math.abs(x - bx) + Math.abs(y - by) + Math.abs(x - sx) + Math.abs(y - sy) > 0.4
       raf = moving ? requestAnimationFrame(loop) : 0
     }
     const ensure = () => {
@@ -84,10 +104,10 @@ export function CursorBubble() {
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return
       if (!seen) {
-        // Premier mouvement : l'anneau apparaît directement sous le pointeur.
+        // Premier mouvement : tout apparaît directement sous le pointeur.
         seen = true
-        rx = e.clientX
-        ry = e.clientY
+        rx = sx = e.clientX
+        ry = sy = e.clientY
       }
       x = e.clientX
       y = e.clientY
@@ -109,35 +129,45 @@ export function CursorBubble() {
       seen = false
       showBubble = false
       overLink = false
+      pressed = false
       b.dataset.active = "false"
       render()
     }
-
-    // Un clic peut ouvrir la visionneuse par-dessus l'élément : on revérifie ce qui est sous le pointeur.
-    const onClick = () => {
+    const onDown = () => {
+      pressed = true
+      render()
+    }
+    const onUp = () => {
+      pressed = false
+      render()
+      // Un clic peut ouvrir la visionneuse par-dessus l'élément : on revérifie ce qui est sous le pointeur.
       window.setTimeout(() => {
         if (seen) probe(document.elementFromPoint(x, y))
       }, 60)
     }
 
     document.addEventListener("pointermove", onMove, { passive: true })
-    document.documentElement.addEventListener("mouseleave", onLeave)
+    document.addEventListener("pointerdown", onDown)
+    document.addEventListener("pointerup", onUp)
+    html.addEventListener("mouseleave", onLeave)
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("blur", onLeave)
-    document.addEventListener("click", onClick)
 
     return () => {
       cancelAnimationFrame(raf)
+      html.classList.remove("cursor-hidden")
       document.removeEventListener("pointermove", onMove)
-      document.documentElement.removeEventListener("mouseleave", onLeave)
+      document.removeEventListener("pointerdown", onDown)
+      document.removeEventListener("pointerup", onUp)
+      html.removeEventListener("mouseleave", onLeave)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("blur", onLeave)
-      document.removeEventListener("click", onClick)
     }
   }, [])
 
   return (
     <>
+      <div ref={spot} className="cursor-spot" data-on="false" aria-hidden />
       <div ref={ring} className="cursor-ring" data-s="hidden" aria-hidden>
         <div className="cursor-ring__in" />
       </div>

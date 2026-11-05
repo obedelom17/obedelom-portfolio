@@ -17,8 +17,3 @@ node_modules
 .env
 .env.local
 *.tsbuildinfo
-
-# Cloudflare Pages
-out
-.wrangler
-.dev.vars

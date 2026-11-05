@@ -3,33 +3,27 @@
 import { useEffect, useState } from "react"
 import { Moon, Sun } from "lucide-react"
 import { useApp } from "@/components/providers"
+import { currentTheme, setTheme } from "@/lib/theme"
 
 export function ThemeToggle() {
   const { t } = useApp()
   const [dark, setDark] = useState(false)
 
+  // Suit le thème quel que soit l'endroit d'où il est changé (bouton, palette de commandes).
   useEffect(() => {
-    setDark(document.documentElement.dataset.theme === "dark")
+    const sync = () => setDark(currentTheme() === "dark")
+    sync()
+    const obs = new MutationObserver(sync)
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
+    return () => obs.disconnect()
   }, [])
-
-  const toggle = () => {
-    const next = dark ? "light" : "dark"
-    const root = document.documentElement
-    root.classList.add("theme-anim")
-    root.dataset.theme = next
-    try {
-      localStorage.setItem("theme", next)
-    } catch {}
-    setDark(!dark)
-    window.setTimeout(() => root.classList.remove("theme-anim"), 500)
-  }
 
   const icon = "absolute inset-0 m-auto h-[18px] w-[18px] transition-all duration-500"
 
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={(e) => setTheme(dark ? "light" : "dark", { x: e.clientX, y: e.clientY })}
       aria-label={t.nav.theme}
       aria-pressed={dark}
       className="theme-toggle relative h-9 w-9 text-muted transition-colors hover:text-fg"

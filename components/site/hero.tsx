@@ -1,10 +1,30 @@
 "use client"
 
-import { useRef } from "react"
+import { Fragment, useRef } from "react"
 import { ArrowDownRight } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { CountUp } from "@/components/count-up"
 import { Magnetic } from "@/components/magnetic"
+import { ParticleField } from "@/components/particle-field"
+import { RotatingWords } from "./rotating-words"
+import { Scramble } from "./scramble"
+
+const d = (ms: number) => ({ ["--d" as string]: `${ms}ms` }) as React.CSSProperties
+
+/** Mots qui montent un à un depuis le masque de leur ligne. */
+function Words({ text, base, className = "" }: { text: string; base: number; className?: string }) {
+  return (
+    <>
+      {text.split(" ").map((w, i) => (
+        <Fragment key={`${i}-${w}`}>
+          <span className={`word-in ${className}`} style={d(base + i * 80)}>
+            {w}
+          </span>{" "}
+        </Fragment>
+      ))}
+    </>
+  )
+}
 
 export function Hero({
   projectCount,
@@ -36,9 +56,10 @@ export function Hero({
       <div className="hero-grid" aria-hidden />
       <div className="hero-orb hero-orb--a" aria-hidden />
       <div className="hero-orb hero-orb--b" aria-hidden />
+      <ParticleField />
       <div ref={glow} className="hero-glow" aria-hidden />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-24 pt-36 sm:px-8 md:pt-48">
+      <div className="relative mx-auto max-w-7xl px-5 pb-32 pt-36 sm:px-8 md:pt-48">
         <div className="hero-badge" aria-hidden>
           <svg viewBox="0 0 120 120" className="hero-badge__ring">
             <defs>
@@ -51,43 +72,36 @@ export function Hero({
           <ArrowDownRight className="hero-badge__icon h-6 w-6" />
         </div>
 
-        <p className="label fade-up flex items-center gap-3" style={{ ["--d" as string]: "100ms" } as React.CSSProperties}>
+        <p className="label fade-up flex items-center gap-3" style={d(100)}>
           <span className="relative flex h-2 w-2" aria-hidden>
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
           </span>
-          {t.hero.kicker}
+          <Scramble text={t.hero.kicker} auto delay={900} />
         </p>
 
         <h1 className="mt-10 max-w-5xl font-serif text-[2.7rem] leading-[1.02] sm:text-7xl lg:text-[5.6rem]">
           <span className="line">
-            <span className="line__in" style={{ ["--d" as string]: "200ms" } as React.CSSProperties}>
-              {l1}
-            </span>
+            <Words text={l1} base={200} />
           </span>
           <span className="line">
-            <span className="line__in" style={{ ["--d" as string]: "320ms" } as React.CSSProperties}>
-              {l2}
-            </span>
+            <Words text={l2} base={380} />
           </span>
           <span className="line">
-            <span className="line__in" style={{ ["--d" as string]: "440ms" } as React.CSSProperties}>
-              <em className="text-shine not-italic">{l3}</em>
-            </span>
+            <Words text={l3} base={520} className="text-shine" />
           </span>
         </h1>
 
-        <div className="mt-16 grid gap-10 md:grid-cols-12">
-          <p
-            className="fade-up max-w-xl text-lg leading-relaxed text-muted md:col-span-6 md:col-start-1"
-            style={{ ["--d" as string]: "700ms" } as React.CSSProperties}
-          >
+        <p className="fade-up mt-8 flex items-center gap-3 font-mono text-sm md:text-base" style={d(900)}>
+          <span className="text-gradient-star">→</span>
+          <RotatingWords words={t.hero.roles} />
+        </p>
+
+        <div className="mt-12 grid gap-10 md:grid-cols-12">
+          <p className="fade-up max-w-xl text-lg leading-relaxed text-muted md:col-span-6 md:col-start-1" style={d(1000)}>
             {t.hero.intro}
           </p>
-          <div
-            className="fade-up flex flex-wrap items-center gap-8 md:col-span-6 md:justify-end"
-            style={{ ["--d" as string]: "850ms" } as React.CSSProperties}
-          >
+          <div className="fade-up flex flex-wrap items-center gap-8 md:col-span-6 md:justify-end" style={d(1100)}>
             <Magnetic>
               <a
                 href="#projets"
@@ -103,10 +117,7 @@ export function Hero({
           </div>
         </div>
 
-        <dl
-          className="fade-up mt-24 grid grid-cols-3 border-y border-line"
-          style={{ ["--d" as string]: "1000ms" } as React.CSSProperties}
-        >
+        <dl className="fade-up mt-20 grid grid-cols-3 border-y border-line" style={d(1250)}>
           {stats.map((s, i) => (
             <div key={s.k} className={`px-2 py-7 sm:px-8 ${i > 0 ? "border-l border-line" : ""}`}>
               <dt className="label">{s.k}</dt>
@@ -114,6 +125,11 @@ export function Hero({
             </div>
           ))}
         </dl>
+      </div>
+
+      <div className="scroll-hint" aria-hidden>
+        <span className="label">Scroll</span>
+        <span className="scroll-hint__line" />
       </div>
     </section>
   )

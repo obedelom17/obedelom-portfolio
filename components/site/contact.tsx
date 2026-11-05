@@ -6,6 +6,9 @@ import emailjs from "@emailjs/browser"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
 import { Magnetic } from "@/components/magnetic"
+import { SplitWords } from "@/components/split-words"
+import { confetti } from "@/lib/confetti"
+import { toast } from "@/lib/toast"
 import { Section } from "./section"
 
 const EMAIL = "agbebaviobedelom@gmail.com"
@@ -21,6 +24,7 @@ export function Contact({ index = "07" }: { index?: string }) {
     try {
       await navigator.clipboard.writeText(EMAIL)
       setCopied(true)
+      toast(t.ui.emailCopied)
       window.setTimeout(() => setCopied(false), 2000)
     } catch {}
   }
@@ -36,16 +40,20 @@ export function Contact({ index = "07" }: { index?: string }) {
         formRef.current,
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!,
       )
+      const rect = formRef.current?.getBoundingClientRect()
       setStatus("success")
+      if (rect) confetti(rect.left + rect.width / 2, rect.top + rect.height / 2)
     } catch {
       setStatus("error")
     }
   }
 
   return (
-    <Section id="contact" index={index} label={t.contact.label}>
+    <Section id="contact" index={index} label={t.contact.label} glow>
       <Reveal>
-        <h2 className="font-serif text-4xl leading-[1.02] md:text-7xl">{t.contact.title}</h2>
+        <h2 className="font-serif text-4xl leading-[1.02] md:text-7xl">
+          <SplitWords text={t.contact.title} />
+        </h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <a href={`mailto:${EMAIL}`} className="link-underline inline-block break-all pb-1 font-serif text-2xl md:text-3xl">
@@ -63,7 +71,7 @@ export function Contact({ index = "07" }: { index?: string }) {
       </Reveal>
 
       <div className="mt-16 grid gap-14 lg:grid-cols-5">
-        <div className="border border-line bg-card p-6 sm:p-10 lg:col-span-3">
+        <div className="glow-border glow-border--on border border-line bg-card p-6 sm:p-10 lg:col-span-3">
           {status === "success" ? (
             <div className="border-t border-fg pt-6">
               <h3 className="font-serif text-3xl">{f.successTitle}</h3>

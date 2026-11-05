@@ -5,6 +5,7 @@ import { ArrowUpRight, Maximize2 } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
 import { Lightbox } from "@/components/lightbox"
+import { Tilt } from "@/components/tilt"
 import { VideoPlayer, VideoThumb } from "@/components/media-player"
 import { buildMedia } from "@/lib/media"
 import { pick, pickList } from "@/lib/pick"
@@ -55,7 +56,8 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
         <div className="lg:col-span-7 lg:col-start-2">
           {media.length > 0 && active && (
             <>
-              <div className="border border-line bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.35)] transition-shadow duration-700 group-hover/row:shadow-[0_50px_90px_-40px_rgba(0,0,0,0.5)]">
+              <Tilt max={3}>
+              <div className="glow-border border border-line bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.35)] transition-shadow duration-700 group-hover/row:shadow-[0_50px_90px_-40px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center gap-1.5 border-b border-line bg-bg px-3 py-2.5">
                   <span className="h-2 w-2 rounded-full bg-muted opacity-40" aria-hidden />
                   <span className="h-2 w-2 rounded-full bg-muted opacity-40" aria-hidden />
@@ -96,6 +98,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                   </button>
                 )}
               </div>
+              </Tilt>
               {media.length > 1 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {media.map((m, i) => (

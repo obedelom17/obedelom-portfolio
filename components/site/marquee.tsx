@@ -71,7 +71,8 @@ export function Marquee() {
         if (half <= 0) continue
         pos[i] += dirs[i] * (BASE_SPEED + velocity * SCROLL_BOOST) * dt
         const x = ((pos[i] % half) + half) % half
-        el.style.transform = `translate3d(${-x}px, 0, 0)`
+        const skew = Math.max(-14, Math.min(14, -velocity * 0.0028))
+        el.style.transform = `translate3d(${-x}px, 0, 0) skewX(${skew.toFixed(2)}deg)`
       }
       raf = requestAnimationFrame(tick)
     }

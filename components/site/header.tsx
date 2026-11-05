@@ -4,7 +4,30 @@ import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Magnetic } from "@/components/magnetic"
+import { PaletteButton } from "@/components/command-palette"
 import { ThemeToggle } from "./theme-toggle"
+import { useScramble } from "./scramble"
+
+function NavLink({ href, label, on }: { href: string; label: string; on: boolean }) {
+  const [out, run] = useScramble(label)
+  return (
+    <a
+      href={href}
+      onMouseEnter={run}
+      aria-label={label}
+      aria-current={on ? "true" : undefined}
+      className={`relative py-1 text-sm transition-colors duration-300 hover:text-fg ${on ? "text-fg" : "text-muted"}`}
+    >
+      <span aria-hidden>{out}</span>
+      <span
+        className={`bg-grad absolute -bottom-0.5 left-0 h-px transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          on ? "w-full" : "w-0"
+        }`}
+        aria-hidden
+      />
+    </a>
+  )
+}
 
 export function Header({ showInternships = false }: { showInternships?: boolean }) {
   const { t, lang, setLang } = useApp()
@@ -55,6 +78,10 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
   ]
 
   return (
+    <>
+    <a href="#main" className="skip-link">
+      {t.ui.skip}
+    </a>
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-500 ${
         scrolled || open ? "border-b border-line bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
@@ -67,28 +94,13 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
         </a>
 
         <nav className="hidden items-center gap-5 md:flex lg:gap-8" aria-label="Navigation principale">
-          {links.map((l) => {
-            const on = active === l.href.slice(1)
-            return (
-              <a
-                key={l.href}
-                href={l.href}
-                aria-current={on ? "true" : undefined}
-                className={`relative py-1 text-sm transition-colors duration-300 hover:text-fg ${on ? "text-fg" : "text-muted"}`}
-              >
-                {l.label}
-                <span
-                  className={`absolute -bottom-0.5 left-0 h-px bg-accent transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                    on ? "w-full" : "w-0"
-                  }`}
-                  aria-hidden
-                />
-              </a>
-            )
-          })}
+          {links.map((l) => (
+            <NavLink key={l.href} href={l.href} label={l.label} on={active === l.href.slice(1)} />
+          ))}
         </nav>
 
         <div className="flex items-center gap-1">
+          <PaletteButton />
           <ThemeToggle />
           <button
             type="button"
@@ -143,5 +155,6 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
         </nav>
       )}
     </header>
+    </>
   )
 }

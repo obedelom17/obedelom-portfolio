@@ -2,25 +2,34 @@ import projects from "@/data/projects.json"
 import certifications from "@/data/certifications.json"
 import journey from "@/data/journey.json"
 import internships from "@/data/internships.json"
+import { dbEnabled, readCollection } from "./content"
 import { sortCertifications, sortInternships, sortJourney, sortProjects } from "./sort"
 import type { Certification, Internship, JourneyItem, PortfolioData, Project } from "./types"
 
-/** Données de départ, embarquées au build. Le contenu à jour est chargé côté client via /api/portfolio. */
-export function getSeedData(): PortfolioData {
-  return {
+export async function getPortfolioData(): Promise<PortfolioData> {
+  const fallback: PortfolioData = {
     projects: sortProjects(projects as unknown as Project[]),
     certifications: sortCertifications(certifications as unknown as Certification[]),
     journey: sortJourney(journey as unknown as JourneyItem[]),
     internships: sortInternships(internships as unknown as Internship[]),
   }
-}
+  if (!dbEnabled()) return fallback
 
-/** Trie les collections renvoyées par l'API. */
-export function sortPortfolio(raw: Partial<PortfolioData>, fallback: PortfolioData): PortfolioData {
-  return {
-    projects: raw.projects ? sortProjects(raw.projects) : fallback.projects,
-    certifications: raw.certifications ? sortCertifications(raw.certifications) : fallback.certifications,
-    journey: raw.journey ? sortJourney(raw.journey) : fallback.journey,
-    internships: raw.internships ? sortInternships(raw.internships) : fallback.internships,
+  try {
+    const [p, c, j, i] = await Promise.all([
+      readCollection<Project>("projects"),
+      readCollection<Certification>("certifications"),
+      readCollection<JourneyItem>("journey"),
+      readCollection<Internship>("internships"),
+    ])
+    if (!p.length && !c.length && !j.length && !i.length) return fallback
+    return {
+      projects: sortProjects(p),
+      certifications: sortCertifications(c),
+      journey: sortJourney(j),
+      internships: sortInternships(i),
+    }
+  } catch {
+    return fallback
   }
 }
