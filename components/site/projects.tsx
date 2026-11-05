@@ -8,8 +8,25 @@ import { Lightbox } from "@/components/lightbox"
 import { VideoPlayer, VideoThumb } from "@/components/media-player"
 import { buildMedia } from "@/lib/media"
 import { pick, pickList } from "@/lib/pick"
-import type { Project } from "@/lib/types"
+import type { Project, ProjectStatus } from "@/lib/types"
 import { Section } from "./section"
+
+const STATUS_DOT: Record<ProjectStatus, string> = {
+  production: "bg-accent",
+  completed: "bg-accent",
+  in_progress: "bg-amber-500 animate-pulse",
+  academic: "bg-muted",
+  security: "bg-red-600",
+}
+
+function hostOf(url: string | null) {
+  if (!url) return null
+  try {
+    return new URL(url).host.replace(/^www\./, "")
+  } catch {
+    return null
+  }
+}
 
 function ProjectRow({ project, number }: { project: Project; number: string }) {
   const { t, lang } = useApp()
@@ -19,23 +36,34 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
   const media = buildMedia(project.images, project.videos)
   const active = media[current] ?? media[0]
   const features = pickList(lang, project.features_fr, project.features_en)
+  const host = hostOf(project.demo_url)
 
   return (
-    <article className="border-t border-line last:border-b">
-      <div className="grid grid-cols-12 items-baseline gap-4 pt-8">
-        <span className="label col-span-2 sm:col-span-1">{number}</span>
-        <h3 className="col-span-10 font-serif text-3xl leading-none sm:col-span-8 md:text-5xl">{project.title}</h3>
-        <span className="label col-span-10 col-start-3 sm:col-span-3 sm:col-start-auto sm:text-right">
+    <article className="group/row border-t border-line last:border-b">
+      <div className="grid grid-cols-12 items-baseline gap-4 pt-10">
+        <span className="col-span-2 font-mono text-sm text-accent sm:col-span-1">{number}</span>
+        <h3 className="col-span-10 font-serif text-3xl leading-none transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:translate-x-3 sm:col-span-8 md:text-6xl">
+          {project.title}
+        </h3>
+        <span className="label col-span-10 col-start-3 flex items-center gap-2 sm:col-span-3 sm:col-start-auto sm:justify-end">
+          <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[project.status] ?? "bg-muted"}`} aria-hidden />
           <span className="text-fg">{t.status[project.status] ?? project.status}</span>
         </span>
       </div>
 
-        <div className="grid gap-8 pb-14 pt-8 lg:grid-cols-12">
-          <div className="lg:col-span-7 lg:col-start-2">
-            {media.length > 0 && active && (
-              <>
+      <div className="grid gap-10 pb-16 pt-10 lg:grid-cols-12">
+        <div className="lg:col-span-7 lg:col-start-2">
+          {media.length > 0 && active && (
+            <>
+              <div className="border border-line bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.35)] transition-shadow duration-700 group-hover/row:shadow-[0_50px_90px_-40px_rgba(0,0,0,0.5)]">
+                <div className="flex items-center gap-1.5 border-b border-line bg-bg px-3 py-2.5">
+                  <span className="h-2 w-2 rounded-full bg-muted opacity-40" aria-hidden />
+                  <span className="h-2 w-2 rounded-full bg-muted opacity-40" aria-hidden />
+                  <span className="h-2 w-2 rounded-full bg-muted opacity-40" aria-hidden />
+                  <span className="label ml-3 truncate normal-case tracking-normal">{host ?? project.title}</span>
+                </div>
                 {active.kind === "video" ? (
-                  <div className="relative w-full overflow-hidden border border-line bg-black">
+                  <div className="relative w-full overflow-hidden bg-black">
                     <VideoPlayer
                       key={active.src}
                       item={active}
@@ -56,7 +84,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                     type="button"
                     onClick={() => setZoom(true)}
                     data-cursor={t.ui.view}
-                    className="group/img relative block w-full overflow-hidden border border-line bg-card"
+                    className="group/img relative block w-full overflow-hidden bg-card"
                     aria-label={`${t.projects.zoom} : ${project.title}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -65,72 +93,88 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                       alt={`${project.title} ${current + 1}`}
                       className="aspect-[16/10] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/img:scale-[1.04]"
                     />
-                    <span className="absolute bottom-3 right-3 bg-bg p-2 opacity-0 transition-opacity group-hover/img:opacity-100">
-                      <Maximize2 className="h-4 w-4" />
-                    </span>
                   </button>
                 )}
-                {media.length > 1 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {media.map((m, i) => (
-                      <button
-                        key={m.src + i}
-                        type="button"
-                        onClick={() => setCurrent(i)}
-                        aria-label={`${m.kind === "video" ? t.projects.video : project.title} ${i + 1}`}
-                        aria-current={i === current}
-                        className={`h-12 w-20 overflow-hidden border transition-opacity ${
-                          i === current ? "border-fg" : "border-line opacity-60 hover:opacity-100"
-                        }`}
-                      >
-                        {m.kind === "video" ? (
-                          <VideoThumb item={m} />
-                        ) : (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={m.src} alt="" className="h-full w-full object-cover object-top" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className="lg:col-span-4">
-            <p className="leading-relaxed text-muted">{pick(lang, project.description_fr, project.description_en)}</p>
-
-            {features.length > 0 && (
-              <ul className="mt-6 space-y-2 text-sm">
-                {features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 border-t border-line pt-2">
-                    <span className="mt-2 h-1 w-1 shrink-0 bg-accent" aria-hidden />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {project.stack?.length > 0 && <p className="label mt-6">{project.stack.join(" / ")}</p>}
-
-            {(project.demo_url || project.code_url) && (
-              <div className="mt-6 flex flex-wrap gap-6 text-sm font-medium">
-                {project.demo_url && (
-                  <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex items-center gap-1 pb-0.5">
-                    {t.projects.demo}
-                    <ArrowUpRight className="h-4 w-4" />
-                  </a>
-                )}
-                {project.code_url && (
-                  <a href={project.code_url} target="_blank" rel="noopener noreferrer" className="link-underline inline-flex items-center gap-1 pb-0.5">
-                    {t.projects.code}
-                    <ArrowUpRight className="h-4 w-4" />
-                  </a>
-                )}
               </div>
-            )}
-          </div>
+              {media.length > 1 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {media.map((m, i) => (
+                    <button
+                      key={m.src + i}
+                      type="button"
+                      onClick={() => setCurrent(i)}
+                      aria-label={`${m.kind === "video" ? t.projects.video : project.title} ${i + 1}`}
+                      aria-current={i === current}
+                      className={`h-12 w-20 overflow-hidden border transition-[opacity,transform,border-color] duration-300 hover:-translate-y-0.5 ${
+                        i === current ? "border-fg" : "border-line opacity-60 hover:opacity-100"
+                      }`}
+                    >
+                      {m.kind === "video" ? (
+                        <VideoThumb item={m} />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.src} alt="" className="h-full w-full object-cover object-top" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
+
+        <div className="lg:col-span-4">
+          <p className="leading-relaxed text-muted">{pick(lang, project.description_fr, project.description_en)}</p>
+
+          {features.length > 0 && (
+            <ul className="mt-6 space-y-2 text-sm">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-3 border-t border-line pt-2">
+                  <span className="mt-2 h-1 w-1 shrink-0 bg-accent" aria-hidden />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {project.stack?.length > 0 && (
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {project.stack.map((s) => (
+                <li key={s} className="label border border-line px-2.5 py-1">
+                  {s}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {(project.demo_url || project.code_url) && (
+            <div className="mt-8 flex flex-wrap items-center gap-4 text-sm font-medium">
+              {project.demo_url && (
+                <a
+                  href={project.demo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-fg px-5 py-3 text-bg transition-colors duration-300 hover:bg-accent-hover hover:text-accent-fg"
+                >
+                  {t.projects.demo}
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              )}
+              {project.code_url && (
+                <a
+                  href={project.code_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border border-fg px-5 py-3 transition-colors duration-300 hover:bg-fg hover:text-bg"
+                >
+                  {t.projects.code}
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
 
       {zoom && (
         <Lightbox media={media} index={current} alt={project.title} onChange={setCurrent} onClose={() => setZoom(false)} />

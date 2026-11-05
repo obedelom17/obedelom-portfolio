@@ -29,11 +29,13 @@ function InternshipBlock({ item, first }: { item: Internship; first: boolean }) 
         <Reveal>
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={item.image_url}
-              alt={item.company}
-              className="aspect-[16/9] w-full border border-line object-cover object-[50%_40%]"
-            />
+            <div className="overflow-hidden border border-line">
+              <img
+                src={item.image_url}
+                alt={item.company}
+                className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
+              />
+            </div>
             <figcaption className="label mt-3">
               {item.company}
               {item.location ? `, ${item.location}` : ""}
@@ -70,7 +72,11 @@ function InternshipBlock({ item, first }: { item: Internship; first: boolean }) 
         )}
         <Reveal className={item.logo_url || site ? "lg:col-span-8" : "lg:col-span-12"} delay={80}>
           <h3 className="font-serif text-3xl leading-tight md:text-4xl">{item.company}</h3>
-          {role && <p className="label mt-3 text-fg">{role}</p>}
+          {role && (
+            <p className="label mt-3">
+              <span className="text-fg">{role}</span>
+            </p>
+          )}
           {description && <p className="mt-6 text-lg leading-relaxed md:text-xl">{description}</p>}
         </Reveal>
       </div>

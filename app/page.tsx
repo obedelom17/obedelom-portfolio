@@ -11,6 +11,8 @@ import { Certifications } from "@/components/site/certifications"
 import { Contact } from "@/components/site/contact"
 import { Footer } from "@/components/site/footer"
 import { SmoothScroll } from "@/components/site/smooth-scroll"
+import { Marquee } from "@/components/site/marquee"
+import { ScrollProgress } from "@/components/scroll-progress"
 import { CursorBubble } from "@/components/site/cursor-bubble"
 
 export const revalidate = 60
@@ -28,6 +30,7 @@ export default async function Home() {
   return (
     <>
       <SmoothScroll />
+      <ScrollProgress />
       <CursorBubble />
       <Header showInternships={hasInternships} />
       <main>
@@ -36,6 +39,7 @@ export default async function Home() {
           certificationCount={data.certifications.length}
           firstYear={Number.isFinite(firstYear) ? firstYear : 2024}
         />
+        <Marquee />
         <About />
         <Education />
         <Internships items={data.internships} index="03" />

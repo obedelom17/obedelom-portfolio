@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useApp } from "@/components/providers"
+import { ThemeToggle } from "./theme-toggle"
 
 export function Header({ showInternships = false }: { showInternships?: boolean }) {
   const { t, lang, setLang } = useApp()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [active, setActive] = useState("")
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -15,6 +17,33 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  // Surligne le lien de la section actuellement au centre de l'écran.
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return
+    const ids = [
+      "top",
+      "apropos",
+      "formation",
+      ...(showInternships ? ["stages"] : []),
+      "projets",
+      "competences",
+      "parcours",
+      "certifications",
+      "contact",
+    ]
+    const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el)
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) setActive(e.target.id === "top" || e.target.id === "apropos" ? "" : e.target.id)
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    )
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [showInternships])
 
   const links = [
     { href: "#formation", label: t.nav.education },
@@ -28,24 +57,40 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-colors ${
-        scrolled || open ? "border-b border-line bg-bg/90 backdrop-blur" : "border-b border-transparent"
+      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-500 ${
+        scrolled || open ? "border-b border-line bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="font-serif text-xl" onClick={() => setOpen(false)}>
+        <a href="#top" className="flex items-center gap-2 font-serif text-xl" onClick={() => setOpen(false)}>
           Obed Agbebavi
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
         </a>
 
         <nav className="hidden items-center gap-5 md:flex lg:gap-8" aria-label="Navigation principale">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm text-muted transition-colors hover:text-fg">
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) => {
+            const on = active === l.href.slice(1)
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                aria-current={on ? "true" : undefined}
+                className={`relative py-1 text-sm transition-colors duration-300 hover:text-fg ${on ? "text-fg" : "text-muted"}`}
+              >
+                {l.label}
+                <span
+                  className={`absolute -bottom-0.5 left-0 h-px bg-accent transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    on ? "w-full" : "w-0"
+                  }`}
+                  aria-hidden
+                />
+              </a>
+            )
+          })}
         </nav>
 
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <button
             type="button"
             onClick={() => setLang(lang === "fr" ? "en" : "fr")}
@@ -59,7 +104,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
           <a
             href="/cvobed.pdf"
             download="CV_AGBEBAVI_Elom_Obed.pdf"
-            className="ml-2 hidden border border-fg px-3 py-1.5 text-sm transition-colors hover:bg-fg hover:text-bg md:inline-block"
+            className="ml-2 hidden border border-fg px-3 py-1.5 text-sm transition-colors duration-300 hover:bg-fg hover:text-bg md:inline-block"
           >
             {t.nav.cv}
           </a>

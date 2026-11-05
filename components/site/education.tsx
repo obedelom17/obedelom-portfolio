@@ -14,13 +14,15 @@ export function Education() {
       <Reveal>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/iai/iai-lome.webp"
-            alt={f.caption}
-            width={1800}
-            height={1350}
-            className="aspect-[16/9] w-full border border-line object-cover object-[50%_40%]"
-          />
+          <div className="overflow-hidden border border-line">
+            <img
+              src="/images/iai/iai-lome.webp"
+              alt={f.caption}
+              width={1800}
+              height={1350}
+              className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
+            />
+          </div>
           <figcaption className="label mt-3">{f.caption}</figcaption>
         </figure>
       </Reveal>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { Reveal } from "@/components/reveal"
 
 export function Section({
   id,
@@ -14,15 +15,19 @@ export function Section({
   children: ReactNode
 }) {
   return (
-    <section id={id} className="border-t border-line">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 md:grid-cols-12 md:py-28">
+    <section id={id} className="relative border-t border-line">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 md:grid-cols-12 md:py-36">
         <div className="md:col-span-3">
-          <p className="label">
-            <span className="text-accent">{index}</span> &nbsp; {label}
-          </p>
-          {title ? (
-            <h2 className="mt-4 font-serif text-3xl leading-tight md:text-4xl">{title}</h2>
-          ) : null}
+          <div className="md:sticky md:top-28">
+            <Reveal>
+              <span className="outline-num block font-serif text-7xl leading-none md:text-8xl">{index}</span>
+              <p className="label mt-6 flex items-center gap-3">
+                <span className="h-px w-8 bg-accent" aria-hidden />
+                {label}
+              </p>
+              {title ? <h2 className="mt-4 font-serif text-3xl leading-tight md:text-4xl">{title}</h2> : null}
+            </Reveal>
+          </div>
         </div>
         <div className="md:col-span-9">{children}</div>
       </div>

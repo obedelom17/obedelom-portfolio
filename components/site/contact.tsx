@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react"
 import emailjs from "@emailjs/browser"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
+import { Magnetic } from "@/components/magnetic"
 import { Section } from "./section"
 
 const EMAIL = "agbebaviobedelom@gmail.com"
@@ -35,7 +36,7 @@ export function Contact({ index = "07" }: { index?: string }) {
   return (
     <Section id="contact" index={index} label={t.contact.label}>
       <Reveal>
-        <h2 className="font-serif text-4xl leading-[1.02] md:text-6xl">{t.contact.title}</h2>
+        <h2 className="font-serif text-4xl leading-[1.02] md:text-7xl">{t.contact.title}</h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>
         <a
           href={`mailto:${EMAIL}`}
@@ -46,7 +47,7 @@ export function Contact({ index = "07" }: { index?: string }) {
       </Reveal>
 
       <div className="mt-16 grid gap-14 lg:grid-cols-5">
-        <div className="lg:col-span-3">
+        <div className="border border-line bg-card p-6 sm:p-10 lg:col-span-3">
           {status === "success" ? (
             <div className="border-t border-fg pt-6">
               <h3 className="font-serif text-3xl">{f.successTitle}</h3>
@@ -91,13 +92,16 @@ export function Contact({ index = "07" }: { index?: string }) {
                   {f.error}
                 </p>
               )}
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                className="bg-fg px-8 py-3 text-sm font-medium text-bg transition-colors hover:bg-accent-hover hover:text-accent-fg disabled:opacity-60"
-              >
-                {status === "loading" ? f.sending : f.send}
-              </button>
+              <Magnetic>
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="inline-flex items-center gap-3 bg-fg px-8 py-4 text-sm font-medium text-bg transition-colors duration-300 hover:bg-accent-hover hover:text-accent-fg disabled:opacity-60"
+                >
+                  {status === "loading" ? f.sending : f.send}
+                  <ArrowUpRight className="h-4 w-4" />
+                </button>
+              </Magnetic>
             </form>
           )}
         </div>
