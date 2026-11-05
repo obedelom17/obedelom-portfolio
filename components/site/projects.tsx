@@ -154,7 +154,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                   href={project.demo_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-fg px-5 py-3 text-bg transition-colors duration-300 hover:bg-accent-hover hover:text-accent-fg"
+                  className="btn-grad inline-flex items-center gap-2 bg-fg px-5 py-3 text-bg"
                 >
                   {t.projects.demo}
                   <ArrowUpRight className="h-4 w-4" />

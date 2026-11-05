@@ -3,6 +3,7 @@
 import { ArrowUpRight } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
+import { Parallax } from "@/components/parallax"
 import { isHttpUrl } from "@/lib/media"
 import { pick, pickList } from "@/lib/pick"
 import type { Internship } from "@/lib/types"
@@ -30,11 +31,13 @@ function InternshipBlock({ item, first }: { item: Internship; first: boolean }) 
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <div className="overflow-hidden border border-line">
-              <img
-                src={item.image_url}
-                alt={item.company}
-                className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
-              />
+              <Parallax>
+                <img
+                  src={item.image_url}
+                  alt={item.company}
+                  className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
+                />
+              </Parallax>
             </div>
             <figcaption className="label mt-3">
               {item.company}

@@ -19,10 +19,10 @@ export function Section({
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 md:grid-cols-12 md:py-36">
         <div className="md:col-span-3">
           <div className="md:sticky md:top-28">
-            <Reveal>
+            <Reveal variant="left">
               <span className="outline-num block font-serif text-7xl leading-none md:text-8xl">{index}</span>
               <p className="label mt-6 flex items-center gap-3">
-                <span className="h-px w-8 bg-accent" aria-hidden />
+                <span className="bg-grad h-px w-8" aria-hidden />
                 {label}
               </p>
               {title ? <h2 className="mt-4 font-serif text-3xl leading-tight md:text-4xl">{title}</h2> : null}

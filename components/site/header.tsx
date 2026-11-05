@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Menu, X } from "lucide-react"
 import { useApp } from "@/components/providers"
+import { Magnetic } from "@/components/magnetic"
 import { ThemeToggle } from "./theme-toggle"
 
 export function Header({ showInternships = false }: { showInternships?: boolean }) {
@@ -28,7 +29,6 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
       ...(showInternships ? ["stages"] : []),
       "projets",
       "competences",
-      "parcours",
       "certifications",
       "contact",
     ]
@@ -50,7 +50,6 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
     ...(showInternships ? [{ href: "#stages", label: t.nav.internships }] : []),
     { href: "#projets", label: t.nav.projects },
     { href: "#competences", label: t.nav.skills },
-    { href: "#parcours", label: t.nav.journey },
     { href: "#certifications", label: t.nav.certifications },
     { href: "#contact", label: t.nav.contact },
   ]
@@ -101,13 +100,15 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
             <span className="mx-1">/</span>
             <span className={lang === "en" ? "text-fg" : ""}>EN</span>
           </button>
-          <a
-            href="/cvobed.pdf"
-            download="CV_AGBEBAVI_Elom_Obed.pdf"
-            className="ml-2 hidden border border-fg px-3 py-1.5 text-sm transition-colors duration-300 hover:bg-fg hover:text-bg md:inline-block"
-          >
-            {t.nav.cv}
-          </a>
+          <Magnetic className="ml-2 hidden md:inline-block" strength={0.2}>
+            <a
+              href="/cvobed.pdf"
+              download="CV_AGBEBAVI_Elom_Obed.pdf"
+              className="btn-grad inline-block border border-fg px-3 py-1.5 text-sm"
+            >
+              {t.nav.cv}
+            </a>
+          </Magnetic>
           <button
             type="button"
             className="p-2 md:hidden"

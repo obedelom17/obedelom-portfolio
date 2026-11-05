@@ -3,40 +3,57 @@
 import { useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
 
+const INTERACTIVE = "a, button, [role='button'], input, textarea, select, label, summary"
+
 /**
- * Bulle qui suit la souris au-dessus des éléments portant `data-cursor="Texte"`.
- * Le texte de la bulle est celui de l'attribut. La position est calculée à chaque image
- * (requestAnimationFrame), avec un amortissement indépendant de la fréquence de l'écran.
- * Absente sur écran tactile.
+ * Curseur personnalisé, sur souris uniquement :
+ * - un anneau qui suit le pointeur avec un léger retard et grossit sur les liens et boutons ;
+ * - une bulle « Voir ↗ » au-dessus des éléments portant `data-cursor="Texte"`.
+ * Les positions sont recalculées à chaque image, avec un amortissement indépendant de la fréquence de l'écran.
  */
 export function CursorBubble() {
-  const wrap = useRef<HTMLDivElement>(null)
+  const bubble = useRef<HTMLDivElement>(null)
+  const ring = useRef<HTMLDivElement>(null)
   const label = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
-    const el = wrap.current
+    const b = bubble.current
+    const r = ring.current
     const text = label.current
-    if (!el || !text) return
+    if (!b || !r || !text) return
 
     let x = -300
     let y = -300
-    let cx = x
-    let cy = y
-    let active = false
+    let bx = x
+    let by = y
+    let rx = x
+    let ry = y
+    let showBubble = false
+    let overLink = false
+    let seen = false
     let raf = 0
     let last = 0
     let checking = false
 
+    const render = () => {
+      b.style.transform = `translate3d(${bx}px, ${by}px, 0)`
+      r.style.transform = `translate3d(${rx}px, ${ry}px, 0)`
+      r.dataset.s = !seen || showBubble ? "hidden" : overLink ? "link" : "idle"
+    }
+
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
-      const k = 1 - Math.exp(-dt / 0.07)
-      cx += (x - cx) * k
-      cy += (y - cy) * k
-      el.style.transform = `translate3d(${cx}px, ${cy}px, 0)`
-      if (active || Math.abs(x - cx) + Math.abs(y - cy) > 0.3) raf = requestAnimationFrame(loop)
-      else raf = 0
+      const kb = 1 - Math.exp(-dt / 0.06)
+      const kr = 1 - Math.exp(-dt / 0.11)
+      bx += (x - bx) * kb
+      by += (y - by) * kb
+      rx += (x - rx) * kr
+      ry += (y - ry) * kr
+      render()
+      const moving = Math.abs(x - bx) + Math.abs(y - by) + Math.abs(x - rx) + Math.abs(y - ry) > 0.3
+      raf = moving ? requestAnimationFrame(loop) : 0
     }
     const ensure = () => {
       if (raf) return
@@ -44,62 +61,66 @@ export function CursorBubble() {
       raf = requestAnimationFrame(loop)
     }
 
-    const setActive = (value: string | null) => {
-      if (value === null) {
-        if (active) {
-          active = false
-          el.dataset.active = "false"
-        }
-        return
-      }
-      if (text.textContent !== value) text.textContent = value
-      if (!active) {
-        // À l'apparition, la bulle naît sous le pointeur au lieu de traverser l'écran.
-        cx = x
-        cy = y
-        el.style.transform = `translate3d(${cx}px, ${cy}px, 0)`
-        active = true
-        el.dataset.active = "true"
-      }
-      ensure()
-    }
-
     const probe = (from: Element | null) => {
       const host = from?.closest?.("[data-cursor]") as HTMLElement | null
-      setActive(host ? host.dataset.cursor ?? "" : null)
+      overLink = !!from?.closest?.(INTERACTIVE)
+      if (host) {
+        const value = host.dataset.cursor ?? ""
+        if (text.textContent !== value) text.textContent = value
+        if (!showBubble) {
+          // À l'apparition, la bulle naît sous le pointeur au lieu de traverser l'écran.
+          bx = x
+          by = y
+          showBubble = true
+          b.dataset.active = "true"
+        }
+      } else if (showBubble) {
+        showBubble = false
+        b.dataset.active = "false"
+      }
+      render()
     }
 
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return
+      if (!seen) {
+        // Premier mouvement : l'anneau apparaît directement sous le pointeur.
+        seen = true
+        rx = e.clientX
+        ry = e.clientY
+      }
       x = e.clientX
       y = e.clientY
       probe(e.target as Element | null)
-      if (active) ensure()
+      ensure()
     }
 
     // Le défilement fluide déplace le contenu sous un pointeur immobile : on revérifie.
     const onScroll = () => {
-      if (checking) return
+      if (checking || !seen) return
       checking = true
       requestAnimationFrame(() => {
         checking = false
-        if (x < 0 && y < 0) return
         probe(document.elementFromPoint(x, y))
       })
     }
 
-    const onLeave = () => setActive(null)
+    const onLeave = () => {
+      seen = false
+      showBubble = false
+      overLink = false
+      b.dataset.active = "false"
+      render()
+    }
 
     // Un clic peut ouvrir la visionneuse par-dessus l'élément : on revérifie ce qui est sous le pointeur.
     const onClick = () => {
       window.setTimeout(() => {
-        if (x < 0 && y < 0) return
-        probe(document.elementFromPoint(x, y))
+        if (seen) probe(document.elementFromPoint(x, y))
       }, 60)
     }
 
     document.addEventListener("pointermove", onMove, { passive: true })
-    document.addEventListener("pointerleave", onLeave)
     document.documentElement.addEventListener("mouseleave", onLeave)
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("blur", onLeave)
@@ -108,7 +129,6 @@ export function CursorBubble() {
     return () => {
       cancelAnimationFrame(raf)
       document.removeEventListener("pointermove", onMove)
-      document.removeEventListener("pointerleave", onLeave)
       document.documentElement.removeEventListener("mouseleave", onLeave)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("blur", onLeave)
@@ -117,11 +137,16 @@ export function CursorBubble() {
   }, [])
 
   return (
-    <div ref={wrap} className="cursor-bubble" data-active="false" aria-hidden>
-      <div className="cursor-bubble__inner">
-        <span ref={label} />
-        <ArrowUpRight className="h-[1.1em] w-[1.1em]" strokeWidth={2.25} />
+    <>
+      <div ref={ring} className="cursor-ring" data-s="hidden" aria-hidden>
+        <div className="cursor-ring__in" />
       </div>
-    </div>
+      <div ref={bubble} className="cursor-bubble" data-active="false" aria-hidden>
+        <div className="cursor-bubble__inner">
+          <span ref={label} />
+          <ArrowUpRight className="h-[1.1em] w-[1.1em]" strokeWidth={2.25} />
+        </div>
+      </div>
+    </>
   )
 }

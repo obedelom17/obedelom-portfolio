@@ -3,7 +3,10 @@
 import { useEffect } from "react"
 
 /** Inertie du défilement, en secondes. Plus la valeur est grande, plus le défilement paraît « lourd ». */
-const TAU = 0.14
+const TAU = 0.085
+
+/** Multiplicateur de la molette : plus grand = défilement plus rapide. */
+const WHEEL_SPEED = 1.2
 
 function inNestedScroller(start: EventTarget | null, dy: number) {
   let el = start instanceof HTMLElement ? start : null
@@ -86,7 +89,7 @@ export function SmoothScroll() {
       let dy = e.deltaY
       if (e.deltaMode === 1) dy *= 33
       else if (e.deltaMode === 2) dy *= window.innerHeight
-      scrollBy(dy)
+      scrollBy(dy * WHEEL_SPEED)
     }
 
     // Défilement natif (barre de défilement, retour arrière du navigateur) : on resynchronise.

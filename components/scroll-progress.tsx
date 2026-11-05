@@ -30,7 +30,7 @@ export function ScrollProgress() {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]" aria-hidden>
-      <div ref={bar} className="h-full origin-left bg-accent" style={{ transform: "scaleX(0)" }} />
+      <div ref={bar} className="bg-grad h-full origin-left" style={{ transform: "scaleX(0)" }} />
     </div>
   )
 }

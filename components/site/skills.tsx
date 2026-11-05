@@ -12,7 +12,7 @@ export function Skills({ index = "04" }: { index?: string }) {
       <ul>
         {skills.map((s) => (
           <li key={s.key}>
-            <Reveal>
+            <Reveal variant="right">
               <div className="grid grid-cols-12 items-center gap-4 border-t border-line py-6 last:border-b">
                 <p className="label col-span-12 sm:col-span-3">{t.skills.categories[s.key]}</p>
                 <ul className="col-span-9 flex flex-wrap gap-2 sm:col-span-7">
@@ -37,7 +37,7 @@ export function Skills({ index = "04" }: { index?: string }) {
                   {[1, 2, 3, 4, 5].map((n) => (
                     <span
                       key={n}
-                      className={`pip h-2.5 w-2.5 ${n <= s.level ? "bg-accent" : "border border-line"}`}
+                      className={`pip h-2.5 w-2.5 ${n <= s.level ? "bg-grad" : "border border-line"}`}
                       style={{ ["--i" as string]: n } as React.CSSProperties}
                     />
                   ))}

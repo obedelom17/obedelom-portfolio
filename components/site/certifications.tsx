@@ -24,7 +24,7 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
             const title = pick(lang, c.title_fr, c.title_en)
             const imageIndex = withImage.findIndex((x) => x.id === c.id)
             return (
-              <Reveal key={c.id} delay={(i % 3) * 70}>
+              <Reveal key={c.id} delay={(i % 3) * 90} variant="scale">
                 <figure>
                   {c.image_url ? (
                     <button

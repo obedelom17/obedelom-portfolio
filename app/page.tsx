@@ -6,7 +6,6 @@ import { Education } from "@/components/site/education"
 import { Internships } from "@/components/site/internships"
 import { Projects } from "@/components/site/projects"
 import { Skills } from "@/components/site/skills"
-import { Journey } from "@/components/site/journey"
 import { Certifications } from "@/components/site/certifications"
 import { Contact } from "@/components/site/contact"
 import { Footer } from "@/components/site/footer"
@@ -14,6 +13,8 @@ import { SmoothScroll } from "@/components/site/smooth-scroll"
 import { Marquee } from "@/components/site/marquee"
 import { ScrollProgress } from "@/components/scroll-progress"
 import { CursorBubble } from "@/components/site/cursor-bubble"
+import { Preloader } from "@/components/site/preloader"
+import { BackToTop } from "@/components/back-to-top"
 
 export const revalidate = 60
 
@@ -29,6 +30,7 @@ export default async function Home() {
 
   return (
     <>
+      <Preloader />
       <SmoothScroll />
       <ScrollProgress />
       <CursorBubble />
@@ -45,11 +47,11 @@ export default async function Home() {
         <Internships items={data.internships} index="03" />
         <Projects projects={data.projects} index={num(3)} />
         <Skills index={num(4)} />
-        <Journey items={data.journey} index={num(5)} />
-        <Certifications items={data.certifications} index={num(6)} />
-        <Contact index={num(7)} />
+        <Certifications items={data.certifications} index={num(5)} />
+        <Contact index={num(6)} />
       </main>
       <Footer />
+      <BackToTop />
     </>
   )
 }

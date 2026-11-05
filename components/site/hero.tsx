@@ -91,7 +91,7 @@ export function Hero({
             <Magnetic>
               <a
                 href="#projets"
-                className="inline-flex items-center gap-3 bg-fg px-7 py-4 text-sm font-medium text-bg transition-colors duration-300 hover:bg-accent-hover hover:text-accent-fg"
+                className="btn-grad inline-flex items-center gap-3 bg-fg px-7 py-4 text-sm font-medium text-bg"
               >
                 {t.hero.projects}
                 <ArrowDownRight className="h-4 w-4" />

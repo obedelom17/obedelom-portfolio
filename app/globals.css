@@ -11,6 +11,7 @@
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-2: var(--accent-2);
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -22,9 +23,11 @@
   --muted: #6b6b66;
   --line: #e5e5e0;
   --card: #f6f6f2;
-  --accent: #1a3c2e;
-  --accent-hover: #2d6a4f;
+  --accent: #059669;
+  --accent-2: #0891b2;
+  --accent-hover: #047857;
   --accent-fg: #ffffff;
+  --grad: linear-gradient(100deg, var(--accent), var(--accent-2));
 }
 
 :root[data-theme="dark"] {
@@ -34,9 +37,10 @@
   --muted: #96968f;
   --line: #242927;
   --card: #111413;
-  --accent: #4fd18b;
-  --accent-hover: #7ae7ad;
-  --accent-fg: #04140b;
+  --accent: #34d399;
+  --accent-2: #22d3ee;
+  --accent-hover: #6ee7b7;
+  --accent-fg: #022c22;
 }
 
 html {
@@ -90,8 +94,17 @@ body {
 
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 32px, 0);
-  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(0, 64px, 0) scale(0.97);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal[data-v="left"] {
+  transform: translate3d(-80px, 0, 0);
+}
+.reveal[data-v="right"] {
+  transform: translate3d(80px, 0, 0);
+}
+.reveal[data-v="scale"] {
+  transform: scale(0.86);
 }
 .reveal.is-visible {
   opacity: 1;
@@ -132,7 +145,7 @@ body::after {
 
 /* Dégradé animé sur le mot clé du titre. */
 .text-shine {
-  background-image: linear-gradient(100deg, var(--accent) 0%, var(--accent-hover) 45%, var(--accent) 100%);
+  background-image: linear-gradient(100deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent) 100%);
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -200,7 +213,7 @@ body::after {
   top: -14rem;
   width: 46rem;
   height: 46rem;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 26%, transparent), transparent 62%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 32%, transparent), transparent 62%);
   animation: drift-a 18s ease-in-out infinite alternate;
 }
 .hero-orb--b {
@@ -208,7 +221,7 @@ body::after {
   bottom: -8rem;
   width: 34rem;
   height: 34rem;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent-hover) 20%, transparent), transparent 65%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 24%, transparent), transparent 65%);
   animation: drift-b 22s ease-in-out infinite alternate;
 }
 @keyframes drift-a {
@@ -281,15 +294,7 @@ body::after {
 .marquee__track {
   display: flex;
   width: max-content;
-  animation: marquee 45s linear infinite;
-}
-.marquee:hover .marquee__track {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
+  will-change: transform;
 }
 
 /* Grand nom du pied de page. */
@@ -413,4 +418,134 @@ html.smooth-scroll {
 .field:focus {
   outline: none;
   border-bottom-color: var(--accent);
+}
+
+/* Dégradé de l'accent, utilisable comme fond. */
+.bg-grad {
+  background: var(--grad);
+}
+
+/* Bouton : un dégradé balaie le fond au survol. */
+.btn-grad {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.4s ease;
+}
+.btn-grad::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--grad);
+  transform: translateX(-101%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-grad:hover::before,
+.btn-grad:focus-visible::before {
+  transform: none;
+}
+.btn-grad:hover,
+.btn-grad:focus-visible {
+  color: var(--accent-fg);
+}
+
+/* Reflet qui suit la souris sur les cartes inclinables. */
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%);
+}
+.tilt:hover .tilt-glare {
+  opacity: 1;
+}
+
+/* Écran d'introduction, une fois par session. */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: 0 0 50% 50% / 0 0 7vh 7vh;
+  transition: transform 1.1s cubic-bezier(0.76, 0, 0.24, 1);
+}
+html[data-loader="on"] .preloader,
+html[data-loader="exit"] .preloader {
+  display: flex;
+}
+html[data-loader] {
+  overflow: hidden;
+}
+.preloader.is-done {
+  transform: translateY(-100%);
+}
+html[data-loader="on"] .line__in,
+html[data-loader="on"] .fade-up {
+  animation-play-state: paused;
+}
+.preloader__bar {
+  height: 2px;
+  width: 100%;
+  background: color-mix(in srgb, var(--bg) 22%, transparent);
+  overflow: hidden;
+}
+.preloader__bar > span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--grad);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+/* Anneau qui suit la souris. */
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 69;
+  pointer-events: none;
+}
+.cursor-ring__in {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 9999px;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+.cursor-ring[data-s="idle"] .cursor-ring__in {
+  opacity: 0.85;
+}
+.cursor-ring[data-s="link"] .cursor-ring__in {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.8);
+  border-color: transparent;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor-ring {
+    display: none;
+  }
+}
+
+.text-gradient-star {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }

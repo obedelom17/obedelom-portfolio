@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Check, Copy } from "lucide-react"
 import emailjs from "@emailjs/browser"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
@@ -15,6 +15,15 @@ export function Contact({ index = "07" }: { index?: string }) {
   const formRef = useRef<HTMLFormElement>(null)
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const f = t.contact.form
+  const [copied, setCopied] = useState(false)
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -38,12 +47,19 @@ export function Contact({ index = "07" }: { index?: string }) {
       <Reveal>
         <h2 className="font-serif text-4xl leading-[1.02] md:text-7xl">{t.contact.title}</h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="link-underline mt-8 inline-block break-all pb-1 font-serif text-2xl md:text-3xl"
-        >
-          {EMAIL}
-        </a>
+        <div className="mt-8 flex flex-wrap items-center gap-4">
+          <a href={`mailto:${EMAIL}`} className="link-underline inline-block break-all pb-1 font-serif text-2xl md:text-3xl">
+            {EMAIL}
+          </a>
+          <button
+            type="button"
+            onClick={copyEmail}
+            className="label inline-flex items-center gap-2 border border-line px-3 py-2 transition-colors hover:border-fg hover:text-fg"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? t.ui.copied : t.ui.copy}
+          </button>
+        </div>
       </Reveal>
 
       <div className="mt-16 grid gap-14 lg:grid-cols-5">
@@ -96,7 +112,7 @@ export function Contact({ index = "07" }: { index?: string }) {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="inline-flex items-center gap-3 bg-fg px-8 py-4 text-sm font-medium text-bg transition-colors duration-300 hover:bg-accent-hover hover:text-accent-fg disabled:opacity-60"
+                  className="btn-grad inline-flex items-center gap-3 bg-fg px-8 py-4 text-sm font-medium text-bg disabled:opacity-60"
                 >
                   {status === "loading" ? f.sending : f.send}
                   <ArrowUpRight className="h-4 w-4" />

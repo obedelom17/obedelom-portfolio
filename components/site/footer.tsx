@@ -2,6 +2,7 @@
 
 import { ArrowUp } from "lucide-react"
 import { useApp } from "@/components/providers"
+import { LocalTime } from "./local-time"
 
 export function Footer() {
   const { t } = useApp()
@@ -13,9 +14,18 @@ export function Footer() {
         </p>
       </div>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-8 sm:px-8">
-        <p className="label">
-          © {new Date().getFullYear()} AGBEBAVI Elom Obed. {t.footer.rights}.
-        </p>
+        <div className="space-y-2">
+          <p className="label flex items-center gap-2">
+            <span className="relative flex h-2 w-2" aria-hidden>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            Lomé, Togo · <LocalTime /> GMT
+          </p>
+          <p className="label">
+            © {new Date().getFullYear()} AGBEBAVI Elom Obed. {t.footer.rights}.
+          </p>
+        </div>
         <a
           href="#top"
           className="label group inline-flex items-center gap-3 transition-colors hover:text-fg"

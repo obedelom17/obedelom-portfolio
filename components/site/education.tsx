@@ -3,6 +3,7 @@
 import { ArrowUpRight } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
+import { Parallax } from "@/components/parallax"
 import { Section } from "./section"
 
 export function Education() {
@@ -15,13 +16,15 @@ export function Education() {
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <div className="overflow-hidden border border-line">
-            <img
-              src="/images/iai/iai-lome.webp"
-              alt={f.caption}
-              width={1800}
-              height={1350}
-              className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
-            />
+            <Parallax>
+              <img
+                src="/images/iai/iai-lome.webp"
+                alt={f.caption}
+                width={1800}
+                height={1350}
+                className="wipe aspect-[16/9] w-full object-cover object-[50%_40%]"
+              />
+            </Parallax>
           </div>
           <figcaption className="label mt-3">{f.caption}</figcaption>
         </figure>
