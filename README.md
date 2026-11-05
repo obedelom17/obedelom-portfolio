@@ -10,7 +10,7 @@
 
 Portfolio personnel de AGBEBAVI Elom Obed, ingénieur en informatique basé à Lomé, Togo. Le site est bilingue (français et anglais), adopte un design blanc, noir et vert, et inclut un espace d'administration pour gérer les projets, les certifications et le parcours sans toucher au code.
 
-Site en ligne : https://obedelom-portfolio.vercel.app
+Site en ligne : https://obedelom-portfolio.pages.dev
 
 ### Fonctionnalités
 
@@ -28,7 +28,7 @@ Site en ligne : https://obedelom-portfolio.vercel.app
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS 4
 - EmailJS (formulaire de contact)
-- Déploiement sur Vercel
+- Déploiement sur Cloudflare Pages (export statique + Pages Functions)
 - Neon (base PostgreSQL serverless) pour le contenu modifiable depuis l'administration
 
 ### Structure
@@ -71,9 +71,9 @@ La page `/admin` permet d'ajouter, modifier, supprimer et réordonner les projet
 
 ### Activer l'administration
 
-1. Créer un compte et un projet sur https://neon.tech (ou, dans Vercel, Storage > Neon, qui ajoute `DATABASE_URL` automatiquement).
+1. Créer un compte et un projet sur https://neon.tech.
 2. Dans le tableau de bord Neon, copier la chaîne de connexion (Connect > Connection string).
-3. Dans Vercel : Settings > Environment Variables, ajouter `DATABASE_URL`, `ADMIN_PASSWORD` (mot de passe long) et `SESSION_SECRET` (chaîne aléatoire).
+3. Dans Cloudflare : Workers & Pages > projet > Settings > Variables and Secrets, ajouter `DATABASE_URL`, `ADMIN_PASSWORD` (mot de passe long) et `SESSION_SECRET` (chaîne aléatoire).
 4. Redéployer le projet.
 5. Ouvrir `/admin` et se connecter avec `ADMIN_PASSWORD`.
 
@@ -107,7 +107,7 @@ GitHub : https://github.com/obedelom17
 
 Personal portfolio of AGBEBAVI Elom Obed, a computer engineer based in Lomé, Togo. The site is bilingual (French and English), uses a white, black and green design, and includes an admin area to manage projects, certifications and journey entries without editing code.
 
-Live site: https://obedelom-portfolio.vercel.app
+Live site: https://obedelom-portfolio.pages.dev
 
 ### Features
 
@@ -125,7 +125,7 @@ Live site: https://obedelom-portfolio.vercel.app
 - Next.js 16 (App Router), React 19, TypeScript
 - Tailwind CSS 4
 - EmailJS (contact form)
-- Deployed on Vercel
+- Deployed on Cloudflare Pages (static export + Pages Functions)
 - Neon (serverless PostgreSQL) for content editable from the admin
 
 ### Structure
@@ -168,9 +168,9 @@ The `/admin` page lets you add, edit, delete and reorder projects, certification
 
 ### Enabling the admin area
 
-1. Create an account and a project at https://neon.tech (or, in Vercel, Storage > Neon, which adds `DATABASE_URL` automatically).
+1. Create an account and a project at https://neon.tech.
 2. In the Neon dashboard, copy the connection string (Connect > Connection string).
-3. In Vercel: Settings > Environment Variables, add `DATABASE_URL`, `ADMIN_PASSWORD` (a long password) and `SESSION_SECRET` (a random string).
+3. In Cloudflare: Workers & Pages > project > Settings > Variables and Secrets, add `DATABASE_URL`, `ADMIN_PASSWORD` (a long password) and `SESSION_SECRET` (a random string).
 4. Redeploy the project.
 5. Open `/admin` and sign in with `ADMIN_PASSWORD`.
 

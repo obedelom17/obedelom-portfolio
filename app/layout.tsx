@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Providers } from "@/components/providers"
 import "./globals.css"
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://obedelom-portfolio.vercel.app"
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://obedelom-portfolio.pages.dev"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
