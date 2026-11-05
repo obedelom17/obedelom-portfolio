@@ -30,7 +30,7 @@ function InternshipBlock({ item, first }: { item: Internship; first: boolean }) 
         <Reveal>
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <div className="overflow-hidden border border-line">
+            <div className="curtain overflow-hidden border border-line">
               <Parallax>
                 <img
                   src={item.image_url}
@@ -103,7 +103,7 @@ function InternshipBlock({ item, first }: { item: Internship; first: boolean }) 
           {missions.length > 0 && (
             <div className="lg:col-span-7">
               <h4 className="label">{f.missionsTitle}</h4>
-              <ul className="mt-4">
+              <ul className="focus-list mt-4">
                 {missions.map((m, i) => (
                   <li key={`${i}-${m}`}>
                     <Reveal>

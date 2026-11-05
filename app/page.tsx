@@ -18,6 +18,10 @@ import { BackToTop } from "@/components/back-to-top"
 import { Toaster } from "@/components/toaster"
 import { CommandPalette } from "@/components/command-palette"
 import { ScrollBand } from "@/components/site/scroll-band"
+import { Aurora } from "@/components/fx/aurora"
+import { CursorTrail } from "@/components/fx/cursor-trail"
+import { GlobalFx } from "@/components/fx/global-fx"
+import { ScrollRail } from "@/components/fx/scroll-rail"
 
 export const revalidate = 60
 
@@ -34,6 +38,10 @@ export default async function Home() {
   return (
     <>
       <Preloader />
+      <Aurora />
+      <CursorTrail />
+      <GlobalFx />
+      <ScrollRail showInternships={hasInternships} />
       <SmoothScroll />
       <ScrollProgress />
       <CursorBubble />

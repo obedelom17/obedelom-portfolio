@@ -10,6 +10,7 @@ import { SplitWords } from "@/components/split-words"
 import { confetti } from "@/lib/confetti"
 import { toast } from "@/lib/toast"
 import { Section } from "./section"
+import { Roll } from "@/components/fx/roll"
 
 const EMAIL = "agbebaviobedelom@gmail.com"
 
@@ -55,6 +56,19 @@ export function Contact({ index = "07" }: { index?: string }) {
           <SplitWords text={t.contact.title} />
         </h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>
+        <Magnetic strength={0.3} className="contact-ring mt-10 hidden md:inline-block">
+          <a href={`mailto:${EMAIL}`} aria-label={EMAIL} className="contact-ring__a">
+            <svg viewBox="0 0 120 120" className="contact-ring__svg" aria-hidden>
+              <defs>
+                <path id="contact-circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" />
+              </defs>
+              <text fontSize="9.5" letterSpacing="3.2" fill="currentColor" style={{ textTransform: "uppercase" }}>
+                <textPath href="#contact-circle">{t.ui.ring}</textPath>
+              </text>
+            </svg>
+            <ArrowUpRight className="h-7 w-7" />
+          </a>
+        </Magnetic>
         <div className="mt-8 flex flex-wrap items-center gap-4">
           <a href={`mailto:${EMAIL}`} className="link-underline inline-block break-all pb-1 font-serif text-2xl md:text-3xl">
             {EMAIL}
@@ -71,7 +85,7 @@ export function Contact({ index = "07" }: { index?: string }) {
       </Reveal>
 
       <div className="mt-16 grid gap-14 lg:grid-cols-5">
-        <div className="glow-border glow-border--on border border-line bg-card p-6 sm:p-10 lg:col-span-3">
+        <div className="glow-border glow-border--on spot border border-line bg-card p-6 sm:p-10 lg:col-span-3">
           {status === "success" ? (
             <div className="border-t border-fg pt-6">
               <h3 className="font-serif text-3xl">{f.successTitle}</h3>
@@ -79,13 +93,13 @@ export function Contact({ index = "07" }: { index?: string }) {
             </div>
           ) : (
             <form ref={formRef} onSubmit={onSubmit} className="space-y-8">
-              <div>
+              <div className="field-wrap">
                 <label htmlFor="from_name" className="label">
                   {f.name}
                 </label>
                 <input id="from_name" name="from_name" required placeholder={f.namePlaceholder} className="field" />
               </div>
-              <div>
+              <div className="field-wrap">
                 <label htmlFor="reply_to" className="label">
                   {f.email}
                 </label>
@@ -98,7 +112,7 @@ export function Contact({ index = "07" }: { index?: string }) {
                   className="field"
                 />
               </div>
-              <div>
+              <div className="field-wrap">
                 <label htmlFor="message" className="label">
                   {f.message}
                 </label>
@@ -120,9 +134,9 @@ export function Contact({ index = "07" }: { index?: string }) {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="btn-grad inline-flex items-center gap-3 bg-fg px-8 py-4 text-sm font-medium text-bg disabled:opacity-60"
+                  className="btn-grad roll-host inline-flex items-center gap-3 bg-fg px-8 py-4 text-sm font-medium text-bg disabled:opacity-60"
                 >
-                  {status === "loading" ? f.sending : f.send}
+                  <Roll text={status === "loading" ? f.sending : f.send} />
                   <ArrowUpRight className="h-4 w-4" />
                 </button>
               </Magnetic>

@@ -33,10 +33,20 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
   const { t, lang, setLang } = useApp()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [hidden, setHidden] = useState(false)
   const [active, setActive] = useState("")
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
+    let lastY = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 8)
+      const dy = y - lastY
+      if (Math.abs(dy) > 6) {
+        setHidden(dy > 0 && y > 480)
+        lastY = y
+      }
+    }
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
@@ -83,7 +93,9 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
       {t.ui.skip}
     </a>
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-500 ${
+      className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        hidden && !open ? "-translate-y-full" : "translate-y-0"
+      } ${
         scrolled || open ? "border-b border-line bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
       }`}
     >

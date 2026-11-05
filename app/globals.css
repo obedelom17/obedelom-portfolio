@@ -775,3 +775,569 @@ html[data-loader="on"] .word-in {
 .skip-link:focus {
   transform: none;
 }
+
+/* ==========================================================================
+   Couche d'animations supplémentaire
+   ========================================================================== */
+
+:root {
+  --accent-3: #7c3aed;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+:root[data-theme="dark"] {
+  --accent-3: #a78bfa;
+}
+
+/* Halos de fond fixes, pilotés par le défilement et le pointeur. */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.55;
+}
+:root[data-theme="dark"] .aurora {
+  opacity: 0.8;
+}
+.aurora__blob {
+  position: absolute;
+  width: 56vmax;
+  height: 56vmax;
+  border-radius: 9999px;
+  will-change: transform;
+}
+.aurora__blob--1 {
+  left: -14vmax;
+  top: -12vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 66%);
+}
+.aurora__blob--2 {
+  right: -16vmax;
+  top: 30vh;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 26%, transparent), transparent 66%);
+}
+.aurora__blob--3 {
+  left: 20vw;
+  bottom: -26vmax;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-3) 24%, transparent), transparent 66%);
+}
+
+/* Traînée du curseur. */
+.cursor-trail {
+  position: fixed;
+  inset: 0;
+  z-index: 119;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor-trail {
+    display: none;
+  }
+}
+
+/* Onde et étincelles au clic. */
+.click-fx {
+  position: fixed;
+  z-index: 125;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.click-fx i {
+  position: absolute;
+  display: block;
+}
+.click-fx__ring {
+  left: -18px;
+  top: -18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 2px solid var(--accent);
+  animation: click-ring 0.7s var(--ease) forwards;
+}
+.click-fx__spark {
+  left: -2px;
+  top: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--accent-2);
+  animation: click-spark 0.7s var(--ease) forwards;
+}
+@keyframes click-ring {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+@keyframes click-spark {
+  from {
+    transform: rotate(var(--a)) translateX(8px);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateX(46px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Lueur qui suit la souris à l'intérieur d'une carte. */
+.spot {
+  position: relative;
+  isolation: isolate;
+}
+.spot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 17%, transparent), transparent 62%);
+}
+.spot:hover::after {
+  opacity: 1;
+}
+
+/* Texte qui « roule » lettre par lettre au survol. */
+.roll {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1.25;
+  white-space: pre;
+}
+.roll__c {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.6s var(--ease);
+  transition-delay: calc(var(--i, 0) * 16ms);
+}
+.roll__c::after {
+  content: attr(data-c);
+  position: absolute;
+  left: 0;
+  top: 100%;
+}
+.roll-host:hover .roll__c,
+.roll-host:focus-visible .roll__c {
+  transform: translate3d(0, -100%, 0);
+}
+
+/* Grand texte à lettres sensibles au pointeur (pied de page). */
+.prox {
+  display: inline-block;
+}
+.prox__in {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 45%, 0);
+  transition: opacity 0.9s ease calc(var(--i, 0) * 45ms), transform 1.2s var(--ease) calc(var(--i, 0) * 45ms);
+}
+.prox[data-in="true"] .prox__in {
+  opacity: 1;
+  transform: none;
+}
+.prox__c {
+  display: inline-block;
+  color: color-mix(in srgb, var(--fg) calc(var(--p, 0) * 100%), transparent);
+  -webkit-text-stroke: 1px var(--fg);
+  transition: transform 0.45s var(--ease);
+  will-change: transform;
+}
+
+/* Chiffre de section qui se remplit. */
+.num-fill {
+  display: inline-block;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--muted);
+  background-image: var(--grad);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% calc(var(--fill, 0) * 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Filet de section qui se trace à l'entrée (animations liées au défilement, sinon trait fixe). */
+.sec-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  pointer-events: none;
+  background: var(--grad);
+  transform-origin: left;
+  transform: scaleX(0.25);
+  opacity: 0.6;
+}
+@supports (animation-timeline: view()) {
+  .sec-line {
+    transform: scaleX(0);
+    opacity: 1;
+    animation: sec-line linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 70%;
+  }
+  @keyframes sec-line {
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* Variantes d'apparition supplémentaires. */
+.reveal[data-v="clip"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.3s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.reveal[data-v="clip"].is-visible {
+  clip-path: inset(0 0 0 0);
+}
+.reveal[data-v="blur"] {
+  filter: blur(14px);
+  transform: translate3d(0, 48px, 0) scale(0.94);
+  transition: opacity 1s var(--ease), transform 1.3s var(--ease), filter 1s ease;
+}
+.reveal[data-v="blur"].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+.reveal[data-v="rotate"] {
+  transform: perspective(900px) rotateX(18deg) translate3d(0, 56px, 0) scale(0.94);
+  transform-origin: 50% 100%;
+}
+.reveal[data-v="rotate"].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Rideau : l'image se dévoile du haut vers le bas. */
+.reveal .curtain {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.5s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.reveal.is-visible .curtain {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Au survol d'une ligne, les autres s'estompent. */
+.focus-list > li {
+  transition: opacity 0.45s ease;
+}
+.focus-list:has(> li:hover) > li:not(:hover) {
+  opacity: 0.32;
+}
+.focus-cols > div {
+  transition: opacity 0.45s ease;
+}
+.focus-cols:has(> div:hover) > div:not(:hover) {
+  opacity: 0.4;
+}
+
+/* Titre du hero incliné vers le pointeur. */
+.hero-title {
+  will-change: transform;
+}
+
+/* Pastille de technologie : le logo se secoue au survol. */
+.chip:hover img {
+  animation: wobble 0.7s var(--ease);
+}
+@keyframes wobble {
+  30% {
+    transform: rotate(-12deg) scale(1.15);
+  }
+  60% {
+    transform: rotate(8deg) scale(1.1);
+  }
+}
+
+/* Navigation latérale. */
+.scroll-rail {
+  position: fixed;
+  right: 1.1rem;
+  top: 50%;
+  z-index: 45;
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.1rem;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(1rem, -50%);
+  transition: opacity 0.5s ease, transform 0.7s var(--ease);
+}
+.scroll-rail[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(0, -50%);
+}
+@media (min-width: 1280px) {
+  .scroll-rail {
+    display: flex;
+  }
+}
+.scroll-rail ul {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.scroll-rail__item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.35rem 0;
+}
+.scroll-rail__label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: var(--bg);
+  padding: 0.15rem 0.45rem;
+  border: 1px solid var(--line);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 0.3s ease, transform 0.5s var(--ease);
+  pointer-events: none;
+}
+.scroll-rail__item:hover .scroll-rail__label,
+.scroll-rail__item:focus-visible .scroll-rail__label {
+  opacity: 1;
+  transform: none;
+}
+.scroll-rail__tick {
+  display: block;
+  height: 2px;
+  width: 0.9rem;
+  background: var(--muted);
+  opacity: 0.6;
+  transition: width 0.5s var(--ease), opacity 0.3s ease, background 0.3s ease;
+}
+.scroll-rail__item:hover .scroll-rail__tick {
+  width: 1.6rem;
+  opacity: 1;
+}
+.scroll-rail__item[data-active="true"] .scroll-rail__tick {
+  width: 2.2rem;
+  opacity: 1;
+  background: var(--grad);
+}
+.scroll-rail__pct {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Terrain de jeu des technologies. */
+.playground {
+  position: relative;
+  height: min(62vh, 420px);
+  margin-bottom: 3.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: radial-gradient(ellipse at 50% 120%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+}
+.playground__cv {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: pan-y;
+}
+.playground__hint {
+  position: absolute;
+  left: 1rem;
+  top: 0.9rem;
+  pointer-events: none;
+}
+
+/* Sommaire des projets avec aperçu flottant. */
+.pidx {
+  border-top: 1px solid var(--line);
+}
+.pidx__row {
+  display: grid;
+  grid-template-columns: 3rem 1fr 2rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--line);
+  transition: padding 0.5s var(--ease);
+}
+@media (min-width: 640px) {
+  .pidx__row {
+    grid-template-columns: 3rem 1fr auto 2rem;
+  }
+}
+.pidx__row:hover,
+.pidx__row:focus-visible {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.pidx__arrow {
+  justify-self: end;
+  opacity: 0;
+  color: var(--accent);
+  transform: translate(-8px, 8px);
+  transition: opacity 0.3s ease, transform 0.5s var(--ease);
+}
+.pidx__row:hover .pidx__arrow,
+.pidx__row:focus-visible .pidx__arrow {
+  opacity: 1;
+  transform: none;
+}
+.pidx__preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  width: min(22rem, 40vw);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  pointer-events: none;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  scale: 0.6;
+  transition: opacity 0.3s ease, scale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pidx__preview[data-on="true"] {
+  opacity: 1;
+  scale: 1;
+}
+.pidx__preview img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.pidx__preview img[data-active="true"] {
+  opacity: 1;
+}
+@media (hover: none), (pointer: coarse) {
+  .pidx__preview {
+    display: none;
+  }
+}
+
+/* Intro : le nom arrive lettre par lettre. */
+.pre-char {
+  display: inline-block;
+  animation: pre-char 0.9s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 100ms);
+}
+@keyframes pre-char {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 60%, 0) rotate(6deg);
+  }
+}
+
+/* Contact : bouton rond à texte circulaire, et champs dont le filet se trace au focus. */
+.contact-ring__a {
+  position: relative;
+  display: flex;
+  width: 8.5rem;
+  height: 8.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+.contact-ring__a:hover {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+.contact-ring__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: spin 18s linear infinite;
+}
+.contact-ring__a:hover .contact-ring__svg {
+  animation-duration: 6s;
+}
+.field-wrap {
+  position: relative;
+}
+.field-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease);
+}
+.field-wrap:focus-within::after {
+  transform: scaleX(1);
+}
+.field-wrap .label {
+  transition: color 0.3s ease;
+}
+.field-wrap:focus-within .label {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .click-fx,
+  .cursor-trail {
+    display: none;
+  }
+  .reveal[data-v="clip"],
+  .reveal[data-v="blur"],
+  .reveal[data-v="rotate"],
+  .reveal .curtain {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    clip-path: none;
+    transition: none;
+  }
+  .prox__in,
+  .pre-char {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+  .roll__c,
+  .contact-ring__svg,
+  .chip:hover img {
+    transition: none;
+    animation: none;
+  }
+}

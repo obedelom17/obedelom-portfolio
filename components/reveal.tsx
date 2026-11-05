@@ -11,7 +11,7 @@ export function Reveal({
   children: ReactNode
   className?: string
   delay?: number
-  variant?: "up" | "left" | "right" | "scale"
+  variant?: "up" | "left" | "right" | "scale" | "clip" | "blur" | "rotate"
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)

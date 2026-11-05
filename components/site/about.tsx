@@ -15,7 +15,7 @@ export function About() {
         {t.about.facts.map((f, i) => (
           <Reveal key={f.title} delay={i * 110} className="h-full">
             <Tilt className="h-full">
-              <div className="glow-border h-full border border-line bg-bg p-6 transition-[border-color,background-color] duration-500 hover:border-accent hover:bg-card">
+              <div className="glow-border spot h-full border border-line bg-bg p-6 transition-[border-color,background-color] duration-500 hover:border-accent hover:bg-card">
                 <span className="label">
                   <span className="text-gradient-star">{String(i + 1).padStart(2, "0")}</span>
                 </span>

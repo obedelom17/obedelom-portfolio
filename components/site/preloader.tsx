@@ -59,7 +59,13 @@ export function Preloader() {
         Portfolio
       </p>
       <div>
-        <p className="font-serif text-[min(12vw,8rem)] leading-none">Obed Agbebavi</p>
+        <p className="font-serif text-[min(12vw,8rem)] leading-none" aria-hidden>
+          {Array.from("Obed Agbebavi").map((c, i) => (
+            <span key={i} className="pre-char" style={{ ["--i" as string]: i } as React.CSSProperties}>
+              {c === " " ? "\u00a0" : c}
+            </span>
+          ))}
+        </p>
         <div className="mt-8 flex items-end gap-6">
           <div className="preloader__bar">
             <span ref={bar} />

@@ -7,6 +7,7 @@ import { Lightbox } from "@/components/lightbox"
 import { pick } from "@/lib/pick"
 import type { Certification } from "@/lib/types"
 import { Section } from "./section"
+import { Tilt } from "@/components/tilt"
 
 export function Certifications({ items, index = "06" }: { items: Certification[]; index?: string }) {
   const { t, lang } = useApp()
@@ -24,9 +25,10 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
             const title = pick(lang, c.title_fr, c.title_en)
             const imageIndex = withImage.findIndex((x) => x.id === c.id)
             return (
-              <Reveal key={c.id} delay={(i % 3) * 90} variant="scale">
+              <Reveal key={c.id} delay={(i % 3) * 90} variant={i % 2 ? "blur" : "rotate"}>
                 <figure>
                   {c.image_url ? (
+                    <Tilt max={6}>
                     <button
                       type="button"
                       onClick={() => setOpen(imageIndex)}
@@ -42,6 +44,7 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
                         className="aspect-[4/3] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/cert:scale-[1.05]"
                       />
                     </button>
+                    </Tilt>
                   ) : (
                     <div className="flex aspect-[4/3] items-center justify-center border border-line bg-card">
                       <span className="font-serif text-5xl text-line">{c.year}</span>

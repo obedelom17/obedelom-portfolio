@@ -8,6 +8,8 @@ import { Magnetic } from "@/components/magnetic"
 import { ParticleField } from "@/components/particle-field"
 import { RotatingWords } from "./rotating-words"
 import { Scramble } from "./scramble"
+import { Roll } from "@/components/fx/roll"
+import { HeroMotion } from "@/components/fx/hero-motion"
 
 const d = (ms: number) => ({ ["--d" as string]: `${ms}ms` }) as React.CSSProperties
 
@@ -54,13 +56,18 @@ export function Hero({
   return (
     <section id="top" onPointerMove={onMove} className="relative overflow-hidden">
       <div className="hero-grid" aria-hidden />
-      <div className="hero-orb hero-orb--a" aria-hidden />
-      <div className="hero-orb hero-orb--b" aria-hidden />
+      <div className="pointer-events-none absolute inset-0" data-depth="-34" aria-hidden>
+        <div className="hero-orb hero-orb--a" />
+      </div>
+      <div className="pointer-events-none absolute inset-0" data-depth="28" aria-hidden>
+        <div className="hero-orb hero-orb--b" />
+      </div>
+      <HeroMotion />
       <ParticleField />
       <div ref={glow} className="hero-glow" aria-hidden />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-32 pt-36 sm:px-8 md:pt-48">
-        <div className="hero-badge" aria-hidden>
+      <div data-hero-exit className="relative mx-auto max-w-7xl px-5 pb-32 pt-36 sm:px-8 md:pt-48">
+        <div className="hero-badge" data-depth="16" aria-hidden>
           <svg viewBox="0 0 120 120" className="hero-badge__ring">
             <defs>
               <path id="badge-circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" />
@@ -80,7 +87,7 @@ export function Hero({
           <Scramble text={t.hero.kicker} auto delay={900} />
         </p>
 
-        <h1 className="mt-10 max-w-5xl font-serif text-[2.7rem] leading-[1.02] sm:text-7xl lg:text-[5.6rem]">
+        <h1 data-hero-title className="hero-title mt-10 max-w-5xl font-serif text-[2.7rem] leading-[1.02] sm:text-7xl lg:text-[5.6rem]">
           <span className="line">
             <Words text={l1} base={200} />
           </span>
@@ -105,9 +112,9 @@ export function Hero({
             <Magnetic>
               <a
                 href="#projets"
-                className="btn-grad inline-flex items-center gap-3 bg-fg px-7 py-4 text-sm font-medium text-bg"
+                className="btn-grad roll-host inline-flex items-center gap-3 bg-fg px-7 py-4 text-sm font-medium text-bg"
               >
-                {t.hero.projects}
+                <Roll text={t.hero.projects} />
                 <ArrowDownRight className="h-4 w-4" />
               </a>
             </Magnetic>
@@ -117,9 +124,9 @@ export function Hero({
           </div>
         </div>
 
-        <dl className="fade-up mt-20 grid grid-cols-3 border-y border-line" style={d(1250)}>
+        <dl className="fade-up focus-cols mt-20 grid grid-cols-3 border-y border-line" style={d(1250)}>
           {stats.map((s, i) => (
-            <div key={s.k} className={`px-2 py-7 sm:px-8 ${i > 0 ? "border-l border-line" : ""}`}>
+            <div key={s.k} className={`spot px-2 py-7 sm:px-8 ${i > 0 ? "border-l border-line" : ""}`}>
               <dt className="label">{s.k}</dt>
               <dd className="mt-3 font-serif text-4xl sm:text-7xl">{s.v}</dd>
             </div>

@@ -15,7 +15,7 @@ export function Education() {
       <Reveal>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <div className="overflow-hidden border border-line">
+          <div className="curtain overflow-hidden border border-line">
             <Parallax>
               <img
                 src="/images/iai/iai-lome.webp"
@@ -69,7 +69,7 @@ export function Education() {
       <div className="mt-14 grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <h3 className="label">{f.diplomasTitle}</h3>
-          <ul className="mt-4">
+          <ul className="focus-list mt-4">
             {f.diplomas.map((d) => (
               <li key={d.title}>
                 <Reveal>

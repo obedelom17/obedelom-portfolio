@@ -11,6 +11,8 @@ import { buildMedia } from "@/lib/media"
 import { pick, pickList } from "@/lib/pick"
 import type { Project, ProjectStatus } from "@/lib/types"
 import { Section } from "./section"
+import { ProjectIndex } from "@/components/fx/project-index"
+import { Roll } from "@/components/fx/roll"
 
 const STATUS_DOT: Record<ProjectStatus, string> = {
   production: "bg-accent",
@@ -40,7 +42,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
   const host = hostOf(project.demo_url)
 
   return (
-    <article className="group/row border-t border-line last:border-b">
+    <article id={`projet-${project.id}`} className="group/row border-t border-line last:border-b">
       <div className="grid grid-cols-12 items-baseline gap-4 pt-10">
         <span className="col-span-2 font-mono text-sm text-accent sm:col-span-1">{number}</span>
         <h3 className="col-span-10 font-serif text-3xl leading-none transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:translate-x-3 sm:col-span-8 md:text-6xl">
@@ -143,7 +145,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
           {project.stack?.length > 0 && (
             <ul className="mt-6 flex flex-wrap gap-2">
               {project.stack.map((s) => (
-                <li key={s} className="label border border-line px-2.5 py-1">
+                <li key={s} className="label spot border border-line px-2.5 py-1 transition-transform duration-300 hover:-translate-y-0.5">
                   {s}
                 </li>
               ))}
@@ -157,9 +159,9 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                   href={project.demo_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-grad inline-flex items-center gap-2 bg-fg px-5 py-3 text-bg"
+                  className="btn-grad roll-host inline-flex items-center gap-2 bg-fg px-5 py-3 text-bg"
                 >
-                  {t.projects.demo}
+                  <Roll text={t.projects.demo} />
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
               )}
@@ -168,9 +170,9 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                   href={project.code_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border border-fg px-5 py-3 transition-colors duration-300 hover:bg-fg hover:text-bg"
+                  className="roll-host inline-flex items-center gap-2 border border-fg px-5 py-3 transition-colors duration-300 hover:bg-fg hover:text-bg"
                 >
-                  {t.projects.code}
+                  <Roll text={t.projects.code} />
                   <ArrowUpRight className="h-4 w-4" />
                 </a>
               )}
@@ -194,6 +196,7 @@ export function Projects({ projects, index = "03" }: { projects: Project[]; inde
         <p className="text-muted">{t.projects.empty}</p>
       ) : (
         <div>
+          <ProjectIndex projects={projects} />
           {projects.map((p, i) => (
             <Reveal key={p.id}>
               <ProjectRow project={p} number={String(i + 1).padStart(2, "0")} />

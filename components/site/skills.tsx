@@ -4,12 +4,14 @@ import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
 import { skills } from "@/lib/skills"
 import { Section } from "./section"
+import { TechPlayground } from "@/components/fx/tech-playground"
 
 export function Skills({ index = "04" }: { index?: string }) {
   const { t } = useApp()
   return (
     <Section id="competences" index={index} label={t.skills.label} title={t.skills.title}>
-      <ul>
+      <TechPlayground hint={t.skills.playground} />
+      <ul className="focus-list">
         {skills.map((s) => (
           <li key={s.key}>
             <Reveal variant="right">
@@ -19,7 +21,7 @@ export function Skills({ index = "04" }: { index?: string }) {
                   {s.items.map((it) => (
                     <li
                       key={it.name}
-                      className="flex items-center gap-2.5 border border-line py-1.5 pl-1.5 pr-3 text-sm transition-[transform,border-color,background-color] duration-300 hover:-translate-y-0.5 hover:border-fg hover:bg-card"
+                      className="chip spot flex items-center gap-2.5 border border-line py-1.5 pl-1.5 pr-3 text-sm transition-[transform,border-color,background-color] duration-300 hover:-translate-y-0.5 hover:border-fg hover:bg-card"
                     >
                       <span className="flex h-7 w-7 items-center justify-center bg-white">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
