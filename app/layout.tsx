@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next"
-import { Analytics } from "@vercel/analytics/react"
 import { Providers } from "@/components/providers"
 import "./globals.css"
 
-const siteUrl = "https://obedelom-portfolio.vercel.app"
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://obedelom-portfolio.vercel.app"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>{children}</Providers>
-        {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
   )

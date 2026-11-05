@@ -17,3 +17,8 @@ node_modules
 .env
 .env.local
 *.tsbuildinfo
+
+# Cloudflare
+.open-next
+.wrangler
+.dev.vars

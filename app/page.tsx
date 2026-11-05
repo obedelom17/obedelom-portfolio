@@ -16,7 +16,7 @@ import { CursorBubble } from "@/components/site/cursor-bubble"
 import { Preloader } from "@/components/site/preloader"
 import { BackToTop } from "@/components/back-to-top"
 
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 export default async function Home() {
   const data = await getPortfolioData()
