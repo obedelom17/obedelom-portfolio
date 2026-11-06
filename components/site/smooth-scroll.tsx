@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { isMin } from "@/lib/perf"
 
 /** Inertie de la molette, en secondes. Plus la valeur est grande, plus le défilement paraît « lourd ». */
 const TAU = 0.125
@@ -126,7 +127,7 @@ export function SmoothScroll() {
     }
 
     const onWheel = (e: WheelEvent) => {
-      if (e.ctrlKey || e.defaultPrevented) return
+      if (e.ctrlKey || e.defaultPrevented || isMin()) return // niveau « min » : défilement natif, géré par le compositeur
       if (document.body.style.overflow === "hidden") return // visionneuse ouverte
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
       if (inNestedScroller(e.target, e.deltaY)) return
@@ -165,7 +166,7 @@ export function SmoothScroll() {
     }
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || isMin()) return
       if (document.body.style.overflow === "hidden") return
       const t = e.target as HTMLElement | null
       if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|A|VIDEO|IFRAME)$/.test(t.tagName))) return

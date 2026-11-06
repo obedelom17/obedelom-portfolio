@@ -39,6 +39,11 @@ export function videoItem(url: string): Extract<MediaItem, { kind: "video" }> {
     u = new URL(src, "https://local.invalid")
   } catch {}
 
+  // Vidéo importée depuis l'ordinateur : /api/video/<id>?poster=<image> (la vignette évite de télécharger la vidéo avant la lecture).
+  if (u && u.pathname.startsWith("/api/video/")) {
+    return { kind: "video", src: u.pathname, poster: u.searchParams.get("poster") || undefined }
+  }
+
   if (u) {
     const yt = youtubeId(u)
     if (yt) {

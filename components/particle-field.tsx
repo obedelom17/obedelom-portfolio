@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { createLoop, frame } from "@/lib/frame"
+import { deviceTier, isTouch, perfLevel } from "@/lib/perf"
 
 type P = { x: number; y: number; vx: number; vy: number }
 
@@ -30,10 +32,8 @@ export function ParticleField({ className = "" }: { className?: string }) {
     let h = 0
     let dpr = 1
     let parts: P[] = []
-    let raf = 0
-    let last = performance.now()
     let visible = true
-    let frame = 0
+    let n = 0
     let color: [number, number, number] = [5, 150, 105]
     const mouse = { x: -9999, y: -9999 }
 
@@ -43,13 +43,14 @@ export function ParticleField({ className = "" }: { className?: string }) {
 
     const resize = () => {
       const r = host.getBoundingClientRect()
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       w = r.width
       h = r.height
       canvas.width = Math.max(1, Math.floor(w * dpr))
       canvas.height = Math.max(1, Math.floor(h * dpr))
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      const count = Math.round(Math.min(Math.max((w * h) / 17000, 28), 85))
+      const cap = isTouch() || deviceTier() !== "high" ? 38 : 85
+      const count = Math.round(Math.min(Math.max((w * h) / 17000, 24), cap))
       parts = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -68,15 +69,13 @@ export function ParticleField({ className = "" }: { className?: string }) {
       mouse.y = -9999
     }
 
-    const tick = (now: number) => {
-      raf = requestAnimationFrame(tick)
-      if (!visible || document.documentElement.classList.contains("is-scrolling")) {
-        last = now
-        return
+    const loop = createLoop((_now, dt) => {
+      if (!visible || perfLevel() >= 1) {
+        if (perfLevel() >= 1) ctx.clearRect(0, 0, w, h)
+        return false
       }
-      const dt = Math.min((now - last) / 1000, 0.05)
-      last = now
-      if (++frame % 90 === 0) readColor()
+      if (frame.scrolling) return
+      if (++n % 90 === 0) readColor()
       ctx.clearRect(0, 0, w, h)
       const [r, g, b] = color
 
@@ -131,7 +130,7 @@ export function ParticleField({ className = "" }: { className?: string }) {
         ctx.arc(a.x, a.y, 1.7, 0, Math.PI * 2)
         ctx.fill()
       }
-    }
+    })
 
     readColor()
     resize()
@@ -139,19 +138,26 @@ export function ParticleField({ className = "" }: { className?: string }) {
     ro.observe(host)
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting
-      last = performance.now()
+      if (visible) loop.wake()
     })
     io.observe(host)
     host.addEventListener("pointermove", onMove, { passive: true })
     host.addEventListener("pointerleave", onLeave)
-    raf = requestAnimationFrame(tick)
+    // Tactile : un appui attire les points, le relâchement les libère.
+    host.addEventListener("pointerdown", onMove, { passive: true })
+    host.addEventListener("pointerup", onLeave, { passive: true })
+    host.addEventListener("pointercancel", onLeave, { passive: true })
+    loop.wake()
 
     return () => {
-      cancelAnimationFrame(raf)
+      loop.destroy()
       ro.disconnect()
       io.disconnect()
       host.removeEventListener("pointermove", onMove)
       host.removeEventListener("pointerleave", onLeave)
+      host.removeEventListener("pointerdown", onMove)
+      host.removeEventListener("pointerup", onLeave)
+      host.removeEventListener("pointercancel", onLeave)
     }
   }, [])
 

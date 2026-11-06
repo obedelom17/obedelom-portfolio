@@ -1,7 +1,7 @@
 "use client"
 
 import { flushSync } from "react-dom"
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 import { dictionary, type Dictionary } from "@/lib/i18n"
 import type { Lang } from "@/lib/types"
 
@@ -50,8 +50,11 @@ export function Providers({ children }: { children: ReactNode }) {
     } catch {}
   }, [])
 
+  // Valeur stable : les composants ne se redessinent que lorsque la langue change réellement.
+  const value = useMemo(() => ({ lang, setLang, t: dictionary[lang] }), [lang, setLang])
+
   return (
-    <AppContext.Provider value={{ lang, setLang, t: dictionary[lang] }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   )

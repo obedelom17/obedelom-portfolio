@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowUp } from "lucide-react"
 import { useApp } from "@/components/providers"
+import { frame, onScroll } from "@/lib/frame"
 
 const R = 21
 const C = 2 * Math.PI * R
@@ -14,25 +15,21 @@ export function BackToTop() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0
-      if (arc.current) arc.current.style.strokeDashoffset = String(C * (1 - p))
-      setShow(window.scrollY > 700)
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener("scroll", schedule, { passive: true })
-    window.addEventListener("resize", schedule)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("resize", schedule)
-    }
+    let on = false
+    let last = -1
+    return onScroll({
+      write: () => {
+        if (arc.current && frame.progress !== last) {
+          last = frame.progress
+          arc.current.style.strokeDashoffset = String(C * (1 - frame.progress))
+        }
+        const next = frame.y > 700
+        if (next !== on) {
+          on = next
+          setShow(next)
+        }
+      },
+    })
   }, [])
 
   return (

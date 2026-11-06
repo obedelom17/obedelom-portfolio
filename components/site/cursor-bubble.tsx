@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { ArrowUpRight } from "lucide-react"
+import { onScrollIdle } from "@/lib/frame"
 
 const INTERACTIVE = "a, button, [role='button'], input, textarea, select, label, summary"
 
@@ -44,7 +45,6 @@ export function CursorBubble() {
     let seen = false
     let raf = 0
     let last = 0
-    let checking = false
 
     const state = () => (!seen || showBubble ? "hidden" : pressed ? "down" : overLink ? "link" : "idle")
 
@@ -115,15 +115,11 @@ export function CursorBubble() {
       ensure()
     }
 
-    // Le défilement fluide déplace le contenu sous un pointeur immobile : on revérifie.
-    const onScroll = () => {
-      if (checking || !seen) return
-      checking = true
-      requestAnimationFrame(() => {
-        checking = false
-        probe(document.elementFromPoint(x, y))
-      })
-    }
+    // Le contenu défile sous un pointeur immobile : on revérifie ce qui est dessous UNE fois, à l'arrêt du
+    // défilement (elementFromPoint force un calcul de mise en page : jamais pendant le mouvement).
+    const stopIdle = onScrollIdle(() => {
+      if (seen) probe(document.elementFromPoint(x, y))
+    })
 
     const onLeave = () => {
       seen = false
@@ -150,7 +146,6 @@ export function CursorBubble() {
     document.addEventListener("pointerdown", onDown)
     document.addEventListener("pointerup", onUp)
     html.addEventListener("mouseleave", onLeave)
-    window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("blur", onLeave)
 
     return () => {
@@ -160,7 +155,7 @@ export function CursorBubble() {
       document.removeEventListener("pointerdown", onDown)
       document.removeEventListener("pointerup", onUp)
       html.removeEventListener("mouseleave", onLeave)
-      window.removeEventListener("scroll", onScroll)
+      stopIdle()
       window.removeEventListener("blur", onLeave)
     }
   }, [])

@@ -9,6 +9,7 @@ import { Magnetic } from "@/components/magnetic"
 import { SplitWords } from "@/components/split-words"
 import { confetti } from "@/lib/confetti"
 import { toast } from "@/lib/toast"
+import { play } from "@/lib/sound"
 import { Section } from "./section"
 import { Roll } from "@/components/fx/roll"
 
@@ -78,9 +79,11 @@ export function Contact({ index = "07" }: { index?: string }) {
       )
       const rect = formRef.current?.getBoundingClientRect()
       setStatus("success")
+      play("success")
       if (rect) confetti(rect.left + rect.width / 2, rect.top + rect.height / 2)
     } catch {
       setStatus("error")
+      play("error")
     }
   }
 

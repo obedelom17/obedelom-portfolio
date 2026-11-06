@@ -58,6 +58,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
         <div className="lg:col-span-7 lg:col-start-2">
           {media.length > 0 && active && (
             <>
+              <Reveal variant="motion">
               <Tilt max={3}>
               <div className="glow-border border border-line bg-card shadow-[0_40px_80px_-40px_rgba(0,0,0,0.35)] transition-shadow duration-700 group-hover/row:shadow-[0_50px_90px_-40px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center gap-1.5 border-b border-line bg-bg px-3 py-2.5">
@@ -95,12 +96,15 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                     <img
                       src={active.src}
                       alt={`${project.title} ${current + 1}`}
+                      loading="lazy"
+                      decoding="async"
                       className="aspect-[16/10] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/img:scale-[1.04]"
                     />
                   </button>
                 )}
               </div>
               </Tilt>
+              </Reveal>
               {media.length > 1 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {media.map((m, i) => (
@@ -118,7 +122,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                         <VideoThumb item={m} />
                       ) : (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={m.src} alt="" className="h-full w-full object-cover object-top" />
+                        <img src={m.src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover object-top" />
                       )}
                     </button>
                   ))}

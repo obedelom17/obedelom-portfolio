@@ -1,11 +1,17 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { createLoop, onScroll } from "@/lib/frame"
+import { isLite } from "@/lib/perf"
 
 /**
  * Grille de points en arrière-plan d'une section (le parent doit être positionné).
- * Les points proches du pointeur grossissent, prennent l'accent et s'écartent ; un clic lance une onde.
- * Le dessin ne tourne que lorsque la section est visible ET qu'il y a du mouvement à rendre.
+ * Les points proches du pointeur (ou du doigt, au toucher) grossissent, prennent l'accent et s'écartent ;
+ * un clic ou un toucher lance une onde.
+ *
+ * Performance : le dessin est regroupé (tous les points « au repos » en un seul tracé), la boucle partagée
+ * s'endort dès que tout est immobile, et rien n'est calculé hors écran. Aux niveaux d'économie la grille
+ * reste affichée, immobile.
  */
 export function DotGrid({ gap = 30 }: { gap?: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -16,9 +22,7 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
     const ctx = cv?.getContext("2d")
     if (!cv || !parent || !ctx) return
 
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const interactive = fine && !reduce
 
     let w = 0
     let h = 0
@@ -31,29 +35,15 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
     let cX = -9999
     let cY = -9999
     let ripples: { x: number; y: number; t: number }[] = []
-    let raf = 0
     let visible = false
     let fg = "#0a0a0a"
     let accent = "#059669"
+    const act: number[] = []
 
     const readColors = () => {
       const cs = getComputedStyle(document.documentElement)
       fg = cs.getPropertyValue("--fg").trim() || fg
       accent = cs.getPropertyValue("--accent").trim() || accent
-    }
-
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      w = parent.clientWidth
-      h = parent.clientHeight
-      cv.width = Math.max(1, Math.round(w * dpr))
-      cv.height = Math.max(1, Math.round(h * dpr))
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      cols = Math.ceil(w / gap) + 1
-      rows = Math.ceil(h / gap) + 1
-      ox = new Float32Array(cols * rows)
-      oy = new Float32Array(cols * rows)
-      draw(0)
     }
 
     const R = 150
@@ -62,6 +52,10 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
       let busy = false
       ripples = ripples.filter((r) => now - r.t < 1500)
       if (ripples.length) busy = true
+      act.length = 0
+      ctx.globalAlpha = 0.2
+      ctx.fillStyle = fg
+      ctx.beginPath()
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
           const idx = j * cols + i
@@ -73,13 +67,15 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
 
           const dx = hx - px
           const dy = hy - py
-          const d = Math.hypot(dx, dy)
-          if (d < R) {
-            const f = 1 - d / R
-            boost += f
-            const k = (f * f * 20) / (d || 1)
-            tx += dx * k
-            ty += dy * k
+          if (dx > -R && dx < R && dy > -R && dy < R) {
+            const d = Math.hypot(dx, dy)
+            if (d < R) {
+              const f = 1 - d / R
+              boost += f
+              const k = (f * f * 20) / (d || 1)
+              tx += dx * k
+              ty += dy * k
+            }
           }
           for (const r of ripples) {
             const age = now - r.t
@@ -99,57 +95,75 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
           oy[idx] += (ty - oy[idx]) * 0.16
           if (Math.abs(tx - ox[idx]) + Math.abs(ty - oy[idx]) > 0.05) busy = true
 
-          const on = boost > 0.02
-          ctx.globalAlpha = on ? Math.min(1, 0.22 + boost * 0.78) : 0.2
-          ctx.fillStyle = on ? accent : fg
-          ctx.beginPath()
-          ctx.arc(hx + ox[idx], hy + oy[idx], 1.1 + Math.min(boost, 1.4) * 2.3, 0, Math.PI * 2)
-          ctx.fill()
+          if (boost > 0.02) act.push(hx + ox[idx], hy + oy[idx], 1.1 + Math.min(boost, 1.4) * 2.3, Math.min(1, 0.22 + boost * 0.78))
+          else {
+            const x = hx + ox[idx]
+            ctx.moveTo(x + 1.1, hy + oy[idx])
+            ctx.arc(x, hy + oy[idx], 1.1, 0, Math.PI * 2)
+          }
         }
+      }
+      ctx.fill()
+      ctx.fillStyle = accent
+      for (let k = 0; k < act.length; k += 4) {
+        ctx.globalAlpha = act[k + 3]
+        ctx.beginPath()
+        ctx.arc(act[k], act[k + 1], act[k + 2], 0, Math.PI * 2)
+        ctx.fill()
       }
       ctx.globalAlpha = 1
       return busy
     }
 
-    const loop = (now: number) => {
-      const busy = draw(now)
-      raf = visible && busy ? requestAnimationFrame(loop) : 0
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+      w = parent.clientWidth
+      h = parent.clientHeight
+      cv.width = Math.max(1, Math.round(w * dpr))
+      cv.height = Math.max(1, Math.round(h * dpr))
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      cols = Math.ceil(w / gap) + 1
+      rows = Math.ceil(h / gap) + 1
+      ox = new Float32Array(cols * rows)
+      oy = new Float32Array(cols * rows)
+      draw(0)
     }
-    const ensure = () => {
-      if (raf || !visible) return
-      raf = requestAnimationFrame(loop)
-    }
+
+    const loop = createLoop((now) => {
+      if (!visible) return false
+      return draw(now) ? undefined : false
+    })
 
     const locate = () => {
       const r = parent.getBoundingClientRect()
-      const inX = cX >= r.left && cX <= r.right
-      const inY = cY >= r.top && cY <= r.bottom
-      if (inX && inY) {
-        px = cX - r.left
-        py = cY - r.top
-      } else {
-        px = -9999
-        py = -9999
-      }
+      const inside = cX >= r.left && cX <= r.right && cY >= r.top && cY <= r.bottom
+      px = inside ? cX - r.left : -9999
+      py = inside ? cY - r.top : -9999
     }
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return
+      if (isLite() || reduce) return
       cX = e.clientX
       cY = e.clientY
       locate()
-      ensure()
+      loop.wake()
     }
-    const onScroll = () => {
-      if (px < -9000) return
-      locate()
-      ensure()
+    const onUp = (e: PointerEvent) => {
+      // Le doigt se lève : les points se relâchent.
+      if (e.pointerType === "mouse") return
+      px = py = -9999
+      loop.wake()
     }
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" || e.button !== 0) return
+      if (isLite() || reduce || (e.pointerType === "mouse" && e.button !== 0)) return
       const r = parent.getBoundingClientRect()
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return
       ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() })
-      ensure()
+      if (e.pointerType !== "mouse") {
+        cX = e.clientX
+        cY = e.clientY
+        locate()
+      }
+      loop.wake()
     }
 
     readColors()
@@ -160,7 +174,7 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
       visible = e.isIntersecting
       if (visible) {
         draw(performance.now())
-        ensure()
+        loop.wake()
       }
     })
     io.observe(parent)
@@ -169,20 +183,31 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
       draw(performance.now())
     })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
+    // Le contenu défile sous un pointeur immobile : on recalcule sa position relative, sans écouteur propre.
+    const stopScroll = onScroll({
+      el: parent,
+      read: () => {
+        if (px > -9000) locate()
+      },
+      write: () => {
+        if (px > -9000) loop.wake()
+      },
+    })
 
-    if (interactive) {
-      document.addEventListener("pointermove", onMove, { passive: true })
-      document.addEventListener("pointerdown", onDown, { passive: true })
-      window.addEventListener("scroll", onScroll, { passive: true })
-    }
+    document.addEventListener("pointermove", onMove, { passive: true })
+    document.addEventListener("pointerdown", onDown, { passive: true })
+    document.addEventListener("pointerup", onUp, { passive: true })
+    document.addEventListener("pointercancel", onUp, { passive: true })
     return () => {
-      cancelAnimationFrame(raf)
+      loop.destroy()
+      stopScroll()
       ro.disconnect()
       io.disconnect()
       mo.disconnect()
       document.removeEventListener("pointermove", onMove)
       document.removeEventListener("pointerdown", onDown)
-      window.removeEventListener("scroll", onScroll)
+      document.removeEventListener("pointerup", onUp)
+      document.removeEventListener("pointercancel", onUp)
     }
   }, [gap])
 

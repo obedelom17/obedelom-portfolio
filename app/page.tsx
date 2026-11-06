@@ -22,7 +22,6 @@ import { Aurora } from "@/components/fx/aurora"
 import { CursorTrail } from "@/components/fx/cursor-trail"
 import { GlobalFx } from "@/components/fx/global-fx"
 import { ScrollRail } from "@/components/fx/scroll-rail"
-import { ScrollFlag } from "@/components/fx/scroll-flag"
 import { Dock } from "@/components/fx/dock"
 import { Ambient } from "@/components/fx/ambient"
 import { PageCurtain } from "@/components/fx/page-curtain"
@@ -31,6 +30,7 @@ import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
 import { PerfGovernor } from "@/components/fx/perf-governor"
 import { TouchFx } from "@/components/fx/touch-fx"
+import { AudioDirector } from "@/components/audio-director"
 
 export const revalidate = 60
 
@@ -47,6 +47,7 @@ export default async function Home() {
   return (
     <>
       <PerfGovernor />
+      <AudioDirector />
       <TouchFx />
       <Preloader />
       <Aurora />
@@ -54,7 +55,6 @@ export default async function Home() {
       <PageCurtain />
       <CursorTrail />
       <GlobalFx />
-      <ScrollFlag />
       <Ambient showInternships={hasInternships} />
       <ScrollRail showInternships={hasInternships} />
       <SmoothScroll />

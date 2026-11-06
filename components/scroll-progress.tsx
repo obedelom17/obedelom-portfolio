@@ -1,31 +1,22 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { frame, onScroll } from "@/lib/frame"
 
 /** Fine barre de progression de lecture, en haut de l'écran. */
 export function ScrollProgress() {
   const bar = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const el = bar.current
-      if (!el) return
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      el.style.transform = `scaleX(${max > 0 ? Math.min(window.scrollY / max, 1) : 0})`
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    schedule()
-    window.addEventListener("scroll", schedule, { passive: true })
-    window.addEventListener("resize", schedule)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("resize", schedule)
-    }
+    let last = -1
+    return onScroll({
+      write: () => {
+        const el = bar.current
+        if (!el || frame.progress === last) return
+        last = frame.progress
+        el.style.transform = `scaleX(${frame.progress.toFixed(4)})`
+      },
+    })
   }, [])
 
   return (

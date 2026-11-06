@@ -8,7 +8,6 @@ import { pick } from "@/lib/pick"
 import type { Certification } from "@/lib/types"
 import { Section } from "./section"
 import { Tilt } from "@/components/tilt"
-import { CertStack } from "@/components/fx/cert-stack"
 
 export function Certifications({ items, index = "06" }: { items: Certification[]; index?: string }) {
   const { t, lang } = useApp()
@@ -16,25 +15,18 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
   const withImage = items.filter((c) => c.image_url)
   const images = withImage.map((c) => c.image_url as string)
 
+  // Disposition horizontale : les certifications se rangent côte à côte et passent à la ligne, même sur mobile.
   return (
     <Section id="certifications" index={index} label={t.certifications.label} title={t.certifications.title}>
       {items.length === 0 ? (
         <p className="text-muted">{t.certifications.empty}</p>
-      ) : items.length > 1 ? (
-        <CertStack
-          items={items}
-          onOpen={(id) => {
-            const i = withImage.findIndex((x) => x.id === id)
-            if (i >= 0) setOpen(i)
-          }}
-        />
       ) : (
-        <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-x-3 gap-y-7 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3">
           {items.map((c, i) => {
             const title = pick(lang, c.title_fr, c.title_en)
             const imageIndex = withImage.findIndex((x) => x.id === c.id)
             return (
-              <Reveal key={c.id} delay={(i % 3) * 90} variant={i % 2 ? "blur" : "rotate"}>
+              <Reveal key={c.id} delay={(i % 3) * 110} variant="motion">
                 <figure>
                   {c.image_url ? (
                     <Tilt max={6}>
@@ -50,6 +42,7 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
                         src={c.image_url}
                         alt={title}
                         loading="lazy"
+                        decoding="async"
                         className="aspect-[4/3] w-full object-cover object-top transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/cert:scale-[1.05]"
                       />
                     </button>
@@ -59,8 +52,8 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
                       <span className="font-serif text-5xl text-line">{c.year}</span>
                     </div>
                   )}
-                  <figcaption className="mt-4 flex items-start justify-between gap-4">
-                    <span className="text-sm leading-snug">{title}</span>
+                  <figcaption className="mt-3 flex items-start justify-between gap-2 sm:mt-4 sm:gap-4">
+                    <span className="text-[0.8rem] leading-snug sm:text-sm">{title}</span>
                     <span className="label shrink-0">{c.year}</span>
                   </figcaption>
                 </figure>

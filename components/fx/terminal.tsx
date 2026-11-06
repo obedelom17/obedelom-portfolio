@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { play as sfx } from "@/lib/sound"
 import { RotateCcw } from "lucide-react"
 import { useApp } from "@/components/providers"
 
@@ -43,6 +44,7 @@ export function Terminal({ projectCount }: { projectCount: number }) {
         for (let i = 1; i <= l.cmd.length; i++) {
           if (!alive()) return
           const part = l.cmd.slice(0, i)
+          sfx("key")
           setRows((r) => [...r.slice(0, -1), { kind: "cmd", text: part }])
           await wait(24 + Math.random() * 38)
         }

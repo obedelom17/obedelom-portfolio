@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { createLoop, frame } from "@/lib/frame"
+import { perfLevel } from "@/lib/perf"
 
 const items = [
   "Next.js",
@@ -20,9 +22,9 @@ const items = [
 const BASE_SPEED = 55 // px par seconde au repos
 const SCROLL_BOOST = 0.45 // part de la vitesse de défilement ajoutée au bandeau
 
-function Row({ trackRef, outlineOdd }: { trackRef: (el: HTMLDivElement | null) => void; outlineOdd: boolean }) {
+function Row({ trackRef, rootRef, outlineOdd }: { trackRef: (el: HTMLDivElement | null) => void; rootRef: (el: HTMLDivElement | null) => void; outlineOdd: boolean }) {
   return (
-    <div className="marquee">
+    <div className="marquee" ref={rootRef}>
       <div ref={trackRef} className="marquee__track">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-center">
@@ -43,47 +45,73 @@ function Row({ trackRef, outlineOdd }: { trackRef: (el: HTMLDivElement | null) =
 
 /**
  * Deux bandeaux de technologies qui défilent en sens inverse.
- * Ils accélèrent avec le défilement de la page et changent de sens quand on remonte.
+ * Ils accélèrent avec le défilement de la page, changent de sens quand on remonte et prennent un léger
+ * flou de mouvement à grande vitesse.
+ *
+ * Performance : la largeur d'une copie est mesurée une seule fois (ResizeObserver), jamais à chaque image ;
+ * la boucle s'endort dès que le bandeau sort de l'écran ; seuls `transform` (et un flou borné sur le
+ * conteneur) sont écrits.
  */
 export function Marquee() {
   const tracks = useRef<(HTMLDivElement | null)[]>([null, null])
+  const roots = useRef<(HTMLDivElement | null)[]>([null, null])
+  const wrap = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const host = wrap.current
+    if (!host) return
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     const dirs = [1, -1]
     const pos = [0, 0]
-    let last = performance.now()
-    let lastY = window.scrollY
-    let velocity = 0
-    let raf = 0
+    const half = [0, 0]
+    let visible = false
+    let lastBlur = -1
 
-    const tick = (now: number) => {
-      const dt = Math.max(Math.min((now - last) / 1000, 0.05), 0.001)
-      last = now
-      const y = window.scrollY
-      const instant = (y - lastY) / dt
-      lastY = y
-      velocity += (instant - velocity) * (1 - Math.exp(-dt / 0.15))
+    const measure = () => {
+      for (let i = 0; i < 2; i++) half[i] = (tracks.current[i]?.scrollWidth ?? 0) / 2
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    tracks.current.forEach((t) => t && ro.observe(t))
+
+    const loop = createLoop((_now, dt) => {
+      if (!visible) return false
+      const v = frame.velocity
+      const lite = perfLevel()
       for (let i = 0; i < 2; i++) {
         const el = tracks.current[i]
-        if (!el) continue
-        const half = el.scrollWidth / 2
-        if (half <= 0) continue
-        pos[i] += dirs[i] * (BASE_SPEED + velocity * SCROLL_BOOST) * dt
-        const x = ((pos[i] % half) + half) % half
-        const skew = Math.max(-14, Math.min(14, -velocity * 0.0028))
-        el.style.transform = `translate3d(${-x}px, 0, 0) skewX(${skew.toFixed(2)}deg)`
+        const h = half[i]
+        if (!el || h <= 0) continue
+        pos[i] += dirs[i] * (BASE_SPEED + v * SCROLL_BOOST) * dt
+        const x = ((pos[i] % h) + h) % h
+        const skew = lite === 0 ? Math.max(-12, Math.min(12, -v * 0.0026)) : 0
+        el.style.transform = `translate3d(${(-x).toFixed(1)}px, 0, 0)${skew ? ` skewX(${skew.toFixed(2)}deg)` : ""}`
       }
-      raf = requestAnimationFrame(tick)
+      // Flou de mouvement borné, par paliers de 0,25 px pour ne pas redessiner à chaque image.
+      const blur = lite === 0 ? Math.min(2.2, Math.round((Math.abs(v) / 2400) * 4) / 4) : 0
+      if (blur !== lastBlur) {
+        lastBlur = blur
+        const f = blur > 0.2 ? `blur(${blur}px)` : "none"
+        roots.current.forEach((r) => r && (r.style.filter = f))
+      }
+    })
+
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting
+      if (visible) loop.wake()
+    })
+    io.observe(host)
+    return () => {
+      io.disconnect()
+      ro.disconnect()
+      loop.destroy()
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
   }, [])
 
   return (
-    <div className="space-y-2 border-y border-line py-7 md:space-y-4 md:py-10" aria-hidden>
-      <Row trackRef={(el) => (tracks.current[0] = el)} outlineOdd />
-      <Row trackRef={(el) => (tracks.current[1] = el)} outlineOdd={false} />
+    <div ref={wrap} className="space-y-2 border-y border-line py-7 md:space-y-4 md:py-10" aria-hidden>
+      <Row trackRef={(el) => (tracks.current[0] = el)} rootRef={(el) => (roots.current[0] = el)} outlineOdd />
+      <Row trackRef={(el) => (tracks.current[1] = el)} rootRef={(el) => (roots.current[1] = el)} outlineOdd={false} />
     </div>
   )
 }

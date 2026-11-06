@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useApp } from "@/components/providers"
 import { confetti } from "@/lib/confetti"
 import { toast } from "@/lib/toast"
+import { play } from "@/lib/sound"
 
 const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"]
 
@@ -20,13 +21,24 @@ export function GlobalFx() {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse") return
+    // Une seule mise à jour par image, même si le pointeur envoie 1000 événements par seconde.
+    let pending: PointerEvent | null = null
+    let raf = 0
+    const flushSpot = () => {
+      raf = 0
+      const e = pending
+      pending = null
+      if (!e) return
       const spot = (e.target as Element | null)?.closest?.(".spot") as HTMLElement | null
       if (!spot) return
       const r = spot.getBoundingClientRect()
       spot.style.setProperty("--mx", `${e.clientX - r.left}px`)
       spot.style.setProperty("--my", `${e.clientY - r.top}px`)
+    }
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return
+      pending = e
+      if (!raf) raf = requestAnimationFrame(flushSpot)
     }
 
     const onDown = (e: PointerEvent) => {
@@ -49,6 +61,7 @@ export function GlobalFx() {
       if (idx === KONAMI.length) {
         idx = 0
         toast(t.ui.konami)
+        play("fanfare")
         const w = window.innerWidth
         const h = window.innerHeight
         ;[0.15, 0.35, 0.5, 0.65, 0.85].forEach((x, i) => window.setTimeout(() => confetti(w * x, h * 0.85), i * 220))
@@ -61,6 +74,7 @@ export function GlobalFx() {
     }
     document.addEventListener("keydown", onKey)
     return () => {
+      cancelAnimationFrame(raf)
       document.removeEventListener("pointermove", onMove)
       document.removeEventListener("pointerdown", onDown)
       document.removeEventListener("keydown", onKey)

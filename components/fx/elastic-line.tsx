@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { play } from "@/lib/sound"
 
 const H = 80
 const MID = H / 2
@@ -68,6 +69,8 @@ export function ElasticLine({ className = "" }: { className?: string }) {
       ensure()
     }
     const onLeave = () => {
+      // Relâchement d'une corde bien tendue : petit son, plus fort selon la tension.
+      if (inside && Math.abs(ty - MID) > 14) play("bounce", Math.min(1, Math.abs(ty - MID) / 70))
       inside = false
       el.dataset.on = "false"
       tx = w / 2
@@ -82,13 +85,19 @@ export function ElasticLine({ className = "" }: { className?: string }) {
 
     if (!reduce) {
       el.addEventListener("pointermove", onMove, { passive: true })
+      el.addEventListener("pointerdown", onMove, { passive: true })
       el.addEventListener("pointerleave", onLeave)
+      el.addEventListener("pointerup", onLeave, { passive: true })
+      el.addEventListener("pointercancel", onLeave, { passive: true })
     }
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
       el.removeEventListener("pointermove", onMove)
+      el.removeEventListener("pointerdown", onMove)
       el.removeEventListener("pointerleave", onLeave)
+      el.removeEventListener("pointerup", onLeave)
+      el.removeEventListener("pointercancel", onLeave)
     }
   }, [])
 

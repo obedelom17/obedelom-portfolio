@@ -33,6 +33,7 @@ export function VideoPlayer({
     el.muted = muted
     const io = new IntersectionObserver(
       ([entry]) => {
+        // La lecture ne démarre (et la vidéo ne se télécharge) qu'une fois visible.
         if (entry.isIntersecting) el.play().catch(() => {})
         else el.pause()
       },
@@ -60,12 +61,12 @@ export function VideoPlayer({
       ref={ref}
       src={item.src}
       title={title}
-      autoPlay={autoPlay}
+      poster={item.poster}
       muted={muted}
       loop
       playsInline
       controls
-      preload="metadata"
+      preload={item.poster ? "none" : "metadata"}
       className={className}
     />
   )
@@ -77,7 +78,7 @@ export function VideoThumb({ item }: { item: VideoMedia }) {
     <span className="relative block h-full w-full bg-black">
       {item.poster ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={item.poster} alt="" className="h-full w-full object-cover" />
+        <img src={item.poster} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
       ) : !item.embed ? (
         <video src={`${item.src}#t=0.1`} muted playsInline preload="metadata" className="h-full w-full object-cover" aria-hidden />
       ) : null}

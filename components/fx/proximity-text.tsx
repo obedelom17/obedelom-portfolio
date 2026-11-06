@@ -22,7 +22,6 @@ export function ProximityText({ text, className = "" }: { text: string; classNam
     }, { threshold: 0.2 })
     io.observe(el)
 
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     let raf = 0
     let mx = 0
@@ -31,13 +30,18 @@ export function ProximityText({ text, className = "" }: { text: string; classNam
 
     const draw = () => {
       raf = 0
+      // Toutes les mesures d'abord, tous les styles ensuite : une seule mise en page par image.
       const R = Math.max(el.getBoundingClientRect().height * 1.6, 160)
-      for (const s of spans) {
-        const r = s.getBoundingClientRect()
+      const ps: number[] = new Array(spans.length)
+      for (let i = 0; i < spans.length; i++) {
+        const r = spans[i].getBoundingClientRect()
         const d = on ? Math.hypot(mx - (r.left + r.width / 2), my - (r.top + r.height / 2)) : R
-        const p = Math.max(0, 1 - d / R)
-        s.style.setProperty("--p", p.toFixed(3))
-        s.style.transform = `translate3d(0, ${(-p * 0.16).toFixed(3)}em, 0) scale(${(1 + p * 0.1).toFixed(3)})`
+        ps[i] = Math.max(0, 1 - d / R)
+      }
+      for (let i = 0; i < spans.length; i++) {
+        const p = ps[i]
+        spans[i].style.setProperty("--p", p.toFixed(3))
+        spans[i].style.transform = `translate3d(0, ${(-p * 0.16).toFixed(3)}em, 0) scale(${(1 + p * 0.1).toFixed(3)})`
       }
     }
     const onMove = (e: PointerEvent) => {
@@ -50,15 +54,21 @@ export function ProximityText({ text, className = "" }: { text: string; classNam
       on = false
       if (!raf) raf = requestAnimationFrame(draw)
     }
-    if (fine && !reduce) {
+    if (!reduce) {
       el.addEventListener("pointermove", onMove, { passive: true })
+      el.addEventListener("pointerdown", onMove, { passive: true })
       el.addEventListener("pointerleave", onLeave)
+      el.addEventListener("pointerup", onLeave, { passive: true })
+      el.addEventListener("pointercancel", onLeave, { passive: true })
     }
     return () => {
       io.disconnect()
       cancelAnimationFrame(raf)
       el.removeEventListener("pointermove", onMove)
+      el.removeEventListener("pointerdown", onMove)
       el.removeEventListener("pointerleave", onLeave)
+      el.removeEventListener("pointerup", onLeave)
+      el.removeEventListener("pointercancel", onLeave)
     }
   }, [])
 

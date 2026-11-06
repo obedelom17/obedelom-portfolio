@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react"
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import type { MediaItem } from "@/lib/media"
 import { VideoPlayer } from "./media-player"
+import { play } from "@/lib/sound"
 
 export function Lightbox({
   images,
@@ -24,12 +25,26 @@ export function Lightbox({
   const items: MediaItem[] = media ?? (images ?? []).map((src): MediaItem => ({ kind: "image", src }))
   const count = items.length
   const current = items[index]
-  const prev = useCallback(() => onChange((index - 1 + count) % count), [index, count, onChange])
-  const next = useCallback(() => onChange((index + 1) % count), [index, count, onChange])
+  const prev = useCallback(() => {
+    play("next")
+    onChange((index - 1 + count) % count)
+  }, [index, count, onChange])
+  const next = useCallback(() => {
+    play("next")
+    onChange((index + 1) % count)
+  }, [index, count, onChange])
+  const close = useCallback(() => {
+    play("close")
+    onClose()
+  }, [onClose])
+
+  useEffect(() => {
+    play("open")
+  }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      if (e.key === "Escape") close()
       if (e.key === "ArrowLeft") prev()
       if (e.key === "ArrowRight") next()
     }
@@ -40,7 +55,7 @@ export function Lightbox({
       document.removeEventListener("keydown", onKey)
       document.body.style.overflow = prevOverflow
     }
-  }, [prev, next, onClose])
+  }, [prev, next, close])
 
   return (
     <div
@@ -48,11 +63,11 @@ export function Lightbox({
       role="dialog"
       aria-modal="true"
       aria-label={alt}
-      onClick={onClose}
+      onClick={close}
     >
       <button
         type="button"
-        onClick={onClose}
+        onClick={close}
         aria-label="Fermer"
         className="absolute right-4 top-4 p-2 text-white/80 hover:text-white"
       >
@@ -97,9 +112,11 @@ export function Lightbox({
       ) : current ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          key={current.src}
           src={current.src}
+          decoding="async"
           alt={`${alt} ${index + 1}`}
-          className="max-h-[88svh] max-w-full object-contain"
+          className="lb-img max-h-[88svh] max-w-full object-contain"
           onClick={(e) => e.stopPropagation()}
         />
       ) : null}

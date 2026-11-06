@@ -6,7 +6,9 @@ import { useApp } from "@/components/providers"
 import { Magnetic } from "@/components/magnetic"
 import { PaletteButton } from "@/components/command-palette"
 import { ThemeToggle } from "./theme-toggle"
+import { SoundToggle } from "@/components/fx/sound-toggle"
 import { useScramble } from "./scramble"
+import { frame, onScroll } from "@/lib/frame"
 
 function NavLink({ href, label, on }: { href: string; label: string; on: boolean }) {
   const [out, run] = useScramble(label)
@@ -36,20 +38,30 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
   const [hidden, setHidden] = useState(false)
   const [active, setActive] = useState("")
 
+  // Un seul écouteur de défilement pour tout le site (voir lib/frame.ts) ; l'état React ne change qu'aux seuils.
   useEffect(() => {
     let lastY = window.scrollY
-    const onScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 8)
-      const dy = y - lastY
-      if (Math.abs(dy) > 6) {
-        setHidden(dy > 0 && y > 480)
-        lastY = y
-      }
-    }
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
+    let isScrolled = false
+    let isHidden = false
+    return onScroll({
+      write: () => {
+        const y = frame.y
+        const s = y > 8
+        if (s !== isScrolled) {
+          isScrolled = s
+          setScrolled(s)
+        }
+        const dy = y - lastY
+        if (Math.abs(dy) > 6) {
+          const h = dy > 0 && y > 480
+          if (h !== isHidden) {
+            isHidden = h
+            setHidden(h)
+          }
+          lastY = y
+        }
+      },
+    })
   }, [])
 
   // Surligne le lien de la section actuellement au centre de l'écran.
@@ -100,7 +112,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <a href="#top" className="flex items-center gap-2 font-serif text-xl" onClick={() => setOpen(false)}>
+        <a href="#top" className="flex items-center gap-2 whitespace-nowrap font-serif text-[1.05rem] min-[380px]:text-xl" onClick={() => setOpen(false)}>
           Obed Agbebavi
           <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
         </a>
@@ -113,6 +125,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
 
         <div className="flex items-center gap-1">
           <PaletteButton />
+          <SoundToggle />
           <ThemeToggle />
           <button
             type="button"

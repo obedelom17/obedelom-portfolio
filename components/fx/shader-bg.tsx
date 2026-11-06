@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { createLoop, frame } from "@/lib/frame"
+import { deviceTier, isTouch, perfLevel } from "@/lib/perf"
 
 const VERT = `attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`
 
@@ -94,7 +96,8 @@ export function ShaderBg() {
     const mo = new MutationObserver(colors)
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * 0.5
+    const weak = deviceTier() !== "high" || isTouch()
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * (weak ? 0.32 : 0.5)
     const resize = () => {
       const r = cv.getBoundingClientRect()
       cv.width = Math.max(2, Math.floor(r.width * dpr))
@@ -131,46 +134,40 @@ export function ShaderBg() {
     host.addEventListener("pointerdown", onDown, { passive: true })
 
     let visible = true
-    let raf = 0
     const t0 = performance.now()
-    const frame = (now: number) => {
-      raf = 0
-      if (document.documentElement.classList.contains("is-scrolling")) {
-        raf = requestAnimationFrame(frame)
-        return
-      }
-      mx += (tx - mx) * 0.06
-      my += (ty - my) * 0.06
-      gl.uniform1f(uT, (now - t0) / 1000)
-      gl.uniform2f(uM, mx, my)
-      for (let i = 0; i < 4; i++) {
-        const age = born[i] ? (now - born[i]) / 1000 : 99
-        ripples[i * 3 + 2] = age < 3 ? age + 0.001 : 0
-      }
-      gl.uniform3fv(uR, ripples)
-      gl.drawArrays(gl.TRIANGLES, 0, 3)
-      if (!reduce && visible && !document.hidden) raf = requestAnimationFrame(frame)
-    }
-    const kick = () => {
-      if (!raf) raf = requestAnimationFrame(frame)
-    }
+    // Fond lent : 30 images/s (20 sur appareil modeste) suffisent, et rien n'est dessiné pendant le défilement.
+    const loop = createLoop(
+      (now) => {
+        if (!visible || perfLevel() >= 1) return false
+        if (frame.scrolling) return
+        mx += (tx - mx) * 0.1
+        my += (ty - my) * 0.1
+        gl.uniform1f(uT, (now - t0) / 1000)
+        gl.uniform2f(uM, mx, my)
+        for (let i = 0; i < 4; i++) {
+          const age = born[i] ? (now - born[i]) / 1000 : 99
+          ripples[i * 3 + 2] = age < 3 ? age + 0.001 : 0
+        }
+        gl.uniform3fv(uR, ripples)
+        gl.drawArrays(gl.TRIANGLES, 0, 3)
+        if (reduce) return false
+      },
+      { fps: weak ? 20 : 30 },
+    )
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting
-      if (visible) kick()
+      if (visible) loop.wake()
     })
     io.observe(cv)
-    const onVis = () => !document.hidden && kick()
-    document.addEventListener("visibilitychange", onVis)
-    kick()
+    loop.wake()
 
     return () => {
-      cancelAnimationFrame(raf)
+      loop.destroy()
       io.disconnect()
       ro.disconnect()
       mo.disconnect()
       host.removeEventListener("pointermove", onMove)
       host.removeEventListener("pointerdown", onDown)
-      document.removeEventListener("visibilitychange", onVis)
       gl.getExtension("WEBGL_lose_context")?.loseContext()
     }
   }, [])

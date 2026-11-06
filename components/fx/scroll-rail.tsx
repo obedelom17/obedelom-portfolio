@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useApp } from "@/components/providers"
+import { frame, onScroll } from "@/lib/frame"
 
 /** Navigation latérale (grands écrans) : un repère par section, la section active s'allonge, et un pourcentage de lecture. */
 export function ScrollRail({ showInternships = false }: { showInternships?: boolean }) {
@@ -34,25 +35,25 @@ export function ScrollRail({ showInternships = false }: { showInternships?: bool
       { rootMargin: "-45% 0px -50% 0px" },
     )
     els.forEach((el) => io.observe(el))
-    let raf = 0
-    const update = () => {
-      raf = 0
-      const max = document.documentElement.scrollHeight - window.innerHeight
-      const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0
-      if (pct.current) pct.current.textContent = String(Math.round(p * 100)).padStart(2, "0")
-      setShown(window.scrollY > 240)
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener("scroll", schedule, { passive: true })
-    window.addEventListener("resize", schedule)
+    let on = false
+    let last = -1
+    const stop = onScroll({
+      write: () => {
+        const p = Math.round(frame.progress * 100)
+        if (pct.current && p !== last) {
+          last = p
+          pct.current.textContent = String(p).padStart(2, "0")
+        }
+        const next = frame.y > 240
+        if (next !== on) {
+          on = next
+          setShown(next)
+        }
+      },
+    })
     return () => {
       io.disconnect()
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("resize", schedule)
+      stop()
     }
   }, [key])
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Check } from "lucide-react"
+import { play } from "@/lib/sound"
 
 type Item = { id: number; message: string }
 
@@ -15,6 +16,7 @@ export function Toaster() {
       const message = String((e as CustomEvent).detail ?? "")
       if (!message) return
       const id = ++n
+      play("toast")
       setItems((list) => [...list.slice(-2), { id, message }])
       window.setTimeout(() => setItems((list) => list.filter((i) => i.id !== id)), 2600)
     }

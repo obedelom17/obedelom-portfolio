@@ -241,3 +241,39 @@ GitHub: https://github.com/obedelom17
 - Navigation par sections : déplacement chronométré à courbe douce. Pendant le trajet, apparitions et changements d'ambiance sont suspendus puis rejoués à l'arrivée (`is-navigating`, `nav:end`) / Section navigation: timed glide with soft easing; reveals and ambience changes are paused during the trip and replayed on arrival.
 - Curseur sans `mix-blend-mode` (source de saccades) / Cursor without `mix-blend-mode` (a known scroll-jank source).
 - Retirés : nœud 3D du hero, section Aperçu des projets, mode vitrine / Removed: hero 3D knot, projects overview section, showcase mode.
+
+---
+
+## Performance, son et vidéos (mise à jour)
+
+### Fluidité
+- `lib/frame.ts` : moteur commun. Une seule boucle `requestAnimationFrame` pour toutes les animations continues
+  (elle s'endort quand il n'y a rien à animer) et un seul écouteur de défilement dont les mesures passent toutes
+  avant les écritures (une seule mise en page par image). Les effets liés à un élément ne sont calculés que lorsqu'il
+  est proche de l'écran.
+- `components/fx/perf-governor.tsx` : mesure la durée réelle des images et allège le site automatiquement
+  (niveau 0 complet → 1 « lite » → 2 « min »), mémorisé quelques jours. Classes `perf-lite` / `perf-min` sur `<html>`.
+- `Reveal` ne passe plus par l'état React (pas de re-rendu à l'apparition) ; `will-change` retiré après la transition.
+- Retiré : `pointer-events` basculé sur `<main>` pendant le défilement (provoquait un recalcul de style de toute la page),
+  filtre `invert` plein écran du grain, flou d'arrière-plan du dock mobile, lecture de `scrollWidth` à chaque image (bandeaux).
+
+### Mobile
+Jeu de logos (compétences), corde élastique, texte sensible au pointeur, grille de points, tilt des cartes et
+particules réagissent au toucher. Dans le jeu de logos, un doigt posé sur un logo l'attrape (la page ne défile pas
+pour ce geste) ; ailleurs la page défile normalement.
+
+### Flou de mouvement
+Variante `<Reveal variant="motion">` (flou + translation + zoom) pour captures, certifications et visuels ;
+flou lié à la vitesse sur les bandeaux ; mots du titre et rôles du hero ; changement d'image dans la visionneuse.
+Seuls `opacity`, `transform` et `filter` sont animés. Coupé aux niveaux d'économie.
+
+### Son
+`lib/sound.ts` synthétise tous les effets et la musique d'ambiance avec Web Audio (aucun fichier audio).
+Les navigateurs interdisent le son avant un geste : la musique démarre au premier clic / toucher. Le bouton du son
+(en-tête, île dynamique, touche `S`) coupe ou rétablit tout ; préférences mémorisées (`sfx`, `music`).
+
+### Vidéos importées depuis l'ordinateur (admin → Projets → Vidéos)
+Bouton « Importer depuis mon ordinateur » : le fichier (≤ 80 Mo, .mp4 / .webm / .mov) est envoyé par morceaux de 2 Mo
+dans la base Neon (tables `videos` et `video_chunks`, créées automatiquement) et lu via `/api/video/<id>` avec
+prise en charge des requêtes `Range`. Une vignette est générée automatiquement. Penser à enregistrer le projet après l'import.
+Aucune dépendance ni variable d'environnement supplémentaire.

@@ -1,10 +1,13 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { frame, onScroll } from "@/lib/frame"
 
 /**
  * Texte dont les mots s'allument un à un au fil du défilement.
  * Le texte reste lisible sans script (opacité réduite, jamais nulle).
+ * Les mesures sont groupées avec les autres effets (une seule mise en page par image) et les styles
+ * ne sont réécrits que lorsque la progression a réellement bougé.
  */
 export function ScrollWords({ text, className = "" }: { text: string; className?: string }) {
   const ref = useRef<HTMLParagraphElement>(null)
@@ -21,29 +24,24 @@ export function ScrollWords({ text, className = "" }: { text: string; className?
     }
     const n = spans.length
     const spread = 7
-    let raf = 0
-
-    const update = () => {
-      raf = 0
-      const r = root.getBoundingClientRect()
-      const vh = window.innerHeight
-      const p = Math.min(Math.max((vh * 0.9 - r.top) / (vh * 0.35 + r.height), 0), 1)
-      for (let i = 0; i < n; i++) {
-        const w = Math.min(Math.max((p * (n + spread) - i) / spread, 0), 1)
-        spans[i].style.opacity = String(0.16 + 0.84 * w)
-      }
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener("scroll", schedule, { passive: true })
-    window.addEventListener("resize", schedule)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("resize", schedule)
-    }
+    let p = 0
+    let last = -1
+    return onScroll({
+      el: root,
+      read: () => {
+        const r = root.getBoundingClientRect()
+        const vh = frame.vh
+        p = Math.min(Math.max((vh * 0.9 - r.top) / (vh * 0.35 + r.height), 0), 1)
+      },
+      write: () => {
+        if (Math.abs(p - last) < 0.004 && p !== 0 && p !== 1) return
+        last = p
+        for (let i = 0; i < n; i++) {
+          const w = Math.min(Math.max((p * (n + spread) - i) / spread, 0), 1)
+          spans[i].style.opacity = (0.16 + 0.84 * w).toFixed(2)
+        }
+      },
+    })
   }, [text])
 
   return (

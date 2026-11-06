@@ -2,12 +2,18 @@
 
 import { useEffect, useRef } from "react"
 import { skills } from "@/lib/skills"
+import { createLoop } from "@/lib/frame"
+import { play } from "@/lib/sound"
+import { haptic } from "@/lib/perf"
 
 type Ball = { x: number; y: number; vx: number; vy: number; r: number; name: string; img: HTMLImageElement }
 
 /**
  * Terrain de jeu : les logos des technologies tombent, rebondissent, se heurtent,
- * fuient le pointeur et peuvent être attrapés puis lancés à la souris.
+ * fuient le pointeur et peuvent être attrapés puis lancés, à la souris comme au doigt.
+ * Sur mobile, un doigt posé sur un logo l'attrape (le défilement de la page est alors suspendu pour ce geste) ;
+ * ailleurs, la page défile normalement. Chaque rebond et choc produit un son proportionnel à sa force.
+ * La simulation s'endort dès que tout est posé et immobile.
  */
 export function TechPlayground({ hint }: { hint: string }) {
   const wrap = useRef<HTMLDivElement>(null)
@@ -32,8 +38,6 @@ export function TechPlayground({ hint }: { hint: string }) {
     let w = 0
     let h = 0
     let dpr = 1
-    let raf = 0
-    let last = 0
     let visible = false
     let launched = false
     let hover: Ball | null = null
@@ -44,7 +48,7 @@ export function TechPlayground({ hint }: { hint: string }) {
 
     const layout = () => {
       const rect = host.getBoundingClientRect()
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5)
       w = rect.width
       h = rect.height
       cv.width = Math.floor(w * dpr)
@@ -74,8 +78,9 @@ export function TechPlayground({ hint }: { hint: string }) {
       line = css.getPropertyValue("--line").trim() || line
     }
 
-    const step = (dt: number) => {
+    const step = (dt: number): boolean => {
       const G = 1500
+      let moving = false
       for (const b of balls) {
         if (b === grab) {
           b.vx = (ptr.x - b.x) * 22
@@ -101,10 +106,12 @@ export function TechPlayground({ hint }: { hint: string }) {
         else if (b.x > w - b.r) ((b.x = w - b.r), (b.vx = -Math.abs(b.vx) * 0.6))
         if (b.y > h - b.r) {
           b.y = h - b.r
+          if (b.vy > 220 && visible) play("bounce", Math.min(1, b.vy / 1500))
           b.vy = -Math.abs(b.vy) * 0.5
           b.vx *= 0.985
           if (Math.abs(b.vy) < 25) b.vy = 0
         }
+        if (Math.abs(b.vx) > 6 || Math.abs(b.vy) > 6 || b.y < h - b.r - 1) moving = true
       }
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
@@ -125,6 +132,7 @@ export function TechPlayground({ hint }: { hint: string }) {
           c.y += ny * push
           const rv = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny
           if (rv < 0) {
+            if (rv < -140 && visible) play("bounce", Math.min(1, -rv / 900))
             const j2 = -rv * 0.75
             a.vx -= j2 * nx
             a.vy -= j2 * ny
@@ -133,6 +141,7 @@ export function TechPlayground({ hint }: { hint: string }) {
           }
         }
       }
+      return moving
     }
 
     const draw = () => {
@@ -169,15 +178,15 @@ export function TechPlayground({ hint }: { hint: string }) {
       }
     }
 
-    const frame = (now: number) => {
-      raf = requestAnimationFrame(frame)
-      if (!visible) return
-      const dt = Math.min((now - last) / 1000, 1 / 30)
-      last = now
+    // La boucle partagée s'endort quand tout est posé, immobile et sans interaction : zéro travail au repos.
+    const loop = createLoop((_now, dt) => {
+      if (!visible) return false
       const sub = 2
-      for (let i = 0; i < sub; i++) step(dt / sub)
+      let moving = false
+      for (let i = 0; i < sub; i++) if (step(Math.min(dt, 1 / 30) / sub)) moving = true
       draw()
-    }
+      if (!moving && !grab && !ptr.in) return false
+    })
 
     const pick = (x: number, y: number) => {
       for (let i = balls.length - 1; i >= 0; i--) {
@@ -191,35 +200,55 @@ export function TechPlayground({ hint }: { hint: string }) {
       return { x: e.clientX - r.left, y: e.clientY - r.top }
     }
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return
       const p = local(e)
       ptr.vx = p.x - ptr.x
       ptr.vy = p.y - ptr.y
       ptr.x = p.x
       ptr.y = p.y
-      ptr.in = true
-      hover = pick(p.x, p.y)
+      if (e.pointerType === "mouse") {
+        ptr.in = true
+        hover = pick(p.x, p.y)
+      }
+      loop.wake()
     }
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return
       const p = local(e)
       ptr.x = p.x
       ptr.y = p.y
+      ptr.vx = ptr.vy = 0
       grab = pick(p.x, p.y)
       ptr.down = !!grab
-      if (grab) cv.setPointerCapture(e.pointerId)
-    }
-    const onUp = () => {
       if (grab) {
+        try {
+          cv.setPointerCapture(e.pointerId)
+        } catch {}
+        if (e.pointerType !== "mouse") haptic(10)
+        play("pop")
+        loop.wake()
+      }
+    }
+    const onUp = (e: PointerEvent) => {
+      if (grab) {
+        const fast = Math.hypot(ptr.vx, ptr.vy) > 1.2
         grab.vx = Math.max(-2200, Math.min(2200, ptr.vx * 45))
-        grab.vy = Math.max(-2200, Math.min(2200, ptr.vy * 45))
+        grab.vy = fast ? Math.max(-2200, Math.min(2200, ptr.vy * 45)) : -560 // simple appui : le logo saute
+        play("whoosh")
+        loop.wake()
       }
       grab = null
       ptr.down = false
+      if (e.pointerType !== "mouse") ptr.in = false
     }
     const onLeave = () => {
       ptr.in = false
       hover = null
+    }
+    // Tactile : si le doigt se pose sur un logo, on bloque le défilement pour ce geste uniquement.
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0]
+      if (!t) return
+      const r = cv.getBoundingClientRect()
+      if (pick(t.clientX - r.left, t.clientY - r.top) && e.cancelable) e.preventDefault()
     }
 
     colors()
@@ -228,7 +257,7 @@ export function TechPlayground({ hint }: { hint: string }) {
     ro.observe(host)
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting
-      last = performance.now()
+      if (visible) loop.wake()
       if (visible && !launched) {
         if (reduce) {
           balls.forEach((b, i) => {
@@ -248,9 +277,10 @@ export function TechPlayground({ hint }: { hint: string }) {
     cv.addEventListener("pointerup", onUp)
     cv.addEventListener("pointercancel", onUp)
     cv.addEventListener("pointerleave", onLeave)
-    if (!reduce) raf = requestAnimationFrame(frame)
+    cv.addEventListener("touchstart", onTouchStart, { passive: false })
+    if (!reduce) loop.wake()
     return () => {
-      cancelAnimationFrame(raf)
+      loop.destroy()
       ro.disconnect()
       io.disconnect()
       theme.disconnect()
@@ -259,6 +289,7 @@ export function TechPlayground({ hint }: { hint: string }) {
       cv.removeEventListener("pointerup", onUp)
       cv.removeEventListener("pointercancel", onUp)
       cv.removeEventListener("pointerleave", onLeave)
+      cv.removeEventListener("touchstart", onTouchStart)
     }
   }, [])
 

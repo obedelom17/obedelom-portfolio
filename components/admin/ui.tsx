@@ -1,7 +1,8 @@
 "use client"
 
 import { useRef, useState, type ReactNode } from "react"
-import { ImagePlus, Loader2, Play, X } from "lucide-react"
+import { ImagePlus, Loader2, Play, Upload, X } from "lucide-react"
+import { VIDEO_CHUNK, VIDEO_MAX, isVideoUrl } from "@/lib/video"
 import { compressToWebp } from "@/lib/image"
 
 // Aperçus locaux des images téléversées, disponibles avant le redéploiement du site.
@@ -169,6 +170,48 @@ export function ImageField({
   )
 }
 
+// Noms et tailles des vidéos importées pendant cette session (pour l'affichage dans la liste).
+const videoLabels = new Map<string, string>()
+
+async function post(url: string, body: unknown): Promise<Response> {
+  return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+}
+
+/** Image de la vidéo (vers 1 s), compressée en WebP et envoyée comme les autres images : sert de vignette. */
+async function capturePoster(file: File): Promise<string | null> {
+  const src = URL.createObjectURL(file)
+  try {
+    const v = document.createElement("video")
+    v.muted = true
+    v.playsInline = true
+    v.preload = "auto"
+    v.src = src
+    await new Promise<void>((ok, ko) => {
+      v.onloadeddata = () => ok()
+      v.onerror = () => ko(new Error("lecture"))
+    })
+    v.currentTime = Math.min(1, (v.duration || 2) * 0.1)
+    await new Promise<void>((ok) => {
+      v.onseeked = () => ok()
+    })
+    const scale = Math.min(1, 960 / (v.videoWidth || 960))
+    const cv = document.createElement("canvas")
+    cv.width = Math.round((v.videoWidth || 960) * scale)
+    cv.height = Math.round((v.videoHeight || 540) * scale)
+    cv.getContext("2d")?.drawImage(v, 0, 0, cv.width, cv.height)
+    const blob = await new Promise<Blob | null>((ok) => cv.toBlob(ok, "image/webp", 0.8))
+    if (!blob) return null
+    const data = (await toBase64(blob)).split(",")[1]
+    const res = await post("/api/admin/upload", { data })
+    if (!res.ok) return null
+    return ((await res.json()) as { url: string }).url
+  } catch {
+    return null
+  } finally {
+    URL.revokeObjectURL(src)
+  }
+}
+
 export function VideoField({
   videos,
   onChange,
@@ -180,6 +223,11 @@ export function VideoField({
 }) {
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [progress, setProgress] = useState<number | null>(null)
+  const [stage, setStage] = useState("")
+  const file = useRef<HTMLInputElement>(null)
+  const latest = useRef(videos)
+  latest.current = videos
 
   const add = () => {
     const v = url.trim()
@@ -193,6 +241,52 @@ export function VideoField({
     setUrl("")
   }
 
+  /** Envoie la vidéo choisie sur l'ordinateur, par morceaux de 2 Mo, puis l'ajoute à la liste. */
+  const upload = async (f: File) => {
+    setError(null)
+    if (!f.type.startsWith("video/")) return setError("Ce fichier n'est pas une vidéo.")
+    if (f.size > VIDEO_MAX) {
+      return setError(`Vidéo trop lourde (${(f.size / 1048576).toFixed(0)} Mo). Maximum : ${VIDEO_MAX / 1048576} Mo. Compresse-la (HandBrake, 720p) ou utilise un lien YouTube.`)
+    }
+    setProgress(0)
+    setStage("Préparation…")
+    let id = ""
+    try {
+      const start = await post("/api/admin/video", { op: "start", type: f.type, size: f.size })
+      if (!start.ok) throw new Error(start.status === 413 ? "Vidéo trop lourde." : "Démarrage de l'envoi impossible.")
+      id = ((await start.json()) as { id: string }).id
+      const total = Math.ceil(f.size / VIDEO_CHUNK)
+      setStage("Envoi de la vidéo…")
+      for (let i = 0; i < total; i++) {
+        const data = (await toBase64(f.slice(i * VIDEO_CHUNK, (i + 1) * VIDEO_CHUNK))).split(",")[1]
+        let ok = false
+        for (let attempt = 0; attempt < 3 && !ok; attempt++) {
+          const r = await post("/api/admin/video", { op: "chunk", id, index: i, data }).catch(() => null)
+          ok = !!r?.ok
+          if (!ok) await new Promise((res) => setTimeout(res, 600 * (attempt + 1)))
+        }
+        if (!ok) throw new Error("Connexion interrompue pendant l'envoi.")
+        setProgress(Math.round(((i + 1) / total) * 92))
+      }
+      const fin = await post("/api/admin/video", { op: "finish", id })
+      if (!fin.ok) throw new Error("La vidéo est incomplète, réessaie.")
+      const { url: base } = (await fin.json()) as { url: string }
+      setStage("Création de la vignette…")
+      const poster = await capturePoster(f)
+      setProgress(100)
+      const finalUrl = poster ? `${base}?poster=${encodeURIComponent(poster)}` : base
+      videoLabels.set(finalUrl, `${f.name} · ${(f.size / 1048576).toFixed(1)} Mo`)
+      onChange([...latest.current, finalUrl])
+    } catch (e) {
+      if (id) void post("/api/admin/video", { op: "abort", id })
+      setError(e instanceof Error ? e.message : "Envoi impossible.")
+    } finally {
+      setProgress(null)
+      setStage("")
+      if (file.current) file.current.value = ""
+    }
+  }
+
   return (
     <div>
       <span className="label">{label}</span>
@@ -201,7 +295,7 @@ export function VideoField({
           {videos.map((src, i) => (
             <li key={src + i} className="flex items-center gap-3 border border-line px-3 py-2 text-sm">
               <Play className="h-4 w-4 shrink-0" />
-              <span className="min-w-0 flex-1 truncate">{src}</span>
+              <span className="min-w-0 flex-1 truncate">{isVideoUrl(src) ? (videoLabels.get(src) ?? "Vidéo importée depuis l'ordinateur") : src}</span>
               {i === 0 && <span className="label shrink-0 text-accent">En premier</span>}
               <button
                 type="button"
@@ -214,6 +308,32 @@ export function VideoField({
             </li>
           ))}
         </ul>
+      )}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <input
+          ref={file}
+          type="file"
+          accept="video/mp4,video/webm,video/quicktime,video/ogg,video/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0]
+            if (f) void upload(f)
+          }}
+        />
+        <Button variant="outline" onClick={() => file.current?.click()} disabled={progress !== null}>
+          {progress !== null ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+          Importer depuis mon ordinateur
+        </Button>
+      </div>
+      {progress !== null && (
+        <div className="mt-3" role="status" aria-live="polite">
+          <div className="h-1.5 w-full overflow-hidden bg-line">
+            <div className="h-full bg-accent transition-[width] duration-300" style={{ width: `${progress}%` }} />
+          </div>
+          <span className="mt-1 block text-xs text-muted">
+            {stage} {progress}%
+          </span>
+        </div>
       )}
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <input
@@ -233,9 +353,10 @@ export function VideoField({
         </Button>
       </div>
       <span className="mt-2 block text-xs text-muted">
-        Lien YouTube ou Vimeo, lien direct vers un fichier .mp4 / .webm, ou fichier placé dans public/videos du dépôt
-        (par exemple /videos/demo.mp4). Les vidéos s'affichent avant les captures d'écran ; la première démarre
-        automatiquement, sans le son.
+        Importe un fichier de ton ordinateur (.mp4, .webm, .mov, 80 Mo maximum : pense à le compresser en 720p), ou
+        colle un lien YouTube / Vimeo / fichier direct, ou un fichier du dossier public (/videos/demo.mp4). Les vidéos
+        s'affichent avant les captures d'écran ; la première démarre automatiquement, sans le son. Pense à enregistrer
+        le projet après l'import.
       </span>
       {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
     </div>

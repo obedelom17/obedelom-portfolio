@@ -6,6 +6,7 @@ import type { LucideIcon } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { currentTheme, setTheme } from "@/lib/theme"
 import { haptic } from "@/lib/perf"
+import { frame, onScroll } from "@/lib/frame"
 
 type Item = { id: string; label: string; Icon: LucideIcon; mobile?: boolean }
 
@@ -45,20 +46,19 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
       { rootMargin: "-45% 0px -50% 0px" },
     )
     els.forEach((el) => io.observe(el))
-    let raf = 0
-    const update = () => {
-      raf = 0
-      setShown(window.scrollY > 520)
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener("scroll", schedule, { passive: true })
+    let on = false
+    const stop = onScroll({
+      write: () => {
+        const next = frame.y > 520
+        if (next !== on) {
+          on = next
+          setShown(next)
+        }
+      },
+    })
     return () => {
       io.disconnect()
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", schedule)
+      stop()
     }
   }, [key])
 

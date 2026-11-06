@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import { haptic } from "@/lib/perf"
+import { haptic, isLite } from "@/lib/perf"
+import { createLoop, frame } from "@/lib/frame"
 
 /**
  * Parité mobile des effets réservés à la souris :
@@ -31,7 +32,7 @@ export function TouchFx() {
       spotAt(e)
       const hit = (e.target as Element | null)?.closest?.("a, button, [role='button'], .spot")
       if (hit) haptic(7)
-      if (reduce || root.classList.contains("perf-lite")) return
+      if (reduce || isLite()) return
       const host = document.createElement("span")
       host.className = "click-fx"
       host.style.left = `${e.clientX}px`
@@ -43,7 +44,7 @@ export function TouchFx() {
       window.setTimeout(() => host.remove(), 800)
     }
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch" && !root.classList.contains("is-scrolling")) spotAt(e)
+      if (e.pointerType === "touch" && !frame.scrolling) spotAt(e)
     }
     document.addEventListener("pointerdown", onDown, { passive: true })
     document.addEventListener("pointermove", onMove, { passive: true })
@@ -57,22 +58,12 @@ export function TouchFx() {
       let ty = 0
       let cx = 0
       let cy = 0
-      let raf = 0
       let visible = true
-      let last = performance.now()
       let listening = false
 
-      const onOri = (e: DeviceOrientationEvent) => {
-        const g = Math.max(-25, Math.min(25, e.gamma ?? 0)) / 25
-        const b = Math.max(-25, Math.min(25, (e.beta ?? 45) - 45)) / 25
-        tx = g
-        ty = b
-      }
-      const tick = (now: number) => {
-        raf = requestAnimationFrame(tick)
-        if (!visible || root.classList.contains("is-scrolling") || root.classList.contains("perf-lite")) return
-        const dt = Math.min((now - last) / 1000, 0.05)
-        last = now
+      // La boucle s'endort dès que la parallaxe a rattrapé l'inclinaison : aucun style écrit au repos.
+      const loop = createLoop((_n, dt) => {
+        if (!visible || frame.scrolling || isLite()) return false
         const k = 1 - Math.exp(-dt / 0.2)
         cx += (tx - cx) * k
         cy += (ty - cy) * k
@@ -80,17 +71,24 @@ export function TouchFx() {
           const d = parseFloat(l.dataset.depth ?? "0") * 0.9
           l.style.transform = `translate3d(${(cx * d).toFixed(2)}px, ${(cy * d).toFixed(2)}px, 0)`
         }
+        if (Math.abs(tx - cx) + Math.abs(ty - cy) < 0.002) return false
+      })
+      const onOri = (e: DeviceOrientationEvent) => {
+        const g = Math.max(-25, Math.min(25, e.gamma ?? 0)) / 25
+        const b = Math.max(-25, Math.min(25, (e.beta ?? 45) - 45)) / 25
+        // Zone morte : les micro-mouvements de la main ne doivent pas réveiller la boucle.
+        if (Math.abs(g - tx) + Math.abs(b - ty) < 0.02) return
+        tx = g
+        ty = b
+        loop.wake()
       }
       const listen = () => {
         if (listening) return
         listening = true
         window.addEventListener("deviceorientation", onOri, { passive: true })
-        last = performance.now()
-        raf = requestAnimationFrame(tick)
       }
       const io = new IntersectionObserver(([en]) => {
         visible = en.isIntersecting
-        last = performance.now()
       })
       io.observe(hero)
 
@@ -109,7 +107,7 @@ export function TouchFx() {
         listen()
       }
       cleanupGyro = () => {
-        cancelAnimationFrame(raf)
+        loop.destroy()
         io.disconnect()
         window.removeEventListener("deviceorientation", onOri)
         if (askListener) window.removeEventListener("touchend", askListener)

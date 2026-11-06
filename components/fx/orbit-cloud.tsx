@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { skills } from "@/lib/skills"
+import { createLoop, frame } from "@/lib/frame"
 
 /**
  * Sphère 3D de logos : rotation automatique, glisser pour la faire tourner avec inertie,
@@ -29,11 +30,18 @@ export function OrbitCloud({ hint }: { hint: string }) {
     let rx = 0, ry = 0
     let drag = false, lx = 0, ly = 0
     let visible = true
-    let raf = 0
+    // Le rayon est mesuré une seule fois (et au redimensionnement), jamais à chaque image.
+    let R = Math.min(el.clientWidth, el.clientHeight) * 0.38
+    const ro = new ResizeObserver(() => {
+      R = Math.min(el.clientWidth, el.clientHeight) * 0.38
+    })
+    ro.observe(el)
 
-    const draw = () => {
-      raf = 0
-      const R = Math.min(el.clientWidth, el.clientHeight) * 0.38
+    // Boucle partagée ; rotation indépendante de la fréquence de l'écran ; en pause pendant le défilement.
+    const loop = createLoop((_n, dt) => {
+      if (!visible) return false
+      if (frame.scrolling && !drag) return
+      const k = dt * 60
       const cx = Math.cos(rx), sx = Math.sin(rx), cy = Math.cos(ry), sy = Math.sin(ry)
       pts.forEach(([x, y, z], i) => {
         const x1 = x * cy + z * sy
@@ -48,16 +56,15 @@ export function OrbitCloud({ hint }: { hint: string }) {
         node.style.zIndex = String(Math.round((z2 + 1) * 50))
       })
       if (!drag) {
-        vx += (ax - vx) * 0.02
-        vy += (ay - vy) * 0.02
+        vx += (ax - vx) * Math.min(1, 0.02 * k)
+        vy += (ay - vy) * Math.min(1, 0.02 * k)
       }
       if (!reduce) {
-        rx += vx
-        ry += vy
+        rx += vx * k
+        ry += vy * k
       }
-      if (visible && !document.hidden) raf = requestAnimationFrame(draw)
-    }
-    const kick = () => !raf && (raf = requestAnimationFrame(draw))
+    })
+    const kick = () => loop.wake()
 
     const down = (e: PointerEvent) => {
       drag = true
@@ -92,7 +99,8 @@ export function OrbitCloud({ hint }: { hint: string }) {
     io.observe(el)
     kick()
     return () => {
-      cancelAnimationFrame(raf)
+      loop.destroy()
+      ro.disconnect()
       io.disconnect()
       el.removeEventListener("pointerdown", down)
       el.removeEventListener("pointermove", move)
