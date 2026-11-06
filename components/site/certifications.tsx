@@ -8,6 +8,7 @@ import { pick } from "@/lib/pick"
 import type { Certification } from "@/lib/types"
 import { Section } from "./section"
 import { Tilt } from "@/components/tilt"
+import { CertStack } from "@/components/fx/cert-stack"
 
 export function Certifications({ items, index = "06" }: { items: Certification[]; index?: string }) {
   const { t, lang } = useApp()
@@ -19,6 +20,14 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
     <Section id="certifications" index={index} label={t.certifications.label} title={t.certifications.title}>
       {items.length === 0 ? (
         <p className="text-muted">{t.certifications.empty}</p>
+      ) : items.length > 1 ? (
+        <CertStack
+          items={items}
+          onOpen={(id) => {
+            const i = withImage.findIndex((x) => x.id === id)
+            if (i >= 0) setOpen(i)
+          }}
+        />
       ) : (
         <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((c, i) => {

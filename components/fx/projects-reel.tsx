@@ -69,7 +69,7 @@ export function ProjectsReel({ projects }: { projects: Project[] }) {
   if (projects.length < 2) return null
 
   return (
-    <div ref={outer} className={`reel ${pinned ? "reel--pin" : ""}`} aria-label={t.projects.reel}>
+    <div ref={outer} id="apercu" className={`reel ${pinned ? "reel--pin" : ""}`} aria-label={t.projects.reel}>
       <div className="reel__stage">
         <div className="reel__head mx-auto flex max-w-7xl items-end justify-between px-5 sm:px-8">
           <p className="label flex items-center gap-3">

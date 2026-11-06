@@ -220,3 +220,5 @@ GitHub: https://github.com/obedelom17
 - Ile dynamique : section en cours, progression, sons d'interface synthétisés (touche S, désactivés par défaut) / Dynamic island with opt-in UI sounds.
 - Retiré : distorsion liquide des images, inclinaison des titres au défilement / Removed: liquid image distortion, scroll skew.
 - Fluidité : survol coupé et canevas en pause pendant le défilement, plus de flou d'arrière-plan sur l'en-tête, animations calculées sur le temps réel (suivent 60, 144, 240 Hz et plus) / Scroll smoothness work.
+- Certifications : paquet de cartes glissable (souris, doigt, flèches) / Swipeable certificate card stack.
+- Mode vitrine : parcours automatique du site (touche D ou bouton de l'île), arrêt au moindre geste / Auto-tour showcase mode.

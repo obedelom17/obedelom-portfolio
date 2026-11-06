@@ -27,6 +27,7 @@ import { Dock } from "@/components/fx/dock"
 import { Ambient } from "@/components/fx/ambient"
 import { ProjectsReel } from "@/components/fx/projects-reel"
 import { PageCurtain } from "@/components/fx/page-curtain"
+import { Showcase } from "@/components/fx/showcase"
 import { DynamicIsland } from "@/components/fx/dynamic-island"
 import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
@@ -80,6 +81,7 @@ export default async function Home() {
       </main>
       <Footer />
       <DynamicIsland />
+      <Showcase />
       <Dock showInternships={hasInternships} />
       <BackToTop />
       <Toaster />
