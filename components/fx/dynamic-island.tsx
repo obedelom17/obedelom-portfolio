@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Pause, Play, Volume2, VolumeX } from "lucide-react"
+import { Volume2, VolumeX } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { initSound, play, setSound } from "@/lib/sound"
 
@@ -16,7 +16,6 @@ export function DynamicIsland() {
   const [wide, setWide] = useState(false)
   const [sound, setSoundState] = useState(false)
   const [shown, setShown] = useState(false)
-  const [demo, setDemo] = useState(false)
   const bar = useRef<HTMLSpanElement>(null)
   const pct = useRef<HTMLSpanElement>(null)
   const timer = useRef(0)
@@ -48,8 +47,6 @@ export function DynamicIsland() {
       window.clearTimeout(timer.current)
       timer.current = window.setTimeout(() => setWide(false), 1900)
     }
-    const onState = (e: Event) => setDemo(Boolean((e as CustomEvent).detail))
-    window.addEventListener("showcase:state", onState)
     const mo = new MutationObserver(read)
     mo.observe(root, { attributes: true, attributeFilter: ["data-sec"] })
 
@@ -94,7 +91,6 @@ export function DynamicIsland() {
     document.addEventListener("keydown", onKey)
 
     return () => {
-      window.removeEventListener("showcase:state", onState)
       mo.disconnect()
       ro.disconnect()
       cancelAnimationFrame(raf)
@@ -126,15 +122,6 @@ export function DynamicIsland() {
           0%
         </span>
       </span>
-      <button
-        type="button"
-        onClick={() => window.dispatchEvent(new Event("showcase:toggle"))}
-        aria-pressed={demo}
-        aria-label={t.ui.showcaseBtn}
-        className="island__btn"
-      >
-        {demo ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-      </button>
       <button
         type="button"
         onClick={toggle}

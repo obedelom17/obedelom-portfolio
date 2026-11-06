@@ -25,9 +25,7 @@ import { ScrollRail } from "@/components/fx/scroll-rail"
 import { ScrollFlag } from "@/components/fx/scroll-flag"
 import { Dock } from "@/components/fx/dock"
 import { Ambient } from "@/components/fx/ambient"
-import { ProjectsReel } from "@/components/fx/projects-reel"
 import { PageCurtain } from "@/components/fx/page-curtain"
-import { Showcase } from "@/components/fx/showcase"
 import { DynamicIsland } from "@/components/fx/dynamic-island"
 import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
@@ -73,7 +71,6 @@ export default async function Home() {
         <About projectCount={data.projects.length} />
         <Education />
         <Internships items={data.internships} index="03" />
-        <ProjectsReel projects={data.projects} />
         <Projects projects={data.projects} index={num(3)} />
         <Skills index={num(4)} />
         <Certifications items={data.certifications} index={num(5)} />
@@ -85,7 +82,6 @@ export default async function Home() {
       </main>
       <Footer />
       <DynamicIsland />
-      <Showcase />
       <Dock showInternships={hasInternships} />
       <BackToTop />
       <Toaster />

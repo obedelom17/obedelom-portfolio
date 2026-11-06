@@ -70,9 +70,6 @@ export const dictionary = {
     },
     ui: {
       view: "Voir",
-      showcaseOn: "Mode vitrine : bouge la souris pour l'arrêter",
-      showcaseOff: "Mode vitrine arrêté",
-      showcaseBtn: "Lancer le mode vitrine",
       soundOn: "Activer les sons",
       soundOff: "Couper les sons",
       copy: "Copier",
@@ -92,7 +89,7 @@ export const dictionary = {
       all: "Tous les projets",
       write: "Écrire",
       away: "👋 Reviens, il reste des choses à voir",
-      shortcuts: "Raccourcis : 0-9 sections · T thème · L langue · F lampe torche · S sons · D vitrine · ⌘K recherche",
+      shortcuts: "Raccourcis : 0-9 sections · T thème · L langue · F lampe torche · S sons · ⌘K recherche",
       flash: "Lampe torche activée · F ou Échap pour sortir",
       lastPush: "Dernier push GitHub",
     },
@@ -134,7 +131,6 @@ export const dictionary = {
     },
     projects: {
       label: "Projets",
-      reel: "Aperçu des projets",
       title: "Réalisations",
       demo: "Voir le site",
       code: "Code source",
@@ -257,9 +253,6 @@ export const dictionary = {
     },
     ui: {
       view: "View",
-      showcaseOn: "Showcase mode: move the mouse to stop",
-      showcaseOff: "Showcase mode stopped",
-      showcaseBtn: "Start showcase mode",
       soundOn: "Turn sounds on",
       soundOff: "Turn sounds off",
       copy: "Copy",
@@ -279,7 +272,7 @@ export const dictionary = {
       all: "All projects",
       write: "Write",
       away: "👋 Come back, there's more to see",
-      shortcuts: "Shortcuts: 0-9 sections · T theme · L language · F flashlight · S sounds · D showcase · ⌘K search",
+      shortcuts: "Shortcuts: 0-9 sections · T theme · L language · F flashlight · S sounds · ⌘K search",
       flash: "Flashlight on · F or Esc to exit",
       lastPush: "Latest GitHub push",
     },
@@ -321,7 +314,6 @@ export const dictionary = {
     },
     projects: {
       label: "Projects",
-      reel: "Projects at a glance",
       title: "Selected work",
       demo: "View site",
       code: "Source code",

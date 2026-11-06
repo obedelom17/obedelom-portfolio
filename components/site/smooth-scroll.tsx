@@ -2,11 +2,14 @@
 
 import { useEffect } from "react"
 
-/** Inertie du défilement, en secondes. Plus la valeur est grande, plus le défilement paraît « lourd ». */
+/** Inertie de la molette, en secondes. Plus la valeur est grande, plus le défilement paraît « lourd ». */
 const TAU = 0.125
 
 /** Multiplicateur de la molette : plus grand = défilement plus rapide. */
 const WHEEL_SPEED = 1.05
+
+/** Courbe des déplacements vers une section : départ et arrivée très doux, aucun à-coup. */
+const ease = (p: number) => (p < 0.5 ? 16 * p ** 5 : 1 - (-2 * p + 2) ** 5 / 2)
 
 function inNestedScroller(start: EventTarget | null, dy: number) {
   let el = start instanceof HTMLElement ? start : null
@@ -23,16 +26,20 @@ function inNestedScroller(start: EventTarget | null, dy: number) {
 }
 
 /**
- * Défilement fluide avec inertie, sans dépendance.
- * L'animation est cadencée par requestAnimationFrame et calculée avec le temps réel écoulé entre
- * deux images : elle suit donc la fréquence de l'écran (60, 120 ou 144 Hz) sans changer de vitesse.
- * Actif uniquement avec une souris ou un pavé tactile ; le tactile mobile garde son défilement natif.
+ * Défilement fluide, sans dépendance, cadencé par requestAnimationFrame sur le temps réel écoulé
+ * (identique à 60, 120 ou 144 Hz).
+ * - Molette et clavier (souris ou pavé tactile) : inertie exponentielle.
+ * - Liens d'ancre, tous appareils : déplacement chronométré avec courbe d'accélération douce.
+ *   Pendant ce trajet, la classe `is-navigating` est posée sur <html> : les apparitions de contenu
+ *   et les changements d'ambiance sont suspendus, puis rejoués à l'arrivée (événement `nav:end`).
+ *   Le trajet ne fait donc que déplacer la page, sans aucun autre calcul : zéro saccade.
+ * Le tactile garde son défilement natif.
  */
 export function SmoothScroll() {
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (!fine || reduce) return
+    if (reduce) return
 
     const root = document.documentElement
     root.classList.add("smooth-scroll")
@@ -42,11 +49,32 @@ export function SmoothScroll() {
     let raf = 0
     let last = 0
     let running = false
+    let glide: { from: number; to: number; t0: number; dur: number } | null = null
 
     const limit = () => Math.max(0, root.scrollHeight - window.innerHeight)
     const clamp = (v: number) => Math.min(Math.max(v, 0), limit())
 
+    const endGlide = () => {
+      if (!glide) return
+      glide = null
+      root.classList.remove("is-navigating")
+      window.dispatchEvent(new Event("nav:end"))
+    }
+
     const tick = (now: number) => {
+      if (glide) {
+        const p = Math.min((now - glide.t0) / glide.dur, 1)
+        current = glide.from + (glide.to - glide.from) * ease(p)
+        window.scrollTo(0, current)
+        if (p >= 1) {
+          current = target = glide.to
+          running = false
+          endGlide()
+          return
+        }
+        raf = requestAnimationFrame(tick)
+        return
+      }
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       current += (target - current) * (1 - Math.exp(-dt / TAU))
@@ -65,7 +93,15 @@ export function SmoothScroll() {
       raf = requestAnimationFrame(tick)
     }
 
+    const stop = () => {
+      cancelAnimationFrame(raf)
+      running = false
+      endGlide()
+      current = target = window.scrollY
+    }
+
     const scrollBy = (dy: number) => {
+      if (glide) stop()
       if (!running) {
         current = window.scrollY
         target = current
@@ -74,10 +110,19 @@ export function SmoothScroll() {
       start()
     }
 
-    const scrollTo = (y: number) => {
-      if (!running) current = window.scrollY
-      target = clamp(y)
-      start()
+    const glideTo = (y: number) => {
+      const to = clamp(y)
+      const from = window.scrollY
+      const dist = Math.abs(to - from)
+      if (dist < 2) return
+      cancelAnimationFrame(raf)
+      current = from
+      target = to
+      const dur = Math.min(1700, Math.max(750, 600 + dist * 0.22))
+      glide = { from, to, t0: performance.now(), dur }
+      root.classList.add("is-navigating")
+      running = true
+      raf = requestAnimationFrame(tick)
     }
 
     const onWheel = (e: WheelEvent) => {
@@ -99,6 +144,11 @@ export function SmoothScroll() {
       target = current
     }
 
+    // Un doigt posé pendant un trajet l'interrompt immédiatement.
+    const onTouch = () => {
+      if (glide) stop()
+    }
+
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       const a = (e.target as HTMLElement | null)?.closest?.("a[href^='#']") as HTMLAnchorElement | null
@@ -110,7 +160,7 @@ export function SmoothScroll() {
       if (id !== "top" && !el) return
       e.preventDefault()
       const offset = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0
-      scrollTo(el ? el.getBoundingClientRect().top + window.scrollY - offset : 0)
+      glideTo(el ? el.getBoundingClientRect().top + window.scrollY - offset : 0)
       history.replaceState(null, "", hash)
     }
 
@@ -138,10 +188,10 @@ export function SmoothScroll() {
           return scrollBy(e.shiftKey ? -page : page)
         case "Home":
           e.preventDefault()
-          return scrollTo(0)
+          return glideTo(0)
         case "End":
           e.preventDefault()
-          return scrollTo(limit())
+          return glideTo(limit())
       }
     }
 
@@ -149,18 +199,20 @@ export function SmoothScroll() {
       target = clamp(target)
     }
 
-    window.addEventListener("wheel", onWheel, { passive: false })
+    if (fine) window.addEventListener("wheel", onWheel, { passive: false })
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onResize)
+    window.addEventListener("touchstart", onTouch, { passive: true })
     document.addEventListener("click", onClick)
-    document.addEventListener("keydown", onKey)
+    if (fine) document.addEventListener("keydown", onKey)
 
     return () => {
       cancelAnimationFrame(raf)
-      root.classList.remove("smooth-scroll")
+      root.classList.remove("smooth-scroll", "is-navigating")
       window.removeEventListener("wheel", onWheel)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onResize)
+      window.removeEventListener("touchstart", onTouch)
       document.removeEventListener("click", onClick)
       document.removeEventListener("keydown", onKey)
     }

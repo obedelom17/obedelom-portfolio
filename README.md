@@ -214,29 +214,30 @@ GitHub: https://github.com/obedelom17
 - Statistiques à rouleaux (odomètre) / Rolling-digit odometer stats.
 - Sphère 3D de logos glissable avec inertie / Draggable 3D tech sphere with inertia.
 - Reflet holographique sur les puces / Holographic sheen on chips.
-- Noeud de tore 3D en WebGL pur dans le hero (irisation, rotation liée au pointeur et au défilement) / Pure WebGL 3D torus knot in the hero.
-- Bande de projets horizontale épinglée au défilement vertical (rangée glissable sur mobile) / Pinned horizontal projects reel.
 - Transitions de page (rideau) et trait de balayage entre sections / Page curtain and section sweep line.
 - Ile dynamique : section en cours, progression, sons d'interface synthétisés (touche S, désactivés par défaut) / Dynamic island with opt-in UI sounds.
 - Retiré : distorsion liquide des images, inclinaison des titres au défilement / Removed: liquid image distortion, scroll skew.
 - Fluidité : survol coupé et canevas en pause pendant le défilement, plus de flou d'arrière-plan sur l'en-tête, animations calculées sur le temps réel (suivent 60, 144, 240 Hz et plus) / Scroll smoothness work.
 - Certifications : paquet de cartes glissable (souris, doigt, flèches) / Swipeable certificate card stack.
-- Mode vitrine : parcours automatique du site (touche D ou bouton de l'île), arrêt au moindre geste / Auto-tour showcase mode.
 
 ## Performance et mobile / Performance and mobile
 
 **Français**
 
 - Défilement à inertie plus lourd (constante de lissage 0,125 s), cadencé sur le temps réel entre images : identique à 60, 120 ou 144 Hz.
-- `PerfGovernor` : mesure la durée des images pendant le défilement. Sous environ 42 images par seconde, la classe `perf-lite` coupe shader, nœud 3D, particules, traînée et halos. Les appareils modestes (2 coeurs, 2 Go, économie de données) démarrent en mode allégé.
-- Parité mobile : nœud 3D allégé (géométrie réduite, sans anticrénelage), barre de navigation en bas, île dynamique compacte, onde au toucher, lueur qui suit le doigt, retour haptique (Android), parallaxe du hero par gyroscope, progression de la rangée de projets, anneau de contact, bouton Partager et fiche contact (vCard).
+- `PerfGovernor` : mesure la durée des images pendant le défilement. Sous environ 42 images par seconde, la classe `perf-lite` coupe shader, particules, traînée et halos. Les appareils modestes (2 coeurs, 2 Go, économie de données) démarrent en mode allégé.
+- Parité mobile : barre de navigation en bas, île dynamique compacte, onde au toucher, lueur qui suit le doigt, retour haptique (Android), parallaxe du hero par gyroscope, anneau de contact, bouton Partager et fiche contact (vCard).
 - Courbes à ressort CSS (`linear()`), entrée en perspective pilotée par le défilement (`animation-timeline: view()`), fondu au changement de langue (View Transitions).
 - Application installable (manifeste), couleur de barre système claire et sombre.
 
 **English**
 
 - Heavier inertial scroll (0.125 s smoothing constant), driven by real frame time: identical at 60, 120 or 144 Hz.
-- `PerfGovernor`: measures frame time while scrolling. Below roughly 42 fps, the `perf-lite` class disables the shader, 3D knot, particles, cursor trail and glows. Low-end devices (2 cores, 2 GB, data saver) start in lite mode.
-- Mobile parity: lighter 3D knot (reduced geometry, no antialiasing), bottom navigation bar, compact dynamic island, tap ripple, glow following the finger, haptic feedback (Android), gyroscope hero parallax, project row progress, contact ring, Share button and contact card (vCard).
+- `PerfGovernor`: measures frame time while scrolling. Below roughly 42 fps, the `perf-lite` class disables the shader, particles, cursor trail and glows. Low-end devices (2 cores, 2 GB, data saver) start in lite mode.
+- Mobile parity: bottom navigation bar, compact dynamic island, tap ripple, glow following the finger, haptic feedback (Android), gyroscope hero parallax, contact ring, Share button and contact card (vCard).
 - CSS spring easing (`linear()`), scroll-driven perspective entry (`animation-timeline: view()`), crossfade on language change (View Transitions).
 - Installable app (manifest), light and dark system bar color.
+
+- Navigation par sections : déplacement chronométré à courbe douce. Pendant le trajet, apparitions et changements d'ambiance sont suspendus puis rejoués à l'arrivée (`is-navigating`, `nav:end`) / Section navigation: timed glide with soft easing; reveals and ambience changes are paused during the trip and replayed on arrival.
+- Curseur sans `mix-blend-mode` (source de saccades) / Cursor without `mix-blend-mode` (a known scroll-jank source).
+- Retirés : nœud 3D du hero, section Aperçu des projets, mode vitrine / Removed: hero 3D knot, projects overview section, showcase mode.

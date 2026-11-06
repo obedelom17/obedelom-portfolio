@@ -23,17 +23,29 @@ export function Reveal({
       setVisible(true)
       return
     }
+    const root = document.documentElement
+    const show = () => {
+      setVisible(true)
+      io.disconnect()
+      window.removeEventListener("nav:end", onEnd)
+    }
+    // Pendant un trajet vers une section, rien n'est calculé ; à l'arrivée on rejoue ce qui est à l'écran.
+    const onEnd = () => {
+      const r = el.getBoundingClientRect()
+      if (r.top < window.innerHeight * 0.92 && r.bottom > 0) show()
+    }
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          io.disconnect()
-        }
+        if (entry.isIntersecting && !root.classList.contains("is-navigating")) show()
       },
       { rootMargin: "0px 0px -8% 0px" },
     )
     io.observe(el)
-    return () => io.disconnect()
+    window.addEventListener("nav:end", onEnd)
+    return () => {
+      io.disconnect()
+      window.removeEventListener("nav:end", onEnd)
+    }
   }, [])
 
   return (
