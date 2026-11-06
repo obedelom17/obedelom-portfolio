@@ -207,3 +207,12 @@ GitHub: https://github.com/obedelom17
 **Internships (EN).** In `/admin`, the "Stages" tab lets you add a company (name, year, period, duration, location, role, overview, missions, technologies, website, logo and photo). The section appears between "Education" and "Projects" as soon as one internship exists, styled like the Education section. Content is bilingual.
 
 **Videos (EN).** In the "Projets" tab, the "Vidéos" field accepts a YouTube or Vimeo link, a direct link to an `.mp4` / `.webm` file, or a file placed in the repository's `public/videos/` folder (link `/videos/name.mp4`). Videos come before screenshots and the first one autoplays. Browsers only allow autoplay when muted, so the video starts muted and visitors turn sound on from the controls. For files kept in the repo, keep them small (ideally under 10 MB, H.264); GitHub rejects files over 100 MB.
+
+## Nouveautés d'animation / Motion additions
+
+- Hero: fond génératif WebGL (bruit fluide, déformation au pointeur, ondes au clic) / WebGL generative background.
+- Statistiques à rouleaux (odomètre) / Rolling-digit odometer stats.
+- Sphère 3D de logos glissable avec inertie / Draggable 3D tech sphere with inertia.
+- Teinte d'ambiance par section et progression de page / Per-section ambient tint.
+- Reflet holographique sur les puces / Holographic sheen on chips.
+- Sections en « feuille » au défilement (CSS scroll-driven) / Scroll-driven section sheets.

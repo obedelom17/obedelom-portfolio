@@ -3,7 +3,8 @@
 import { Fragment, useRef } from "react"
 import { ArrowDownRight } from "lucide-react"
 import { useApp } from "@/components/providers"
-import { CountUp } from "@/components/count-up"
+import { Odometer } from "@/components/fx/odometer"
+import { ShaderBg } from "@/components/fx/shader-bg"
 import { Magnetic } from "@/components/magnetic"
 import { ParticleField } from "@/components/particle-field"
 import { RotatingWords } from "./rotating-words"
@@ -48,13 +49,14 @@ export function Hero({
   }
 
   const stats = [
-    { v: <CountUp to={projectCount} />, k: t.hero.stats.projects },
-    { v: <CountUp to={certificationCount} />, k: t.hero.stats.certifications },
+    { v: <Odometer to={projectCount} />, k: t.hero.stats.projects },
+    { v: <Odometer to={certificationCount} />, k: t.hero.stats.certifications },
     { v: <span>{firstYear}</span>, k: t.hero.stats.since },
   ]
 
   return (
     <section id="top" onPointerMove={onMove} className="relative overflow-hidden">
+      <ShaderBg />
       <div className="hero-grid" aria-hidden />
       <div className="pointer-events-none absolute inset-0" data-depth="-34" aria-hidden>
         <div className="hero-orb hero-orb--a" />

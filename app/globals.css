@@ -1641,3 +1641,148 @@ body {
     height: 78svh;
   }
 }
+
+/* ---------- Nouveautés : shader, odomètre, sphère 3D, teinte de section, reflet holographique ---------- */
+.shader-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.9;
+  pointer-events: auto;
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+}
+
+.odo {
+  display: inline-flex;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+.odo__cell {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+}
+.odo__reel {
+  display: flex;
+  flex-direction: column;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.odo__reel > span {
+  display: block;
+  height: 1em;
+}
+
+.orbit {
+  position: relative;
+  height: clamp(280px, 46vw, 440px);
+  margin-bottom: 3rem;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.orbit[data-drag] {
+  cursor: grabbing;
+}
+.orbit__core {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 68%);
+  filter: blur(18px);
+}
+.orbit__item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -24px 0 0 -24px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.35);
+  will-change: transform, opacity;
+}
+.orbit__item img {
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+}
+.orbit__hint {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.sec-tint {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vmax 40vmax at calc(10% + var(--page, 0) * 80%) 105%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    radial-gradient(50vmax 36vmax at calc(90% - var(--page, 0) * 80%) -5%, color-mix(in srgb, var(--accent-2, var(--accent)) 10%, transparent), transparent 70%);
+  transition: filter 1.2s ease;
+}
+html[data-sec="projets"] .sec-tint { filter: hue-rotate(18deg) saturate(1.25); }
+html[data-sec="competences"] .sec-tint { filter: hue-rotate(-24deg) saturate(1.3); }
+html[data-sec="certifications"] .sec-tint { filter: hue-rotate(40deg); }
+html[data-sec="contact"] .sec-tint { filter: hue-rotate(-12deg) saturate(1.5); }
+
+/* Reflet holographique qui suit le pointeur sur les puces et cartes `.spot`. */
+.chip.spot,
+.spot.holo {
+  position: relative;
+  isolation: isolate;
+}
+.chip.spot::after,
+.spot.holo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  background: conic-gradient(from 210deg at var(--mx, 50%) var(--my, 50%), #34d39944, #38bdf833, #a78bfa33, #fbbf2433, #34d39944);
+  mix-blend-mode: soft-light;
+  transition: opacity 0.35s ease;
+}
+.chip.spot:hover::after,
+.spot.holo:hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .odo__reel { transition: none !important; }
+  .sec-tint { transition: none; }
+}
+
+/* Entrée des sections en « feuille » qui s'ouvre au défilement (CSS natif, si supporté). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main > section:not(#top) {
+      animation: sheet-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+    @keyframes sheet-open {
+      from { clip-path: inset(3% 2.5% 0 2.5% round 36px 36px 0 0); }
+      to { clip-path: inset(0 0 0 0 round 0); }
+    }
+  }
+}

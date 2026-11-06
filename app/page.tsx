@@ -26,6 +26,7 @@ import { ScrollVelocity } from "@/components/fx/scroll-velocity"
 import { Dock } from "@/components/fx/dock"
 import { Ambient } from "@/components/fx/ambient"
 import { LiquidFilter } from "@/components/fx/liquid"
+import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
 
 export const revalidate = 60
@@ -44,6 +45,7 @@ export default async function Home() {
     <>
       <Preloader />
       <Aurora />
+      <SectionTint />
       <CursorTrail />
       <GlobalFx />
       <ScrollVelocity />
