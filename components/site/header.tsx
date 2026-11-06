@@ -105,7 +105,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
           <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
         </a>
 
-        <nav className="hidden items-center gap-5 md:flex lg:gap-8" aria-label="Navigation principale">
+        <nav className="hidden items-center gap-5 xl:flex xl:gap-8" aria-label="Navigation principale">
           {links.map((l) => (
             <NavLink key={l.href} href={l.href} label={l.label} on={active === l.href.slice(1)} />
           ))}
@@ -124,7 +124,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
             <span className="mx-1">/</span>
             <span className={lang === "en" ? "text-fg" : ""}>EN</span>
           </button>
-          <Magnetic className="ml-2 hidden md:inline-block" strength={0.2}>
+          <Magnetic className="ml-2 hidden xl:inline-block" strength={0.2}>
             <a
               href="/cvobed.pdf"
               download="CV_AGBEBAVI_Elom_Obed.pdf"
@@ -135,7 +135,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
           </Magnetic>
           <button
             type="button"
-            className="p-2 md:hidden"
+            className="p-2 xl:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? t.nav.close : t.nav.menu}
             aria-expanded={open}
@@ -146,7 +146,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
       </div>
 
       {open && (
-        <nav className="border-t border-line px-5 pb-6 pt-2 md:hidden" aria-label="Navigation mobile">
+        <nav className="max-h-[calc(100svh-4rem)] overflow-y-auto border-t border-line px-5 pb-6 pt-2 xl:hidden" aria-label="Navigation mobile">
           {links.map((l) => (
             <a
               key={l.href}

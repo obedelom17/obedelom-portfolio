@@ -26,7 +26,7 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
             const imageIndex = withImage.findIndex((x) => x.id === c.id)
             return (
               <Reveal key={c.id} delay={(i % 3) * 90} variant={i % 2 ? "blur" : "rotate"}>
-                <figure className="vskew">
+                <figure>
                   {c.image_url ? (
                     <Tilt max={6}>
                     <button

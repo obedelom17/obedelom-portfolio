@@ -3,25 +3,36 @@
 import { useEffect } from "react"
 
 /**
- * Publie la vitesse de défilement dans deux variables CSS sur <html> :
- *  --vel     : de -1 (vite vers le haut) à 1 (vite vers le bas), lissée ;
- *  --vel-abs : sa valeur absolue.
- * Les éléments `.vskew` s'en servent pour s'incliner légèrement pendant le défilement,
- * comme sur les sites de studios. La boucle s'arrête dès que la page est immobile.
+ * Incline légèrement les éléments `.vskew` selon la vitesse de défilement.
+ * Pour rester fluide : aucune variable CSS globale (elle forcerait un recalcul de style de toute la page),
+ * on écrit directement le transform des seuls éléments visibles, et la boucle s'arrête quand la page est immobile.
  */
 export function ScrollVelocity() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    const root = document.documentElement
+    const all = Array.from(document.querySelectorAll<HTMLElement>(".vskew"))
+    const visible = new Set<HTMLElement>()
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const el = e.target as HTMLElement
+        if (e.isIntersecting) visible.add(el)
+        else {
+          visible.delete(el)
+          el.style.transform = ""
+        }
+      }
+    })
+    all.forEach((el) => io.observe(el))
+
     let lastY = window.scrollY
     let vel = 0
     let raf = 0
     let last = performance.now()
     let running = false
 
-    const set = (v: number) => {
-      root.style.setProperty("--vel", v.toFixed(4))
-      root.style.setProperty("--vel-abs", Math.abs(v).toFixed(4))
+    const apply = (v: number) => {
+      const t = v === 0 ? "" : `skewY(${(v * -2.2).toFixed(3)}deg)`
+      visible.forEach((el) => (el.style.transform = t))
     }
 
     const tick = (now: number) => {
@@ -34,13 +45,12 @@ export function ScrollVelocity() {
       if (Math.abs(vel) < 4 && Math.abs(instant) < 4) {
         vel = 0
         running = false
-        set(0)
+        apply(0)
         return
       }
-      set(Math.max(-1, Math.min(1, vel / 2600)))
+      apply(Math.max(-1, Math.min(1, vel / 2600)))
       raf = requestAnimationFrame(tick)
     }
-
     const kick = () => {
       if (running) return
       running = true
@@ -48,13 +58,12 @@ export function ScrollVelocity() {
       lastY = window.scrollY
       raf = requestAnimationFrame(tick)
     }
-
     window.addEventListener("scroll", kick, { passive: true })
     return () => {
       cancelAnimationFrame(raf)
+      io.disconnect()
       window.removeEventListener("scroll", kick)
-      root.style.removeProperty("--vel")
-      root.style.removeProperty("--vel-abs")
+      all.forEach((el) => (el.style.transform = ""))
     }
   }, [])
 

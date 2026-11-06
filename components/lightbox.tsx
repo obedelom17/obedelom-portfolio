@@ -91,7 +91,7 @@ export function Lightbox({
             item={current}
             title={`${alt} ${index + 1}`}
             muted={false}
-            className={current.embed ? "aspect-video w-full" : "max-h-[88vh] max-w-full bg-black"}
+            className={current.embed ? "aspect-video w-full" : "max-h-[88svh] max-w-full bg-black"}
           />
         </div>
       ) : current ? (
@@ -99,7 +99,7 @@ export function Lightbox({
         <img
           src={current.src}
           alt={`${alt} ${index + 1}`}
-          className="max-h-[88vh] max-w-full object-contain"
+          className="max-h-[88svh] max-w-full object-contain"
           onClick={(e) => e.stopPropagation()}
         />
       ) : null}

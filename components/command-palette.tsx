@@ -169,7 +169,7 @@ export function CommandPalette({ showInternships }: { showInternships: boolean }
 
   let lastGroup = ""
   return (
-    <div className="palette-backdrop fixed inset-0 z-[90] flex items-start justify-center px-4 pt-[14vh]" onMouseDown={() => setOpen(false)}>
+    <div className="palette-backdrop fixed inset-0 z-[90] flex items-start justify-center px-4 pt-[10svh] sm:pt-[14vh]" onMouseDown={() => setOpen(false)}>
       <div
         role="dialog"
         aria-modal="true"
@@ -189,7 +189,7 @@ export function CommandPalette({ showInternships }: { showInternships: boolean }
           />
           <span className="label border border-line px-1.5 py-0.5">esc</span>
         </div>
-        <ul ref={list} className="max-h-[50vh] overflow-y-auto p-2">
+        <ul ref={list} className="max-h-[50svh] overflow-y-auto p-2">
           {results.length === 0 && <li className="px-3 py-8 text-center text-sm text-muted">{t.cmd.empty}</li>}
           {results.map((item, i) => {
             const header = item.group !== lastGroup

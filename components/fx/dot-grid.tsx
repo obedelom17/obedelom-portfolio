@@ -113,7 +113,7 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
 
     const loop = (now: number) => {
       const busy = draw(now)
-      raf = visible && (busy || (px > -9000 && py > -9000)) ? requestAnimationFrame(loop) : 0
+      raf = visible && busy ? requestAnimationFrame(loop) : 0
     }
     const ensure = () => {
       if (raf || !visible) return
@@ -140,7 +140,7 @@ export function DotGrid({ gap = 30 }: { gap?: number }) {
       ensure()
     }
     const onScroll = () => {
-      if (cX < -9000) return
+      if (px < -9000) return
       locate()
       ensure()
     }

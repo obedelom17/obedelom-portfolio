@@ -15,7 +15,7 @@ export function Education() {
       <Reveal>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <div className="curtain vskew overflow-hidden border border-line">
+          <div className="curtain overflow-hidden border border-line">
             <Parallax>
               <img
                 src="/images/iai/iai-lome.webp"
@@ -61,7 +61,7 @@ export function Education() {
         {f.stats.map((s, i) => (
           <div key={s.label} className={`px-2 py-6 sm:px-6 ${i > 0 ? "border-l border-line" : ""}`}>
             <dt className="label">{s.label}</dt>
-            <dd className="mt-2 font-serif text-3xl sm:text-5xl">{s.value}</dd>
+            <dd className="mt-2 font-serif text-2xl min-[420px]:text-3xl sm:text-4xl md:text-5xl">{s.value}</dd>
           </div>
         ))}
       </dl>

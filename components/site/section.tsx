@@ -35,9 +35,9 @@ export function Section({
           <DotGrid />
         </div>
       )}
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 md:grid-cols-12 md:py-36">
-        <div className="md:col-span-3">
-          <div className="md:sticky md:top-28">
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 md:py-36 lg:grid-cols-12">
+        <div className="lg:col-span-3">
+          <div className="lg:sticky lg:top-28">
             <Reveal variant="left">
               <span className="block origin-left font-serif text-7xl leading-none md:text-8xl">
                 <ScrollFillNum value={index} />
@@ -47,14 +47,14 @@ export function Section({
                 {label}
               </p>
               {title ? (
-                <h2 className="vskew mt-4 font-serif text-3xl leading-tight md:text-4xl">
+                <h2 className="vskew mt-4 font-serif text-3xl leading-tight md:text-4xl lg:text-2xl xl:text-3xl">
                   <SplitWords text={title} />
                 </h2>
               ) : null}
             </Reveal>
           </div>
         </div>
-        <div className="md:col-span-9">{children}</div>
+        <div className="lg:col-span-9">{children}</div>
       </div>
     </section>
   )

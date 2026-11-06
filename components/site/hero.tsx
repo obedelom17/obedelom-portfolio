@@ -87,7 +87,7 @@ export function Hero({
           <Scramble text={t.hero.kicker} auto delay={900} />
         </p>
 
-        <h1 data-hero-title className="hero-title mt-10 max-w-5xl font-serif text-[2.7rem] leading-[1.02] sm:text-7xl lg:text-[5.6rem]">
+        <h1 data-hero-title className="hero-title mt-10 max-w-5xl font-serif text-[clamp(2.1rem,10.8vw,2.9rem)] leading-[1.02] min-[480px]:text-[3.4rem] sm:text-7xl lg:text-[5.6rem]">
           <span className="line">
             <Words text={l1} base={200} />
           </span>
@@ -127,8 +127,8 @@ export function Hero({
         <dl className="fade-up focus-cols mt-20 grid grid-cols-3 border-y border-line" style={d(1250)}>
           {stats.map((s, i) => (
             <div key={s.k} className={`spot px-2 py-7 sm:px-8 ${i > 0 ? "border-l border-line" : ""}`}>
-              <dt className="label">{s.k}</dt>
-              <dd className="mt-3 font-serif text-4xl sm:text-7xl">{s.v}</dd>
+              <dt className="label break-words">{s.k}</dt>
+              <dd className="mt-3 font-serif text-[clamp(1.6rem,8.4vw,2.25rem)] sm:text-5xl md:text-6xl lg:text-7xl">{s.v}</dd>
             </div>
           ))}
         </dl>
