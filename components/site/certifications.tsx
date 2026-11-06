@@ -26,13 +26,14 @@ export function Certifications({ items, index = "06" }: { items: Certification[]
             const imageIndex = withImage.findIndex((x) => x.id === c.id)
             return (
               <Reveal key={c.id} delay={(i % 3) * 90} variant={i % 2 ? "blur" : "rotate"}>
-                <figure>
+                <figure className="vskew">
                   {c.image_url ? (
                     <Tilt max={6}>
                     <button
                       type="button"
                       onClick={() => setOpen(imageIndex)}
                       data-cursor={t.ui.view}
+                      data-liquid
                       className="group/cert block w-full overflow-hidden border border-line bg-card shadow-[0_0_0_0_rgba(0,0,0,0)] transition-[box-shadow,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.45)]"
                       aria-label={title}
                     >

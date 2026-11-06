@@ -22,6 +22,11 @@ import { Aurora } from "@/components/fx/aurora"
 import { CursorTrail } from "@/components/fx/cursor-trail"
 import { GlobalFx } from "@/components/fx/global-fx"
 import { ScrollRail } from "@/components/fx/scroll-rail"
+import { ScrollVelocity } from "@/components/fx/scroll-velocity"
+import { Dock } from "@/components/fx/dock"
+import { Ambient } from "@/components/fx/ambient"
+import { LiquidFilter } from "@/components/fx/liquid"
+import { ElasticLine } from "@/components/fx/elastic-line"
 
 export const revalidate = 60
 
@@ -41,6 +46,9 @@ export default async function Home() {
       <Aurora />
       <CursorTrail />
       <GlobalFx />
+      <ScrollVelocity />
+      <LiquidFilter />
+      <Ambient showInternships={hasInternships} />
       <ScrollRail showInternships={hasInternships} />
       <SmoothScroll />
       <ScrollProgress />
@@ -53,16 +61,20 @@ export default async function Home() {
           firstYear={Number.isFinite(firstYear) ? firstYear : 2024}
         />
         <Marquee />
-        <About />
+        <About projectCount={data.projects.length} />
         <Education />
         <Internships items={data.internships} index="03" />
         <Projects projects={data.projects} index={num(3)} />
         <Skills index={num(4)} />
         <Certifications items={data.certifications} index={num(5)} />
         <ScrollBand />
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <ElasticLine />
+        </div>
         <Contact index={num(6)} />
       </main>
       <Footer />
+      <Dock showInternships={hasInternships} />
       <BackToTop />
       <Toaster />
       <CommandPalette showInternships={hasInternships} />

@@ -5,12 +5,15 @@ import { useApp } from "@/components/providers"
 import { LocalTime } from "./local-time"
 import { ProximityText } from "@/components/fx/proximity-text"
 import { Magnetic } from "@/components/magnetic"
+import { ElasticLine } from "@/components/fx/elastic-line"
+import { GithubPulse } from "@/components/fx/github-pulse"
 
 export function Footer() {
   const { t } = useApp()
   return (
     <footer className="relative overflow-hidden border-t border-line">
-      <div className="mx-auto max-w-7xl px-5 pt-16 sm:px-8 md:pt-24">
+      <div className="mx-auto max-w-7xl px-5 pt-10 sm:px-8 md:pt-16">
+        <ElasticLine />
         <p className="wordmark select-none font-serif text-[min(11.5vw,10.5rem)] leading-[0.85]" aria-hidden>
           <ProximityText text="Obed Agbebavi" />
         </p>
@@ -24,6 +27,7 @@ export function Footer() {
             </span>
             Lomé, Togo · <LocalTime /> GMT
           </p>
+          <GithubPulse />
           <p className="label">
             © {new Date().getFullYear()} AGBEBAVI Elom Obed. {t.footer.rights}.
           </p>

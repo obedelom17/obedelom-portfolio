@@ -1341,3 +1341,240 @@ html[data-loader="on"] .word-in {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Troisième couche : dock, corde élastique, grille de points, terminal, lampe torche
+   ========================================================================== */
+
+/* Inclinaison des titres et images selon la vitesse de défilement (variable posée par ScrollVelocity). */
+.vskew {
+  transform: skewY(calc(var(--vel, 0) * -2.2deg));
+  transform-origin: 0 50%;
+}
+
+/* Nouvelles variantes d'apparition. */
+.reveal[data-v="flip"] {
+  transform: perspective(1000px) rotateY(-72deg) translate3d(-24px, 0, 0);
+  transform-origin: 0 50%;
+  transition: opacity 0.9s var(--ease), transform 1.4s var(--ease);
+}
+.reveal[data-v="zoom"] {
+  transform: scale(1.14);
+  filter: blur(10px);
+  transition: opacity 1s var(--ease), transform 1.5s var(--ease), filter 1s ease;
+}
+.reveal[data-v="skew"] {
+  transform: translate3d(0, 44px, 0) skewY(5deg);
+  transform-origin: 0 100%;
+}
+.reveal[data-v="flip"].is-visible,
+.reveal[data-v="zoom"].is-visible,
+.reveal[data-v="skew"].is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* Dock flottant (ordinateur). */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 1.1rem;
+  z-index: 46;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 160%);
+  transition: opacity 0.5s ease, transform 0.8s var(--ease);
+}
+.dock[data-on="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+body[style*="overflow: hidden"] .dock {
+  opacity: 0;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .dock {
+    display: block;
+  }
+}
+.dock__bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 1.15rem;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.5);
+}
+.dock__sep {
+  align-self: stretch;
+  width: 1px;
+  margin: 0.35rem 0.2rem;
+  background: var(--line);
+}
+.dock__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(2.5rem * var(--s, 1));
+  height: calc(2.5rem * var(--s, 1));
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: var(--card);
+  color: var(--muted);
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+.dock__item svg {
+  width: 46%;
+  height: 46%;
+}
+.dock__item:hover,
+.dock__item:focus-visible {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.dock__item[data-active="true"] {
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.dock__tip {
+  position: absolute;
+  bottom: calc(100% + 0.7rem);
+  left: 50%;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.2s ease, transform 0.35s var(--ease);
+}
+.dock__item:hover .dock__tip,
+.dock__item:focus-visible .dock__tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Corde élastique. */
+.elastic {
+  position: relative;
+  height: 80px;
+  color: var(--line);
+  transition: color 0.4s ease;
+}
+.elastic[data-on="true"] {
+  color: var(--accent);
+}
+.elastic svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+  overflow: visible;
+}
+
+/* Grille de points (canvas) : les bords se fondent dans la page. */
+.dotgrid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+}
+
+/* Terminal. */
+.term {
+  position: relative;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.75;
+}
+.term__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+.term__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: var(--muted);
+  opacity: 0.4;
+}
+.term__body {
+  min-height: 15.5rem;
+  padding: 1.1rem 1.1rem 1.4rem;
+  overflow-x: auto;
+}
+.term__prompt {
+  margin-right: 0.65rem;
+  color: var(--accent);
+}
+.term__out {
+  padding-left: 1.4rem;
+  color: var(--muted);
+}
+.term__caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Lampe torche : la page s'assombrit, seul le pointeur éclaire. */
+html.flashlight::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 54;
+  pointer-events: none;
+  background: radial-gradient(circle 230px at var(--fx, 50%) var(--fy, 50%), transparent 0, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.96) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vskew {
+    transform: none;
+  }
+  .reveal[data-v="flip"],
+  .reveal[data-v="zoom"],
+  .reveal[data-v="skew"] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .dock,
+  .dock__tip,
+  .term__caret {
+    transition: none;
+    animation: none;
+  }
+}

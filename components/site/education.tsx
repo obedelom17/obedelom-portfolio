@@ -15,7 +15,7 @@ export function Education() {
       <Reveal>
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <div className="curtain overflow-hidden border border-line">
+          <div className="curtain vskew overflow-hidden border border-line">
             <Parallax>
               <img
                 src="/images/iai/iai-lome.webp"
@@ -72,7 +72,7 @@ export function Education() {
           <ul className="focus-list mt-4">
             {f.diplomas.map((d) => (
               <li key={d.title}>
-                <Reveal>
+                <Reveal variant="skew">
                   <div className="border-t border-line py-5 last:border-b">
                     <p className="font-serif text-xl leading-snug md:text-2xl">{d.title}</p>
                     <p className="mt-1 text-sm leading-relaxed text-muted">{d.text}</p>
