@@ -14,23 +14,15 @@ export function ScrollFillNum({ value, className = "" }: { value: string; classN
       return
     }
     let raf = 0
-    let lastY = window.scrollY
-    let vel = 0
     let running = false
     let visible = true
 
     const frame = () => {
-      const y = window.scrollY
-      vel += ((y - lastY) * 0.05 - vel) * 0.2
-      lastY = y
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
       const p = Math.min(Math.max((vh * 0.85 - r.top) / (vh * 0.7), 0), 1)
       el.style.setProperty("--fill", p.toFixed(3))
-      const sk = Math.max(-8, Math.min(8, vel))
-      el.style.transform = `skewY(${sk.toFixed(2)}deg)`
-      if (visible && (Math.abs(vel) > 0.02 || p < 1)) raf = requestAnimationFrame(frame)
-      else running = false
+      running = false
     }
     const kick = () => {
       if (running || !visible) return

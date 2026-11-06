@@ -25,7 +25,7 @@ export function CursorTrail() {
     const pts: Pt[] = []
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const dpr = 1
       w = window.innerWidth
       h = window.innerHeight
       canvas.width = Math.floor(w * dpr)

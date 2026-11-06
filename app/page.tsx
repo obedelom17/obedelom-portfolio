@@ -22,10 +22,12 @@ import { Aurora } from "@/components/fx/aurora"
 import { CursorTrail } from "@/components/fx/cursor-trail"
 import { GlobalFx } from "@/components/fx/global-fx"
 import { ScrollRail } from "@/components/fx/scroll-rail"
-import { ScrollVelocity } from "@/components/fx/scroll-velocity"
+import { ScrollFlag } from "@/components/fx/scroll-flag"
 import { Dock } from "@/components/fx/dock"
 import { Ambient } from "@/components/fx/ambient"
-import { LiquidFilter } from "@/components/fx/liquid"
+import { ProjectsReel } from "@/components/fx/projects-reel"
+import { PageCurtain } from "@/components/fx/page-curtain"
+import { DynamicIsland } from "@/components/fx/dynamic-island"
 import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
 
@@ -46,10 +48,10 @@ export default async function Home() {
       <Preloader />
       <Aurora />
       <SectionTint />
+      <PageCurtain />
       <CursorTrail />
       <GlobalFx />
-      <ScrollVelocity />
-      <LiquidFilter />
+      <ScrollFlag />
       <Ambient showInternships={hasInternships} />
       <ScrollRail showInternships={hasInternships} />
       <SmoothScroll />
@@ -66,6 +68,7 @@ export default async function Home() {
         <About projectCount={data.projects.length} />
         <Education />
         <Internships items={data.internships} index="03" />
+        <ProjectsReel projects={data.projects} />
         <Projects projects={data.projects} index={num(3)} />
         <Skills index={num(4)} />
         <Certifications items={data.certifications} index={num(5)} />
@@ -76,6 +79,7 @@ export default async function Home() {
         <Contact index={num(6)} />
       </main>
       <Footer />
+      <DynamicIsland />
       <Dock showInternships={hasInternships} />
       <BackToTop />
       <Toaster />

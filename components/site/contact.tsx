@@ -52,7 +52,7 @@ export function Contact({ index = "07" }: { index?: string }) {
   return (
     <Section id="contact" index={index} label={t.contact.label} glow grid>
       <Reveal>
-        <h2 className="vskew font-serif text-4xl leading-[1.02] md:text-7xl">
+        <h2 className="font-serif text-4xl leading-[1.02] md:text-7xl">
           <SplitWords text={t.contact.title} />
         </h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>

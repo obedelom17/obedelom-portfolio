@@ -70,6 +70,8 @@ export const dictionary = {
     },
     ui: {
       view: "Voir",
+      soundOn: "Activer les sons",
+      soundOff: "Couper les sons",
       copy: "Copier",
       copied: "Copié",
       emailCopied: "Email copié dans le presse-papiers",
@@ -124,6 +126,7 @@ export const dictionary = {
     },
     projects: {
       label: "Projets",
+      reel: "Aperçu des projets",
       title: "Réalisations",
       demo: "Voir le site",
       code: "Code source",
@@ -246,6 +249,8 @@ export const dictionary = {
     },
     ui: {
       view: "View",
+      soundOn: "Turn sounds on",
+      soundOff: "Turn sounds off",
       copy: "Copy",
       copied: "Copied",
       emailCopied: "Email copied to clipboard",
@@ -300,6 +305,7 @@ export const dictionary = {
     },
     projects: {
       label: "Projects",
+      reel: "Projects at a glance",
       title: "Selected work",
       demo: "View site",
       code: "Source code",

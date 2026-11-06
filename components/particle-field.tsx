@@ -70,7 +70,10 @@ export function ParticleField({ className = "" }: { className?: string }) {
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick)
-      if (!visible) return
+      if (!visible || document.documentElement.classList.contains("is-scrolling")) {
+        last = now
+        return
+      }
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       if (++frame % 90 === 0) readColor()

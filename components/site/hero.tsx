@@ -5,6 +5,7 @@ import { ArrowDownRight } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { Odometer } from "@/components/fx/odometer"
 import { ShaderBg } from "@/components/fx/shader-bg"
+import { Hero3D } from "@/components/fx/hero-3d"
 import { Magnetic } from "@/components/magnetic"
 import { ParticleField } from "@/components/particle-field"
 import { RotatingWords } from "./rotating-words"
@@ -57,6 +58,7 @@ export function Hero({
   return (
     <section id="top" onPointerMove={onMove} className="relative overflow-hidden">
       <ShaderBg />
+      <Hero3D />
       <div className="hero-grid" aria-hidden />
       <div className="pointer-events-none absolute inset-0" data-depth="-34" aria-hidden>
         <div className="hero-orb hero-orb--a" />

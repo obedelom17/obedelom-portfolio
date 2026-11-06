@@ -40,7 +40,7 @@ export function BackToTop() {
       href="#top"
       aria-label={t.ui.top}
       tabIndex={show ? 0 : -1}
-      className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-5 z-[45] flex h-12 w-12 items-center justify-center rounded-full bg-bg/80 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.35)] backdrop-blur-md transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-110 sm:right-8 ${
+      className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-5 z-[45] flex h-12 w-12 items-center justify-center rounded-full bg-bg shadow-[0_10px_30px_-10px_rgba(0,0,0,0.35)] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-110 sm:right-8 ${
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
       }`}
     >

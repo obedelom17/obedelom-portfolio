@@ -47,7 +47,7 @@ export function Section({
                 {label}
               </p>
               {title ? (
-                <h2 className="vskew mt-4 font-serif text-3xl leading-tight md:text-4xl lg:text-2xl xl:text-3xl">
+                <h2 className="mt-4 font-serif text-3xl leading-tight md:text-4xl lg:text-2xl xl:text-3xl">
                   <SplitWords text={title} />
                 </h2>
               ) : null}

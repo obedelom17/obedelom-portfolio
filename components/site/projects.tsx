@@ -88,7 +88,6 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                     type="button"
                     onClick={() => setZoom(true)}
                     data-cursor={t.ui.view}
-                    data-liquid
                     className="group/img relative block w-full overflow-hidden bg-card"
                     aria-label={`${t.projects.zoom} : ${project.title}`}
                   >

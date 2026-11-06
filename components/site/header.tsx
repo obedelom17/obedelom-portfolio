@@ -96,7 +96,7 @@ export function Header({ showInternships = false }: { showInternships?: boolean 
       className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         hidden && !open ? "-translate-y-full" : "translate-y-0"
       } ${
-        scrolled || open ? "border-b border-line bg-bg/80 backdrop-blur-xl" : "border-b border-transparent"
+        scrolled || open ? "border-b border-line bg-bg/95" : "border-b border-transparent"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">

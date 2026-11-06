@@ -11,7 +11,7 @@ uniform vec3 uR[4];
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
 return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+vec2(1.7,9.2);a*=.5;}return v;}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<3;i++){v+=a*n(p);p=p*2.02+vec2(1.7,9.2);a*=.5;}return v;}
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes;
   vec2 p=(gl_FragCoord.xy-.5*uRes)/min(uRes.x,uRes.y);
@@ -94,7 +94,7 @@ export function ShaderBg() {
     const mo = new MutationObserver(colors)
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * 0.6
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * 0.5
     const resize = () => {
       const r = cv.getBoundingClientRect()
       cv.width = Math.max(2, Math.floor(r.width * dpr))
@@ -135,6 +135,10 @@ export function ShaderBg() {
     const t0 = performance.now()
     const frame = (now: number) => {
       raf = 0
+      if (document.documentElement.classList.contains("is-scrolling")) {
+        raf = requestAnimationFrame(frame)
+        return
+      }
       mx += (tx - mx) * 0.06
       my += (ty - my) * 0.06
       gl.uniform1f(uT, (now - t0) / 1000)

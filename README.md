@@ -213,6 +213,10 @@ GitHub: https://github.com/obedelom17
 - Hero: fond génératif WebGL (bruit fluide, déformation au pointeur, ondes au clic) / WebGL generative background.
 - Statistiques à rouleaux (odomètre) / Rolling-digit odometer stats.
 - Sphère 3D de logos glissable avec inertie / Draggable 3D tech sphere with inertia.
-- Teinte d'ambiance par section et progression de page / Per-section ambient tint.
 - Reflet holographique sur les puces / Holographic sheen on chips.
-- Sections en « feuille » au défilement (CSS scroll-driven) / Scroll-driven section sheets.
+- Noeud de tore 3D en WebGL pur dans le hero (irisation, rotation liée au pointeur et au défilement) / Pure WebGL 3D torus knot in the hero.
+- Bande de projets horizontale épinglée au défilement vertical (rangée glissable sur mobile) / Pinned horizontal projects reel.
+- Transitions de page (rideau) et trait de balayage entre sections / Page curtain and section sweep line.
+- Ile dynamique : section en cours, progression, sons d'interface synthétisés (touche S, désactivés par défaut) / Dynamic island with opt-in UI sounds.
+- Retiré : distorsion liquide des images, inclinaison des titres au défilement / Removed: liquid image distortion, scroll skew.
+- Fluidité : survol coupé et canevas en pause pendant le défilement, plus de flou d'arrière-plan sur l'en-tête, animations calculées sur le temps réel (suivent 60, 144, 240 Hz et plus) / Scroll smoothness work.
