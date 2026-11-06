@@ -66,6 +66,28 @@ export function ProjectsReel({ projects }: { projects: Project[] }) {
     }
   }, [pinned, projects.length])
 
+  // Mobile : la barre suit le glissement de la rangée.
+  useEffect(() => {
+    const tr = track.current
+    if (!tr || pinned) return
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const max = tr.scrollWidth - tr.clientWidth
+      const p = max > 0 ? tr.scrollLeft / max : 0
+      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(Math.max(p, 0.04), 1).toFixed(4)})`
+    }
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+    update()
+    tr.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      cancelAnimationFrame(raf)
+      tr.removeEventListener("scroll", onScroll)
+    }
+  }, [pinned, projects.length])
+
   if (projects.length < 2) return null
 
   return (

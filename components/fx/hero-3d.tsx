@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { deviceTier } from "@/lib/perf"
 
 const VERT = `
 attribute vec3 aPos;attribute vec3 aNor;attribute vec2 aUv;
@@ -34,8 +35,8 @@ function hex(c: string): [number, number, number] {
   return [parseInt(f.slice(0, 2), 16) / 255, parseInt(f.slice(2, 4), 16) / 255, parseInt(f.slice(4, 6), 16) / 255]
 }
 
-function knot() {
-  const P = 2, Q = 3, SEG = 240, RAD = 18, TUBE = 0.34
+function knot(SEG = 240, RAD = 18) {
+  const P = 2, Q = 3, TUBE = 0.34
   const pos = (u: number): [number, number, number] => {
     const qu = (Q / P) * u
     const r = 0.5 * (2 + Math.cos(qu))
@@ -79,8 +80,10 @@ export function Hero3D() {
     const cv = ref.current
     if (!cv) return
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    if (!window.matchMedia("(min-width: 1024px)").matches) return
-    const gl = cv.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: false, powerPreference: "low-power" })
+    const small = !window.matchMedia("(min-width: 1024px)").matches
+    if (small && deviceTier() === "low") return
+    if (document.documentElement.classList.contains("perf-lite")) return
+    const gl = cv.getContext("webgl", { antialias: !small, alpha: true, premultipliedAlpha: false, powerPreference: "low-power" })
     if (!gl) return
 
     const mk = (t: number, src: string) => {
@@ -96,7 +99,7 @@ export function Hero3D() {
     if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return
     gl.useProgram(prog)
 
-    const g = knot()
+    const g = small ? knot(96, 10) : knot()
     const vb = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, vb)
     gl.bufferData(gl.ARRAY_BUFFER, g.v, gl.STATIC_DRAW)
@@ -128,7 +131,7 @@ export function Hero3D() {
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+      const dpr = Math.min(window.devicePixelRatio || 1, small ? 1.25 : 1.5)
       const r = cv.getBoundingClientRect()
       cv.width = Math.max(2, Math.floor(r.width * dpr))
       cv.height = Math.max(2, Math.floor(r.height * dpr))
@@ -168,7 +171,7 @@ export function Hero3D() {
       raf = 0
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
-      if (!document.documentElement.classList.contains("is-scrolling")) {
+      if (!document.documentElement.classList.contains("is-scrolling") && !document.documentElement.classList.contains("perf-lite")) {
         const k = 1 - Math.exp(-dt / 0.2)
         cx += (tx - cx) * k
         cy += (ty - cy) * k

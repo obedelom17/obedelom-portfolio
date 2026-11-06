@@ -31,6 +31,8 @@ import { Showcase } from "@/components/fx/showcase"
 import { DynamicIsland } from "@/components/fx/dynamic-island"
 import { SectionTint } from "@/components/fx/section-tint"
 import { ElasticLine } from "@/components/fx/elastic-line"
+import { PerfGovernor } from "@/components/fx/perf-governor"
+import { TouchFx } from "@/components/fx/touch-fx"
 
 export const revalidate = 60
 
@@ -46,6 +48,8 @@ export default async function Home() {
 
   return (
     <>
+      <PerfGovernor />
+      <TouchFx />
       <Preloader />
       <Aurora />
       <SectionTint />

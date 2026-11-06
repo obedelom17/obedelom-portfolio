@@ -1,5 +1,6 @@
 "use client"
 
+import { flushSync } from "react-dom"
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react"
 import { dictionary, type Dictionary } from "@/lib/i18n"
 import type { Lang } from "@/lib/types"
@@ -31,7 +32,19 @@ export function Providers({ children }: { children: ReactNode }) {
   }, [lang])
 
   const setLang = useCallback((l: Lang) => {
-    setLangState(l)
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (doc.startViewTransition && !reduce) {
+      const root = document.documentElement
+      root.dataset.vt = "lang"
+      const vt = doc.startViewTransition(() => flushSync(() => setLangState(l))) as { finished?: Promise<unknown> } | undefined
+      const clear = () => {
+        delete root.dataset.vt
+      }
+      if (vt?.finished) vt.finished.then(clear, clear)
+      else window.setTimeout(clear, 700)
+    }
+    else setLangState(l)
     try {
       localStorage.setItem("lang", l)
     } catch {}

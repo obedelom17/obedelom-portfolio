@@ -5,8 +5,9 @@ import { Award, Briefcase, GraduationCap, House, Layers, Mail, Search, SunMoon, 
 import type { LucideIcon } from "lucide-react"
 import { useApp } from "@/components/providers"
 import { currentTheme, setTheme } from "@/lib/theme"
+import { haptic } from "@/lib/perf"
 
-type Item = { id: string; label: string; Icon: LucideIcon }
+type Item = { id: string; label: string; Icon: LucideIcon; mobile?: boolean }
 
 /**
  * Dock flottant en bas de l'écran (ordinateur) : une icône par section, qui grossit quand le pointeur
@@ -20,14 +21,14 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
   const bar = useRef<HTMLUListElement>(null)
 
   const items: Item[] = [
-    { id: "top", label: "Intro", Icon: House },
+    { id: "top", label: "Intro", Icon: House, mobile: true },
     { id: "apropos", label: t.about.label, Icon: User },
     { id: "formation", label: t.nav.education, Icon: GraduationCap },
     ...(showInternships ? [{ id: "stages", label: t.nav.internships, Icon: Briefcase }] : []),
-    { id: "projets", label: t.nav.projects, Icon: Layers },
-    { id: "competences", label: t.nav.skills, Icon: Wrench },
+    { id: "projets", label: t.nav.projects, Icon: Layers, mobile: true },
+    { id: "competences", label: t.nav.skills, Icon: Wrench, mobile: true },
     { id: "certifications", label: t.nav.certifications, Icon: Award },
-    { id: "contact", label: t.nav.contact, Icon: Mail },
+    { id: "contact", label: t.nav.contact, Icon: Mail, mobile: true },
   ]
   const key = items.map((i) => i.id).join(",")
 
@@ -117,8 +118,8 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
   return (
     <nav className="dock" data-on={shown} aria-label={t.ui.rail}>
       <ul ref={bar} className="dock__bar">
-        {items.map(({ id, label, Icon }) => (
-          <li key={id}>
+        {items.map(({ id, label, Icon, mobile }) => (
+          <li key={id} data-m={mobile ? "1" : "0"}>
             <a
               href={`#${id}`}
               data-dock
@@ -127,6 +128,7 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
               aria-current={active === id ? "true" : undefined}
               tabIndex={shown ? 0 : -1}
               className="dock__item"
+              onClick={() => haptic(8)}
             >
               <Icon strokeWidth={1.75} />
               <span className="dock__tip">{label}</span>
@@ -141,7 +143,10 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
             aria-label={t.cmd.open}
             tabIndex={shown ? 0 : -1}
             className="dock__item"
-            onClick={() => window.dispatchEvent(new Event("open-palette"))}
+            onClick={() => {
+              haptic(8)
+              window.dispatchEvent(new Event("open-palette"))
+            }}
           >
             <Search strokeWidth={1.75} />
             <span className="dock__tip">{t.cmd.open}</span>
@@ -154,7 +159,10 @@ export function Dock({ showInternships = false }: { showInternships?: boolean })
             aria-label={t.cmd.theme}
             tabIndex={shown ? 0 : -1}
             className="dock__item"
-            onClick={(e) => setTheme(currentTheme() === "dark" ? "light" : "dark", { x: e.clientX, y: e.clientY })}
+            onClick={(e) => {
+              haptic(8)
+              setTheme(currentTheme() === "dark" ? "light" : "dark", { x: e.clientX, y: e.clientY })
+            }}
           >
             <SunMoon strokeWidth={1.75} />
             <span className="dock__tip">{t.cmd.theme}</span>

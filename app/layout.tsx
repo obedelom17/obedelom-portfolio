@@ -12,6 +12,8 @@ export const metadata: Metadata = {
     "Portfolio de AGBEBAVI Elom Obed, ingénieur en informatique à Lomé, Togo. Développement logiciel, applications web, bases de données, réseaux et sécurité.",
   keywords: ["ingénieur en informatique", "développeur full-stack", "Togo", "Lomé", "Next.js", "React", "Django", "SYSCOHADA", "portfolio"],
   authors: [{ name: "AGBEBAVI Elom Obed" }],
+  appleWebApp: { capable: true, title: "Obed", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
   openGraph: {
     title: "AGBEBAVI Elom Obed | Ingénieur en informatique",
     description: "Ingénieur en informatique à Lomé, Togo. Solutions logicielles de la conception au déploiement.",
@@ -25,7 +27,11 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0c0b" },
+  ],
+  colorScheme: "light dark",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

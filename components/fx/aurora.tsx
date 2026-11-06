@@ -26,7 +26,13 @@ export function Aurora() {
       const max = document.documentElement.scrollHeight - window.innerHeight
       sp = max > 0 ? window.scrollY / max : 0
     }
+    const lite = document.documentElement.classList
     const tick = (now: number) => {
+      if (lite.contains("perf-lite") || lite.contains("is-scrolling")) {
+        last = now
+        raf = requestAnimationFrame(tick)
+        return
+      }
       const dt = Math.min((now - last) / 1000, 0.05)
       last = now
       const k = 1 - Math.exp(-dt / 0.6)

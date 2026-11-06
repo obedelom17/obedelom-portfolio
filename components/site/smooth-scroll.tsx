@@ -3,10 +3,10 @@
 import { useEffect } from "react"
 
 /** Inertie du défilement, en secondes. Plus la valeur est grande, plus le défilement paraît « lourd ». */
-const TAU = 0.085
+const TAU = 0.125
 
 /** Multiplicateur de la molette : plus grand = défilement plus rapide. */
-const WHEEL_SPEED = 1.2
+const WHEEL_SPEED = 1.05
 
 function inNestedScroller(start: EventTarget | null, dy: number) {
   let el = start instanceof HTMLElement ? start : null

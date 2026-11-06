@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { ArrowUpRight, Check, Copy } from "lucide-react"
+import { ArrowUpRight, Check, Copy, Share2, UserPlus } from "lucide-react"
 import emailjs from "@emailjs/browser"
 import { useApp } from "@/components/providers"
 import { Reveal } from "@/components/reveal"
@@ -30,6 +30,41 @@ export function Contact({ index = "07" }: { index?: string }) {
     } catch {}
   }
 
+  const share = async () => {
+    const url = window.location.origin
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: t.ui.shareTitle, url })
+      } else {
+        await navigator.clipboard.writeText(url)
+        toast(t.ui.linkCopied)
+      }
+    } catch {}
+  }
+
+  const saveContact = () => {
+    const card = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      "N:AGBEBAVI;Elom Obed;;;",
+      "FN:AGBEBAVI Elom Obed",
+      "TITLE:Ingénieur en informatique",
+      "TEL;TYPE=CELL:+22897459518",
+      `EMAIL:${EMAIL}`,
+      `URL:${window.location.origin}`,
+      "ADR;TYPE=WORK:;;;Lomé;;;Togo",
+      "END:VCARD",
+    ].join("\r\n")
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(new Blob([card], { type: "text/vcard;charset=utf-8" }))
+    a.download = "elom-obed-agbebavi.vcf"
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    window.setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+    toast(t.ui.contactSaved)
+  }
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!formRef.current) return
@@ -56,7 +91,7 @@ export function Contact({ index = "07" }: { index?: string }) {
           <SplitWords text={t.contact.title} />
         </h2>
         <p className="mt-6 max-w-lg text-muted">{t.contact.text}</p>
-        <Magnetic strength={0.3} className="contact-ring mt-10 hidden md:inline-block">
+        <Magnetic strength={0.3} className="contact-ring mt-10 inline-block">
           <a href={`mailto:${EMAIL}`} aria-label={EMAIL} className="contact-ring__a">
             <svg viewBox="0 0 120 120" className="contact-ring__svg" aria-hidden>
               <defs>
@@ -82,10 +117,28 @@ export function Contact({ index = "07" }: { index?: string }) {
             {copied ? t.ui.copied : t.ui.copy}
           </button>
         </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={share}
+            className="label inline-flex items-center gap-2 border border-line px-3 py-2 transition-colors hover:border-fg hover:text-fg"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {t.ui.share}
+          </button>
+          <button
+            type="button"
+            onClick={saveContact}
+            className="label inline-flex items-center gap-2 border border-line px-3 py-2 transition-colors hover:border-fg hover:text-fg"
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            {t.ui.saveContact}
+          </button>
+        </div>
       </Reveal>
 
       <div className="mt-16 grid gap-14 lg:grid-cols-5">
-        <div className="glow-border glow-border--on spot border border-line bg-card p-6 sm:p-10 lg:col-span-3">
+        <div className="sd-rise glow-border glow-border--on spot border border-line bg-card p-6 sm:p-10 lg:col-span-3">
           {status === "success" ? (
             <div className="border-t border-fg pt-6">
               <h3 className="font-serif text-3xl">{f.successTitle}</h3>

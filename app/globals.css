@@ -1918,3 +1918,221 @@ body {
 
 /* Mode vitrine : curseur et lampe masqués pour une démo propre. */
 html.showcase .cursor-trail { display: none; }
+
+/* =====================================================================
+   Passe finale : ressort, tactile, mobile, défilement piloté par CSS,
+   dégradation automatique. Tout est animé via transform et opacity.
+   ===================================================================== */
+
+/* Courbes à ressort (CSS linear()) : repli sur la courbe douce existante. */
+:root {
+  --spring: var(--ease);
+  --spring-soft: var(--ease);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring: linear(0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077, 1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991, 0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1.004 83.8%, 1);
+    --spring-soft: linear(0, 0.006, 0.024 2.2%, 0.099, 0.214 8.6%, 0.52 15.8%, 0.725 21.2%, 0.864 26.9%, 0.97 33%, 1.024 39%, 1.047 45%, 1.045 52%, 1.025 60%, 1.007 69%, 0.999 79%, 1);
+  }
+}
+.island {
+  transition: transform 0.9s var(--spring), opacity 0.4s ease, padding 0.6s var(--spring-soft);
+}
+.dock {
+  transition: opacity 0.5s ease, transform 1s var(--spring);
+}
+.toast-in {
+  animation-duration: 0.8s;
+  animation-timing-function: var(--spring-soft);
+}
+.island__btn,
+.dock__item {
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.5s var(--spring);
+}
+
+/* Fondu au changement de langue (View Transitions). */
+html[data-vt="lang"]::view-transition-old(root) {
+  animation: vt-out 0.26s ease both;
+}
+html[data-vt="lang"]::view-transition-new(root) {
+  animation: vt-in 0.5s var(--ease) both;
+}
+@keyframes vt-out {
+  to { opacity: 0; transform: translate3d(0, -8px, 0); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+}
+
+/* Entrée en perspective pilotée par le défilement (aucun JavaScript, thread du compositeur). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sd-rise {
+      animation: sd-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
+      transform-origin: 50% 100%;
+    }
+    @keyframes sd-rise {
+      from { opacity: 0.2; transform: perspective(1100px) translate3d(0, 56px, 0) rotateX(9deg) scale(0.965); }
+      to { opacity: 1; transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0) scale(1); }
+    }
+  }
+}
+
+/* ---------- Tactile et mobile ---------- */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+a,
+button,
+[role="button"],
+summary,
+label {
+  touch-action: manipulation;
+}
+@media (hover: none), (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* évite le zoom automatique d'iOS */
+  }
+  .btn-grad,
+  .reel__card,
+  .dock__item,
+  .island__btn,
+  .contact-ring__a {
+    transition: transform 0.4s var(--spring), color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  }
+  .btn-grad:active,
+  .reel__card:active,
+  .contact-ring__a:active {
+    transform: scale(0.965);
+  }
+  .dock__item:active,
+  .island__btn:active {
+    transform: scale(0.9);
+  }
+  /* La lueur suit le doigt au lieu du pointeur. */
+  .spot:active {
+    --spot-on: 1;
+  }
+}
+
+/* Noeud 3D sur téléphone : centré derrière le texte, discret, légèrement flou de profondeur. */
+@media (max-width: 1023px) {
+  .hero-3d {
+    display: block;
+    right: 50%;
+    top: 30%;
+    width: min(86vw, 420px);
+    transform: translate3d(50%, -50%, 0);
+    opacity: 0.4;
+  }
+}
+@media (max-width: 1023px) and (min-width: 640px) {
+  .hero-3d {
+    right: -6%;
+    transform: translate3d(0, -50%, 0);
+    width: min(56vw, 440px);
+    opacity: 0.55;
+  }
+}
+
+/* Dock de navigation sur téléphone : barre pleine largeur, six icônes. */
+@media (max-width: 767px) {
+  .dock {
+    display: block;
+    left: 0;
+    right: 0;
+    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    padding: 0 0.75rem;
+    transform: translate3d(0, 170%, 0);
+  }
+  .dock[data-on="true"] {
+    transform: translate3d(0, 0, 0);
+  }
+  .dock__bar {
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+    max-width: 23rem;
+    margin: 0 auto;
+    padding: 0.4rem 0.5rem;
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+  }
+  .dock li[data-m="0"] {
+    display: none;
+  }
+  .dock__item {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+  .dock__tip {
+    display: none;
+  }
+}
+
+/* Île dynamique sur téléphone : pastille compacte sous l'en-tête. */
+@media (max-width: 899px) {
+  .island {
+    display: flex;
+    top: calc(4.2rem + env(safe-area-inset-top));
+    height: 2rem;
+    max-width: calc(100vw - 1.5rem);
+    padding: 0 0.85rem;
+    font-size: 0.72rem;
+  }
+  .island__btn,
+  .island__more {
+    display: none;
+  }
+  .island__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+@media (max-width: 899px) and (min-width: 640px) {
+  .island__btn {
+    display: grid;
+  }
+}
+
+/* Anneau de contact : plus petit sur téléphone. */
+@media (max-width: 639px) {
+  .contact-ring {
+    margin-top: 2rem;
+  }
+}
+
+/* Rangée de projets sur téléphone : accroche franche, bords qui respirent. */
+@media (max-width: 899px) {
+  .reel__track {
+    scroll-padding-inline: 1.25rem;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .reel__card {
+    scroll-snap-stop: always;
+  }
+}
+
+/* ---------- Dégradation automatique (PerfGovernor) ---------- */
+html.perf-lite .shader-bg,
+html.perf-lite .hero-3d,
+html.perf-lite .cursor-trail,
+html.perf-lite .aurora,
+html.perf-lite .hero-orb,
+html.perf-lite .click-fx {
+  display: none !important;
+}
+html.perf-lite body::after {
+  display: none;
+}
+html.perf-lite * {
+  scroll-behavior: auto !important;
+}
