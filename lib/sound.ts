@@ -93,18 +93,19 @@ function build(): AC | null {
   ctx = c
 
   const comp = c.createDynamicsCompressor()
-  comp.threshold.value = -18
-  comp.knee.value = 24
-  comp.ratio.value = 5
-  comp.attack.value = 0.004
-  comp.release.value = 0.2
+  // Limiteur : volume maximal sans saturation.
+  comp.threshold.value = -8
+  comp.knee.value = 4
+  comp.ratio.value = 20
+  comp.attack.value = 0.002
+  comp.release.value = 0.12
   master = c.createGain()
-  master.gain.value = 0.9
+  master.gain.value = 1
   master.connect(comp)
   comp.connect(c.destination)
 
   sfxBus = c.createGain()
-  sfxBus.gain.value = state.sfx ? 0.85 : 0
+  sfxBus.gain.value = state.sfx ? SFX_LEVEL : 0
   sfxBus.connect(master)
 
   // Musique : filtre doux + écho feutré (réverbération légère).
@@ -332,7 +333,9 @@ const CHORDS: number[][] = [
 ]
 const BELLS = [587.33, 659.25, 783.99, 880.0, 1046.5]
 const CHORD_LEN = 9
-const MUSIC_LEVEL = 0.5
+/** Niveaux maximum : les sons sont synthétisés très bas à la source, ces gains les montent au plus fort ; le limiteur final évite toute saturation. */
+const MUSIC_LEVEL = 3.4
+const SFX_LEVEL = 10
 
 let musicOn = false
 let chordTimer = 0
@@ -431,7 +434,7 @@ export function setSfx(on: boolean) {
   try {
     localStorage.setItem("sfx", on ? "on" : "off")
   } catch {}
-  if (ctx) sfxBus.gain.value = on ? 0.85 : 0
+  if (ctx) sfxBus.gain.value = on ? SFX_LEVEL : 0
   if (on) {
     unlockAudio()
     play("toggle")
