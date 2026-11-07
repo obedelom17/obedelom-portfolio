@@ -84,6 +84,7 @@ export const dictionary = {
       band: "Travaillons ensemble",
       skip: "Aller au contenu",
       konami: "Mode secret activé ✨",
+      shake: "Secousse détectée 🎉",
       ring: "Écrivons-nous · Parlons projet · ",
       rail: "Sections",
       all: "Tous les projets",
@@ -92,6 +93,11 @@ export const dictionary = {
       shortcuts: "Raccourcis : 0-9 sections · T thème · L langue · F lampe torche · S sons · ⌘K recherche",
       flash: "Lampe torche activée · F ou Échap pour sortir",
       lastPush: "Dernier push GitHub",
+    },
+    statement: {
+      kicker: "Ma façon de travailler",
+      lines: ["Je conçois", "des logiciels", "qui laissent", "une trace."],
+      hint: "Promène ta lampe sur le texte · ou touche l'écran",
     },
     terminal: {
       title: "obed@lome: ~",
@@ -267,6 +273,7 @@ export const dictionary = {
       band: "Let's work together",
       skip: "Skip to content",
       konami: "Secret mode unlocked ✨",
+      shake: "Shake detected 🎉",
       ring: "Let's talk · Got a project · ",
       rail: "Sections",
       all: "All projects",
@@ -275,6 +282,11 @@ export const dictionary = {
       shortcuts: "Shortcuts: 0-9 sections · T theme · L language · F flashlight · S sounds · ⌘K search",
       flash: "Flashlight on · F or Esc to exit",
       lastPush: "Latest GitHub push",
+    },
+    statement: {
+      kicker: "How I work",
+      lines: ["I build", "software that", "leaves a", "mark."],
+      hint: "Sweep the light over the text · or touch the screen",
     },
     terminal: {
       title: "obed@lome: ~",

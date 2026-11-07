@@ -31,6 +31,10 @@ import { ElasticLine } from "@/components/fx/elastic-line"
 import { PerfGovernor } from "@/components/fx/perf-governor"
 import { TouchFx } from "@/components/fx/touch-fx"
 import { AudioDirector } from "@/components/audio-director"
+import { VelocityFx } from "@/components/fx/velocity-fx"
+import { LightSheen } from "@/components/fx/light-sheen"
+import { ShakeFx } from "@/components/fx/shake-fx"
+import { Statement } from "@/components/site/statement"
 
 export const revalidate = 60
 
@@ -49,6 +53,9 @@ export default async function Home() {
       <PerfGovernor />
       <AudioDirector />
       <TouchFx />
+      <VelocityFx />
+      <LightSheen />
+      <ShakeFx />
       <Preloader />
       <Aurora />
       <SectionTint />
@@ -68,6 +75,7 @@ export default async function Home() {
           firstYear={Number.isFinite(firstYear) ? firstYear : 2024}
         />
         <Marquee />
+        <Statement />
         <About projectCount={data.projects.length} />
         <Education />
         <Internships items={data.internships} index="03" />

@@ -2170,3 +2170,58 @@ html.is-navigating .cursor-bubble {
 @media (prefers-reduced-motion: reduce) {
   .eq i { animation: none !important; }
 }
+
+/* ---------- Nouveautés : vitesse, lumière globale, manifeste « lampe torche » ---------- */
+html.vel-on h2.font-serif {
+  text-shadow:
+    calc(var(--vel, 0) * 6px) 0 0 color-mix(in srgb, #22d3ee 55%, transparent),
+    calc(var(--vel, 0) * -6px) 0 0 color-mix(in srgb, #f43f5e 45%, transparent);
+}
+
+.light-sheen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  width: 640px;
+  height: 640px;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 0%, color-mix(in srgb, var(--accent-2) 8%, transparent) 40%, transparent 68%);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease, ease);
+  will-change: transform;
+}
+.light-sheen[data-on="1"] { opacity: 1; }
+:root[data-theme="dark"] .light-sheen { mix-blend-mode: plus-lighter; opacity: 0; }
+:root[data-theme="dark"] .light-sheen[data-on="1"] { opacity: 0.55; }
+html.perf-lite .light-sheen { display: none; }
+
+.statement { --sx: 30%; --sy: 40%; touch-action: pan-y; }
+.statement__stack { position: relative; }
+.statement__text {
+  margin: 0;
+  font-size: clamp(2.6rem, 12.5vw, 9.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+.statement__text--base {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--fg) 34%, transparent);
+}
+.statement__text--lit {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(100deg, var(--accent), var(--accent-2) 55%, var(--accent-3, var(--accent)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-mask-image: radial-gradient(circle clamp(110px, 22vw, 230px) at var(--sx) var(--sy), #000 0%, rgba(0, 0, 0, 0.85) 45%, transparent 100%);
+  mask-image: radial-gradient(circle clamp(110px, 22vw, 230px) at var(--sx) var(--sy), #000 0%, rgba(0, 0, 0, 0.85) 45%, transparent 100%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .statement__text--lit { -webkit-mask-image: none; mask-image: none; }
+}
+html.perf-min .statement__text--lit { -webkit-mask-image: none; mask-image: none; }
