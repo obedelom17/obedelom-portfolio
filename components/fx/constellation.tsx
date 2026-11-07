@@ -37,7 +37,7 @@ export function Constellation() {
     let lastT = 0
 
     const LINK = touch ? 110 : 135
-    const PULL = touch ? 190 : 230
+    const PULL = touch ? 210 : 260
     const BUCKETS = 5
     const segs: number[][] = Array.from({ length: BUCKETS }, () => [])
 
@@ -51,7 +51,7 @@ export function Constellation() {
       const count = Math.round(Math.min(touch ? 56 : 120, Math.max(28, (w * h) / (touch ? 12000 : 10500))))
       nodes = Array.from({ length: count }, () => {
         const a = Math.random() * Math.PI * 2
-        const s = 6 + Math.random() * 14
+        const s = 12 + Math.random() * 22
         return { x: Math.random() * w, y: Math.random() * h, bx: Math.cos(a) * s, by: Math.sin(a) * s, ex: 0, ey: 0, r: 1 + Math.random() * 1.3 }
       })
     }
@@ -72,7 +72,7 @@ export function Constellation() {
       const now = performance.now()
       shocks = shocks.filter((s) => now - s.t < 900)
       hold += (holdTarget - hold) * Math.min(1, dt * 8)
-      const damp = Math.exp(-dt * 2.4)
+      const damp = Math.exp(-dt * 3.2)
       const anim = dt > 0 && !reduce && !isLite()
 
       for (const n of nodes) {
@@ -84,9 +84,10 @@ export function Constellation() {
             const d = Math.hypot(dx, dy)
             if (d < PULL && d > 1) {
               const f = (1 - d / PULL) * hold
-              const dir = d < 46 ? -0.6 : 1
-              n.ex += (dx / d) * f * 420 * dir * dt
-              n.ey += (dy / d) * f * 420 * dir * dt
+              // Le trait qui relie le point au curseur est un fil : le point glisse le long de ce trait et s'arrête à ~54 px.
+              const dir = d < 54 ? -0.5 : 1
+              n.ex += (dx / d) * (0.35 + f) * 760 * dir * dt
+              n.ey += (dy / d) * (0.35 + f) * 760 * dir * dt
             }
           }
           for (const s of shocks) {

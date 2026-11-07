@@ -5,7 +5,7 @@ import { createLoop, frame, onScroll } from "@/lib/frame"
 import { isMin } from "@/lib/perf"
 
 /**
- * Grille de points fixe derrière tout le site. Elle défile légèrement moins vite que la page (profondeur).
+ * Grille de points fixe derrière tout le site, sauf sur le hero (constellation). Effet « miel » : lent, épais, sans rebond. Elle défile légèrement moins vite que la page (profondeur).
  * Les points proches du pointeur ou du doigt grossissent, prennent l'accent et s'écartent ; au déplacement
  * rapide ils sont poussés dans le sens du mouvement ; un clic ou un toucher lance une onde.
  * Un seul canvas, tous les points au repos tracés en un seul chemin ; la boucle s'endort dès que tout est immobile.
@@ -50,6 +50,9 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
       const off = (frame.y * 0.35) % gap
       const rowShift = Math.floor((frame.y * 0.35) / gap)
       const active = px > -9000
+      const hero = document.getElementById("top")?.getBoundingClientRect()
+      const hTop = hero ? hero.top : 1e9
+      const hBot = hero ? hero.bottom : -1e9
       act.length = 0
       ctx.globalAlpha = 0.26
       ctx.fillStyle = fg
@@ -59,6 +62,8 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
           const idx = (((j + rowShift) % rows) + rows) % rows * cols + i
           const hx = i * gap + gap / 2
           const hy = j * gap + gap / 2 - off
+          // Pas de points sur le hero : la constellation y occupe tout l'espace.
+          if (hy > hTop - 4 && hy < hBot + 4) continue
           let tx = 0
           let ty = 0
           let boost = 0
@@ -70,30 +75,31 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
               if (d < R) {
                 const f = 1 - d / R
                 boost += f
-                const k = (f * f * 24) / (d || 1)
-                tx += dx * k + pvx * f * 0.9
-                ty += dy * k + pvy * f * 0.9
+                const k = (f * f * 13) / (d || 1)
+                tx += dx * k + pvx * f * 0.35
+                ty += dy * k + pvy * f * 0.35
               }
             }
           }
           for (const r of ripples) {
             const age = now - r.t
-            const ring = age * 0.55
+            const ring = age * 0.2
             const rx = hx - r.x
             const ry = hy - r.y
-            if (rx > ring + 240 || rx < -ring - 240 || ry > ring + 240 || ry < -ring - 240) continue
+            if (rx > ring + 200 || rx < -ring - 200 || ry > ring + 200 || ry < -ring - 200) continue
             const rd = Math.hypot(rx, ry) || 1
-            const env = Math.exp(-Math.abs(rd - ring) / 85)
-            if (env < 0.03) continue
-            // Vague circulaire : plusieurs crêtes qui s'éloignent du point d'impact et s'amortissent.
+            // Miel : un seul bourrelet épais et lent, sans rebond ni oscillation, qui s'étale puis s'efface.
+            const u = (rd - ring) / 95
+            const bump = Math.exp(-u * u)
+            if (bump < 0.03) continue
             const fade = 1 - age / r.life
-            const v = Math.cos((rd - ring) / 13) * env * fade * fade * r.amp
-            boost += Math.abs(v) * 1.4
-            tx += (rx / rd) * v * 17
-            ty += (ry / rd) * v * 17
+            const v = bump * fade * fade * r.amp
+            boost += v * 1.1
+            tx += (rx / rd) * v * 12
+            ty += (ry / rd) * v * 12
           }
-          ox[idx] += (tx - ox[idx]) * 0.16
-          oy[idx] += (ty - oy[idx]) * 0.16
+          ox[idx] += (tx - ox[idx]) * 0.055
+          oy[idx] += (ty - oy[idx]) * 0.055
           if (Math.abs(tx - ox[idx]) + Math.abs(ty - oy[idx]) > 0.05) busy = true
           const x = hx + ox[idx]
           const y = hy + oy[idx]
@@ -143,10 +149,10 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
       pvy = Math.max(-40, Math.min(40, e.movementY || 0))
       px = e.clientX
       py = e.clientY
-      // Sillage : une petite goutte tous les ~60 px parcourus.
-      if (Math.hypot(px - lastDrop.x, py - lastDrop.y) > 60) {
+      // Sillage discret : une trace tous les ~140 px parcourus.
+      if (Math.hypot(px - lastDrop.x, py - lastDrop.y) > 140) {
         lastDrop = { x: px, y: py }
-        ripples.push({ x: px, y: py, t: performance.now(), amp: 0.32, life: 1200 })
+        ripples.push({ x: px, y: py, t: performance.now(), amp: 0.22, life: 2400 })
         if (ripples.length > 18) ripples.splice(0, ripples.length - 18)
       }
       loop.wake()
@@ -155,11 +161,13 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
       if (isMin() || reduce || (e.pointerType === "mouse" && e.button !== 0)) return
       px = e.clientX
       py = e.clientY
+      const hr = document.getElementById("top")?.getBoundingClientRect()
+      if (hr && py > hr.top && py < hr.bottom) return
       lastDrop = { x: px, y: py }
       const t = performance.now()
-      // Chute de la bille : onde principale, puis une seconde onde plus faible juste derrière.
-      ripples.push({ x: e.clientX, y: e.clientY, t, amp: 1.25, life: 2600 })
-      ripples.push({ x: e.clientX, y: e.clientY, t: t + 140, amp: 0.55, life: 2200 })
+      // Chute d'une goutte de miel : bourrelet principal, puis un second plus faible.
+      ripples.push({ x: e.clientX, y: e.clientY, t, amp: 1, life: 4200 })
+      ripples.push({ x: e.clientX, y: e.clientY, t: t + 260, amp: 0.45, life: 3600 })
       if (ripples.length > 18) ripples.splice(0, ripples.length - 18)
       loop.wake()
     }
