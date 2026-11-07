@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { createLoop, frame, onScroll } from "@/lib/frame"
-import { isLite } from "@/lib/perf"
+import { isMin } from "@/lib/perf"
 
 /**
  * Grille de points fixe derrière tout le site. Elle défile légèrement moins vite que la page (profondeur).
@@ -29,7 +29,8 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
     let py = -9999
     let pvx = 0
     let pvy = 0
-    let ripples: { x: number; y: number; t: number }[] = []
+    let ripples: { x: number; y: number; t: number; amp: number; life: number }[] = []
+    let lastDrop = { x: -9999, y: -9999 }
     let fg = "#ffffff"
     let accent = "#34d399"
     const act: number[] = []
@@ -44,13 +45,13 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
     const draw = (now: number): boolean => {
       ctx.clearRect(0, 0, w, h)
       let busy = false
-      ripples = ripples.filter((r) => now - r.t < 1600)
+      ripples = ripples.filter((r) => now - r.t < r.life)
       if (ripples.length) busy = true
       const off = (frame.y * 0.35) % gap
       const rowShift = Math.floor((frame.y * 0.35) / gap)
       const active = px > -9000
       act.length = 0
-      ctx.globalAlpha = 0.2
+      ctx.globalAlpha = 0.26
       ctx.fillStyle = fg
       ctx.beginPath()
       for (let j = 0; j < rows; j++) {
@@ -77,16 +78,19 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
           }
           for (const r of ripples) {
             const age = now - r.t
+            const ring = age * 0.55
             const rx = hx - r.x
             const ry = hy - r.y
-            const rd = Math.hypot(rx, ry)
-            const g = Math.max(0, 1 - Math.abs(rd - age * 0.6) / 80) * (1 - age / 1600)
-            if (g > 0) {
-              boost += g
-              const k = (g * 18) / (rd || 1)
-              tx += rx * k
-              ty += ry * k
-            }
+            if (rx > ring + 240 || rx < -ring - 240 || ry > ring + 240 || ry < -ring - 240) continue
+            const rd = Math.hypot(rx, ry) || 1
+            const env = Math.exp(-Math.abs(rd - ring) / 85)
+            if (env < 0.03) continue
+            // Vague circulaire : plusieurs crêtes qui s'éloignent du point d'impact et s'amortissent.
+            const fade = 1 - age / r.life
+            const v = Math.cos((rd - ring) / 13) * env * fade * fade * r.amp
+            boost += Math.abs(v) * 1.4
+            tx += (rx / rd) * v * 17
+            ty += (ry / rd) * v * 17
           }
           ox[idx] += (tx - ox[idx]) * 0.16
           oy[idx] += (ty - oy[idx]) * 0.16
@@ -134,18 +138,29 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
     })
 
     const onMove = (e: PointerEvent) => {
-      if (isLite() || reduce) return
+      if (isMin() || reduce) return
       pvx = Math.max(-40, Math.min(40, e.movementX || 0))
       pvy = Math.max(-40, Math.min(40, e.movementY || 0))
       px = e.clientX
       py = e.clientY
+      // Sillage : une petite goutte tous les ~60 px parcourus.
+      if (Math.hypot(px - lastDrop.x, py - lastDrop.y) > 60) {
+        lastDrop = { x: px, y: py }
+        ripples.push({ x: px, y: py, t: performance.now(), amp: 0.32, life: 1200 })
+        if (ripples.length > 18) ripples.splice(0, ripples.length - 18)
+      }
       loop.wake()
     }
     const onDown = (e: PointerEvent) => {
-      if (isLite() || reduce || (e.pointerType === "mouse" && e.button !== 0)) return
+      if (isMin() || reduce || (e.pointerType === "mouse" && e.button !== 0)) return
       px = e.clientX
       py = e.clientY
-      ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() })
+      lastDrop = { x: px, y: py }
+      const t = performance.now()
+      // Chute de la bille : onde principale, puis une seconde onde plus faible juste derrière.
+      ripples.push({ x: e.clientX, y: e.clientY, t, amp: 1.25, life: 2600 })
+      ripples.push({ x: e.clientX, y: e.clientY, t: t + 140, amp: 0.55, life: 2200 })
+      if (ripples.length > 18) ripples.splice(0, ripples.length - 18)
       loop.wake()
     }
     const onUp = (e: PointerEvent) => {
@@ -167,7 +182,7 @@ export function PageDots({ gap = 38 }: { gap?: number }) {
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
     const stopScroll = onScroll({
       write: () => {
-        if (!isLite() && !reduce) loop.wake()
+        if (!isMin() && !reduce) loop.wake()
       },
     })
     window.addEventListener("resize", resize, { passive: true })
