@@ -152,7 +152,7 @@ export function ShaderBg() {
         gl.drawArrays(gl.TRIANGLES, 0, 3)
         if (reduce) return false
       },
-      { fps: weak ? 20 : 30 },
+      {},
     )
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting

@@ -70,6 +70,8 @@ export const dictionary = {
     },
     ui: {
       view: "Voir",
+      enter: "Entrer",
+      enterHint: "Son activé à l'entrée",
       soundOn: "Activer les sons",
       soundOff: "Couper les sons",
       copy: "Copier",
@@ -259,6 +261,8 @@ export const dictionary = {
     },
     ui: {
       view: "View",
+      enter: "Enter",
+      enterHint: "Sound starts on entry",
       soundOn: "Turn sounds on",
       soundOff: "Turn sounds off",
       copy: "Copy",

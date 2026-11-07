@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { getAudio, initAudio, play, subscribeAudio, unlockAudio } from "@/lib/sound"
+import { getAudio, initAudio, play, subscribeAudio, tryAutoplay, unlockAudio } from "@/lib/sound"
 
 const INTERACTIVE = "a, button, [role='button'], summary, label, input[type='checkbox'], input[type='radio'], select"
 
@@ -16,6 +16,7 @@ const INTERACTIVE = "a, button, [role='button'], summary, label, input[type='che
 export function AudioDirector() {
   useEffect(() => {
     initAudio()
+    void tryAutoplay()
     const root = document.documentElement
 
     // 1. Premier geste : déblocage.

@@ -81,6 +81,7 @@ let master: GainNode
 let sfxBus: GainNode
 let musicBus: GainNode
 let musicIn: GainNode
+let analyser: AnalyserNode | null = null
 let noiseBuf: AudioBuffer
 let voices = 0
 const MAX_VOICES = 14
@@ -112,6 +113,10 @@ function build(): AC | null {
   musicBus = c.createGain()
   musicBus.gain.value = 0
   musicBus.connect(master)
+  analyser = c.createAnalyser()
+  analyser.fftSize = 64
+  analyser.smoothingTimeConstant = 0.8
+  musicBus.connect(analyser)
   musicIn = c.createGain()
   const lp = c.createBiquadFilter()
   lp.type = "lowpass"
@@ -154,6 +159,35 @@ export function unlockAudio() {
     emit({ unlocked: true })
     if (state.music) startMusic()
   }
+}
+
+/**
+ * Tente de lancer la musique sans geste (accepté par certains navigateurs : site déjà fréquenté, installé en PWA…).
+ * Renvoie vrai si le son tourne ; sinon l'audio reste en attente du premier geste.
+ */
+export function tryAutoplay(): Promise<boolean> {
+  readPrefs()
+  if (state.unlocked) return Promise.resolve(true)
+  const c = build()
+  if (!c) return Promise.resolve(false)
+  return new Promise((resolve) => {
+    void c.resume().catch(() => {})
+    window.setTimeout(() => {
+      if (c.state === "running") {
+        unlockAudio()
+        resolve(true)
+      } else resolve(false)
+    }, 280)
+  })
+}
+
+/** Remplit `buf` (32 valeurs, 0-255) avec le spectre de la musique et renvoie le niveau moyen (0 à 1). */
+export function readSpectrum(buf: Uint8Array<ArrayBuffer>): number {
+  if (!analyser || !musicOn) return 0
+  analyser.getByteFrequencyData(buf)
+  let sum = 0
+  for (let i = 0; i < buf.length; i++) sum += buf[i]
+  return sum / (buf.length * 255)
 }
 
 /* ------------------------------------------------------------------ */

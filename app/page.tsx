@@ -31,6 +31,7 @@ import { ElasticLine } from "@/components/fx/elastic-line"
 import { PerfGovernor } from "@/components/fx/perf-governor"
 import { TouchFx } from "@/components/fx/touch-fx"
 import { AudioDirector } from "@/components/audio-director"
+import { AudioViz } from "@/components/fx/audio-viz"
 import { VelocityFx } from "@/components/fx/velocity-fx"
 import { LightSheen } from "@/components/fx/light-sheen"
 import { ShakeFx } from "@/components/fx/shake-fx"
@@ -52,6 +53,7 @@ export default async function Home() {
     <>
       <PerfGovernor />
       <AudioDirector />
+      <AudioViz />
       <TouchFx />
       <VelocityFx />
       <LightSheen />

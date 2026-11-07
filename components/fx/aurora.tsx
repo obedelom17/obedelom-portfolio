@@ -47,7 +47,7 @@ export function Aurora() {
           b.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(1 + Math.sin(sp * 6 + i) * 0.12).toFixed(3)})`
         })
       },
-      { fps: 30 },
+      {},
     )
     loop.wake()
     document.addEventListener("pointermove", onMove, { passive: true })
