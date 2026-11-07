@@ -2,7 +2,6 @@ import type { ReactNode } from "react"
 import { Reveal } from "@/components/reveal"
 import { SplitWords } from "@/components/split-words"
 import { ScrollFillNum } from "@/components/fx/scroll-fill-num"
-import { DotGrid } from "@/components/fx/dot-grid"
 
 export function Section({
   id,
@@ -28,11 +27,6 @@ export function Section({
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
           <div className="hero-orb hero-orb--a" style={{ top: "auto", bottom: "-18rem" }} />
           <div className="hero-orb hero-orb--b" style={{ bottom: "auto", top: "-6rem" }} />
-        </div>
-      )}
-      {grid && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <DotGrid />
         </div>
       )}
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-24 sm:px-8 md:py-36 lg:grid-cols-12">

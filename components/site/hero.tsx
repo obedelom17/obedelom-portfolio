@@ -6,7 +6,7 @@ import { useApp } from "@/components/providers"
 import { Odometer } from "@/components/fx/odometer"
 import { ShaderBg } from "@/components/fx/shader-bg"
 import { Magnetic } from "@/components/magnetic"
-import { ParticleField } from "@/components/particle-field"
+import { Constellation } from "@/components/fx/constellation"
 import { RotatingWords } from "./rotating-words"
 import { Scramble } from "./scramble"
 import { Roll } from "@/components/fx/roll"
@@ -65,7 +65,7 @@ export function Hero({
         <div className="hero-orb hero-orb--b" />
       </div>
       <HeroMotion />
-      <ParticleField />
+      <Constellation />
       <div ref={glow} className="hero-glow" aria-hidden />
 
       <div data-hero-exit className="relative mx-auto max-w-7xl px-5 pb-32 pt-36 sm:px-8 md:pt-48">
