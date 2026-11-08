@@ -268,7 +268,8 @@ flou lié à la vitesse sur les bandeaux ; mots du titre et rôles du hero ; cha
 Seuls `opacity`, `transform` et `filter` sont animés. Coupé aux niveaux d'économie.
 
 ### Son
-`lib/sound.ts` synthétise tous les effets et la musique d'ambiance avec Web Audio (aucun fichier audio).
+`lib/sound.ts` synthétise tous les effets avec Web Audio, et joue en boucle une pièce de piano douce (« Lumière douce », composée dans le code).
+Pour utiliser plutôt un morceau de ton choix, dépose-le dans `public/music/background.mp3` : il sera joué automatiquement à la place.
 Les navigateurs interdisent le son avant un geste : la musique démarre au premier clic / toucher. Le bouton du son
 (en-tête, île dynamique, touche `S`) coupe ou rétablit tout ; préférences mémorisées (`sfx`, `music`).
 

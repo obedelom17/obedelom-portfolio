@@ -72,6 +72,7 @@ function ProjectRow({ project, number }: { project: Project; number: string }) {
                     <VideoPlayer
                       key={active.src}
                       item={active}
+                      paused={zoom}
                       title={`${project.title} ${current + 1}`}
                       className={`aspect-[16/10] w-full ${active.embed ? "" : "object-contain"}`}
                     />

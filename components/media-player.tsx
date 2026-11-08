@@ -3,8 +3,25 @@
 import { useEffect, useRef } from "react"
 import { Play } from "lucide-react"
 import type { MediaItem } from "@/lib/media"
+import { duckMusic } from "@/lib/sound"
 
 type VideoMedia = Extract<MediaItem, { kind: "video" }>
+
+/**
+ * Une seule vidéo peut avoir du son à la fois : quand une vidéo devient audible, les autres sont mises en pause.
+ * Pendant qu'une vidéo a du son, la musique de fond se tait (et revient ensuite).
+ */
+const audible = new Set<HTMLVideoElement>()
+function refreshAudible(el: HTMLVideoElement) {
+  const on = !el.muted && !el.paused && !el.ended && el.volume > 0
+  if (on) {
+    Array.from(audible).forEach((o) => {
+      if (o !== el) o.pause()
+    })
+    audible.add(el)
+  } else audible.delete(el)
+  duckMusic(audible.size > 0)
+}
 
 /**
  * Lecteur de vidéo qui démarre tout seul.
@@ -18,18 +35,40 @@ export function VideoPlayer({
   className = "",
   autoPlay = true,
   muted = true,
+  paused = false,
 }: {
   item: VideoMedia
   title: string
   className?: string
   autoPlay?: boolean
   muted?: boolean
+  /** Vrai quand la vidéo est cachée derrière un agrandissement : elle se tait et ne redémarre pas. */
+  paused?: boolean
 }) {
   const ref = useRef<HTMLVideoElement>(null)
 
+  // Suivi du son : une seule vidéo audible à la fois, musique de fond coupée pendant ce temps.
   useEffect(() => {
     const el = ref.current
-    if (!el || !autoPlay) return
+    if (!el) return
+    const sync = () => refreshAudible(el)
+    const events = ["play", "pause", "ended", "volumechange"] as const
+    events.forEach((e) => el.addEventListener(e, sync))
+    return () => {
+      events.forEach((e) => el.removeEventListener(e, sync))
+      audible.delete(el)
+      duckMusic(audible.size > 0)
+    }
+  }, [])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (paused) {
+      el.pause()
+      return
+    }
+    if (!autoPlay) return
     el.muted = muted
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -41,9 +80,11 @@ export function VideoPlayer({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [autoPlay, muted])
+  }, [autoPlay, muted, paused])
 
   if (item.embed) {
+    // Caché derrière un agrandissement : on retire le lecteur (un lecteur intégré ne peut pas être mis en pause).
+    if (paused) return <div className={className} aria-hidden />
     return (
       <iframe
         src={item.embed}

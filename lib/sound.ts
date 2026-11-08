@@ -1,7 +1,8 @@
 /**
  * Moteur sonore du portfolio, 100 % synthétisé avec Web Audio (aucun fichier audio à charger) :
  *  - des effets (survol, clic, section, thème, langue, ouverture, succès, jeux…) ;
- *  - une musique d'ambiance générative, douce, qui démarre au premier geste du visiteur.
+ *  - une vraie pièce de piano douce et émouvante (composée dans le code, jouée en boucle), qui démarre au premier geste du visiteur.
+ *    Option : déposer un fichier `public/music/background.mp3` pour le jouer à la place de la pièce synthétisée.
  *
  * Les navigateurs interdisent tout son avant un geste de l'utilisateur : `unlockAudio()` est donc
  * appelé au premier appui / toucher / touche. Les préférences (effets, musique) sont mémorisées ;
@@ -85,6 +86,22 @@ let noiseBuf: AudioBuffer
 let voices = 0
 const MAX_VOICES = 14
 
+/** Réponse impulsionnelle d'une grande salle douce : bruit stéréo qui s'éteint, aigus amortis. */
+function makeReverb(c: AC, secs: number) {
+  const len = Math.floor(c.sampleRate * secs)
+  const buf = c.createBuffer(2, len, c.sampleRate)
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch)
+    let lp = 0
+    for (let i = 0; i < len; i++) {
+      const x = i / len
+      lp += (Math.random() * 2 - 1 - lp) * 0.3
+      d[i] = lp * Math.pow(1 - x, 2.6) * (x < 0.01 ? x / 0.01 : 1)
+    }
+  }
+  return buf
+}
+
 function build(): AC | null {
   if (ctx) return ctx
   const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
@@ -108,34 +125,23 @@ function build(): AC | null {
   sfxBus.gain.value = state.sfx ? SFX_LEVEL : 0
   sfxBus.connect(master)
 
-  // Musique : filtre doux + écho feutré (réverbération légère).
+  // Musique : ton chaud et feutré + réverbération de salle (réponse impulsionnelle synthétisée).
   musicBus = c.createGain()
   musicBus.gain.value = 0
   musicBus.connect(master)
   musicIn = c.createGain()
-  const lp = c.createBiquadFilter()
-  lp.type = "lowpass"
-  lp.frequency.value = 1700
-  lp.Q.value = 0.2
-  musicIn.connect(lp)
-  lp.connect(musicBus)
+  const soft = c.createBiquadFilter()
+  soft.type = "lowpass"
+  soft.frequency.value = 4200
+  soft.Q.value = 0.3
+  musicIn.connect(soft)
+  soft.connect(musicBus)
+  const room = c.createConvolver()
+  room.buffer = makeReverb(c, 3.6)
   const wet = c.createGain()
-  wet.gain.value = 0.42
-  const d1 = c.createDelay(1)
-  const d2 = c.createDelay(1)
-  d1.delayTime.value = 0.37
-  d2.delayTime.value = 0.53
-  const fb = c.createGain()
-  fb.gain.value = 0.4
-  const damp = c.createBiquadFilter()
-  damp.type = "lowpass"
-  damp.frequency.value = 1500
-  lp.connect(d1)
-  d1.connect(d2)
-  d2.connect(damp)
-  damp.connect(fb)
-  fb.connect(d1)
-  damp.connect(wet)
+  wet.gain.value = 0.55
+  soft.connect(room)
+  room.connect(wet)
   wet.connect(musicBus)
 
   noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate)
@@ -342,40 +348,109 @@ export function play(kind: Kind, intensity = 0.5) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Musique d'ambiance générative                                        */
+/* Musique : « Lumière douce » — pièce de piano en boucle              */
 /* ------------------------------------------------------------------ */
 
-const CHORDS: number[][] = [
-  [146.83, 220.0, 261.63, 329.63, 349.23], // Ré mineur 9
-  [116.54, 174.61, 220.0, 293.66, 349.23], // Si♭ majeur 7
-  [174.61, 220.0, 261.63, 329.63, 392.0], // Fa majeur 9
-  [130.81, 196.0, 293.66, 329.63, 392.0], // Do add9
-]
-const BELLS = [587.33, 659.25, 783.99, 880.0, 1046.5]
-const CHORD_LEN = 9
-/** Niveaux maximum : les sons sont synthétisés très bas à la source, ces gains les montent au plus fort ; le limiteur final évite toute saturation. */
-const MUSIC_LEVEL = 3.4
+/** Pour jouer un vrai morceau (mp3) à la place de la pièce synthétisée : le déposer ici dans `public/`. */
+const MUSIC_FILE = "/music/background.mp3"
+/** Niveaux : le piano est synthétisé bas à la source ; le limiteur final évite toute saturation. */
+const MUSIC_LEVEL = 1.15
+const FILE_LEVEL = 0.4
 const SFX_LEVEL = 10
 
-let musicOn = false
-let chordTimer = 0
-let bellTimer = 0
-let chordIdx = 0
+const NOTE_IDX: Record<string, number> = { C: 0, "C#": 1, D: 2, "D#": 3, E: 4, F: 5, "F#": 6, G: 7, "G#": 8, A: 9, "A#": 10, B: 11 }
+function hz(name: string) {
+  const m = /^([A-G]#?)(\d)$/.exec(name)
+  if (!m) return 440
+  const midi = (parseInt(m[2], 10) + 1) * 12 + NOTE_IDX[m[1]]
+  return 440 * Math.pow(2, (midi - 69) / 12)
+}
 
-function voice(freq: number, t: number, len: number, vol: number) {
+type Bar = { bass: string; arp: string[]; mel: [number, string, number][] }
+/** Un temps = environ 57 battements par minute : lent, respirant. */
+const BEAT = 1.05
+/** Ordre de l'arpège (indices dans `arp`), une croche sur deux temps. */
+const ARP = [0, 1, 2, 3, 2, 1, 3, 2]
+
+// La mineur — Fa — Do — Sol, puis la montée émouvante vers Mi : la progression qui serre le cœur.
+const AM7 = { bass: "A2", arp: ["E3", "A3", "C4", "E4"] }
+const FMAJ7 = { bass: "F2", arp: ["C4", "A3", "C4", "E4"] }
+const CMAJ7 = { bass: "C3", arp: ["G3", "B3", "E4", "G4"] }
+const GADD9 = { bass: "G2", arp: ["B3", "D4", "G4", "A4"] }
+const DM9 = { bass: "D3", arp: ["A3", "C4", "E4", "F4"] }
+const E = { bass: "E2", arp: ["B3", "E4", "G#4", "B4"] }
+
+const SONG: Bar[] = [
+  // Couplet : la mélodie se pose, simple, presque murmurée.
+  { ...AM7, mel: [[0, "E5", 2.6], [3, "D5", 1]] },
+  { ...FMAJ7, mel: [[0, "C5", 2], [2, "A4", 1], [3, "C5", 1]] },
+  { ...CMAJ7, mel: [[0, "E5", 3], [3, "G5", 1]] },
+  { ...GADD9, mel: [[0, "D5", 2], [2, "B4", 1.8]] },
+  { ...AM7, mel: [[0, "C5", 1.5], [1.5, "E5", 1.5], [3, "G5", 1]] },
+  { ...FMAJ7, mel: [[0, "F5", 2], [2, "E5", 1], [3, "C5", 1]] },
+  { ...DM9, mel: [[0, "D5", 2], [2, "F5", 1], [3, "E5", 1]] },
+  { ...E, mel: [[0, "B4", 2], [2, "G#4", 2]] },
+  // Refrain : la mélodie monte, s'ouvre, puis redescend pour mieux revenir.
+  { ...AM7, mel: [[0, "A5", 3], [3, "G5", 1]] },
+  { ...FMAJ7, mel: [[0, "A5", 1.5], [1.5, "G5", 1.5], [3, "F5", 1]] },
+  { ...CMAJ7, mel: [[0, "G5", 2], [2, "E5", 2]] },
+  { ...GADD9, mel: [[0, "B4", 1], [1, "D5", 1], [2, "G5", 2]] },
+  { ...AM7, mel: [[0, "E5", 3], [3, "C5", 1]] },
+  { ...FMAJ7, mel: [[0, "A4", 1], [1, "C5", 1], [2, "F5", 2]] },
+  { ...DM9, mel: [[0, "F5", 2], [2, "E5", 1], [3, "D5", 1]] },
+  { ...E, mel: [[0, "B4", 2], [2, "G#4", 1], [3, "B4", 1]] },
+]
+
+let musicOn = false
+let ducked = false
+let chordTimer = 0
+let barIdx = 0
+let nextBarAt = 0
+let fileMode = false
+let fileTrack: HTMLAudioElement | null = null
+let fileProbe: Promise<boolean> | null = null
+
+/** Une note de piano doux : fondamentale + harmoniques qui s'éteignent à des vitesses différentes. */
+function pianoNote(freq: number, t: number, dur: number, vol: number, parts: number) {
   const c = ctx
   if (!c) return
-  for (const det of [-5, 5]) {
+  const amps = [1, 0.3, 0.09]
+  for (let p = 0; p < parts; p++) {
     const osc = c.createOscillator()
     const g = c.createGain()
     osc.type = "sine"
+    osc.frequency.value = freq * (p + 1)
+    osc.detune.value = (Math.random() - 0.5) * 5
+    const d = dur / (1 + p * 0.8)
+    g.gain.setValueAtTime(0.0001, t)
+    g.gain.exponentialRampToValueAtTime(vol * amps[p], t + 0.014)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d)
+    osc.connect(g)
+    g.connect(musicIn)
+    osc.start(t)
+    osc.stop(t + d + 0.1)
+    osc.onended = () => {
+      osc.disconnect()
+      g.disconnect()
+    }
+  }
+}
+
+/** Un coussin chaud (cordes très douces) sous le piano, qui se fond d'un accord au suivant. */
+function pad(freq: number, t: number, len: number, vol: number) {
+  const c = ctx
+  if (!c) return
+  const a = 1.7
+  const r = 2.6
+  for (const det of [-6, 6]) {
+    const osc = c.createOscillator()
+    const g = c.createGain()
+    osc.type = "triangle"
     osc.frequency.value = freq
     osc.detune.value = det
-    const a = 3.2
-    const r = 4.2
     g.gain.setValueAtTime(0.0001, t)
     g.gain.linearRampToValueAtTime(vol, t + a)
-    g.gain.setValueAtTime(vol, t + len - r * 0.4)
+    g.gain.setValueAtTime(vol, t + len - 0.3)
     g.gain.linearRampToValueAtTime(0.0001, t + len + r)
     osc.connect(g)
     g.connect(musicIn)
@@ -388,42 +463,64 @@ function voice(freq: number, t: number, len: number, vol: number) {
   }
 }
 
-function nextChord() {
-  const c = ctx
-  if (!c || !musicOn) return
-  // Contexte en veille (onglet masqué) : on ne programme rien, pour ne pas empiler d'accords.
-  if (c.state === "running" && !document.hidden) {
-    const t = c.currentTime + 0.05
-    const chord = CHORDS[chordIdx % CHORDS.length]
-    chord.forEach((f, i) => voice(f, t, CHORD_LEN, i === 0 ? 0.03 : 0.017))
-    chordIdx++
-  }
-  chordTimer = window.setTimeout(nextChord, (CHORD_LEN - 0.8) * 1000)
+function scheduleBar() {
+  const bar = SONG[barIdx % SONG.length]
+  barIdx++
+  const t0 = nextBarAt
+  const human = () => (Math.random() - 0.5) * 0.03
+  const notes = bar.arp.map(hz)
+
+  pianoNote(hz(bar.bass), t0, 5.6, 0.16, 2)
+  ARP.forEach((k, i) => pianoNote(notes[k], t0 + (i * BEAT) / 2 + human(), 3.4, i % 4 === 0 ? 0.07 : 0.05, 2))
+  bar.mel.forEach(([beat, n, len]) => pianoNote(hz(n), t0 + beat * BEAT + human(), 2.4 + len * BEAT * 1.3, 0.14, 3))
+  pad(hz(bar.bass) * 2, t0, 4 * BEAT, 0.012)
+  pad(notes[1], t0, 4 * BEAT, 0.009)
+
+  nextBarAt += 4 * BEAT
 }
 
-function nextBell() {
+/** Programme la musique quelques secondes à l'avance (jamais dans un onglet masqué). */
+function pump() {
   const c = ctx
-  if (!c || !musicOn) return
-  if (c.state === "running" && !document.hidden && Math.random() < 0.85) {
-    const f = BELLS[Math.floor(Math.random() * BELLS.length)]
-    const t = c.currentTime + 0.02
-    const osc = c.createOscillator()
-    const g = c.createGain()
-    osc.type = "sine"
-    osc.frequency.value = f
-    g.gain.setValueAtTime(0.0001, t)
-    g.gain.exponentialRampToValueAtTime(0.03, t + 0.02)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 3.2)
-    osc.connect(g)
-    g.connect(musicIn)
-    osc.start(t)
-    osc.stop(t + 3.3)
-    osc.onended = () => {
-      osc.disconnect()
-      g.disconnect()
-    }
+  if (!c || !musicOn || fileMode) return
+  if (c.state === "running" && !document.hidden) {
+    if (nextBarAt < c.currentTime + 0.1) nextBarAt = c.currentTime + 0.15
+    while (nextBarAt < c.currentTime + 3) scheduleBar()
   }
-  bellTimer = window.setTimeout(nextBell, 2400 + Math.random() * 3600)
+  chordTimer = window.setTimeout(pump, 800)
+}
+
+function startGenerative() {
+  window.clearTimeout(chordTimer)
+  fileMode = false
+  nextBarAt = 0
+  pump()
+}
+
+function probeFile() {
+  fileProbe ??= fetch(MUSIC_FILE, { method: "HEAD" })
+    .then((r) => r.ok && (r.headers.get("content-type") || "").startsWith("audio"))
+    .catch(() => false)
+  return fileProbe
+}
+
+function playFile() {
+  const c = ctx
+  if (!c) return
+  window.clearTimeout(chordTimer)
+  fileMode = true
+  if (!fileTrack) {
+    const a = new Audio(MUSIC_FILE)
+    a.loop = true
+    a.preload = "auto"
+    const src = c.createMediaElementSource(a)
+    const g = c.createGain()
+    g.gain.value = FILE_LEVEL
+    src.connect(g)
+    g.connect(musicBus)
+    fileTrack = a
+  }
+  void fileTrack.play().catch(() => {})
 }
 
 function startMusic() {
@@ -432,20 +529,39 @@ function startMusic() {
   musicOn = true
   musicBus.gain.cancelScheduledValues(c.currentTime)
   musicBus.gain.setValueAtTime(musicBus.gain.value, c.currentTime)
-  musicBus.gain.linearRampToValueAtTime(MUSIC_LEVEL, c.currentTime + 4)
-  nextChord()
-  bellTimer = window.setTimeout(nextBell, 3500)
+  musicBus.gain.linearRampToValueAtTime(ducked ? 0 : MUSIC_LEVEL, c.currentTime + 5)
+  void probeFile().then((ok) => {
+    if (!musicOn || !ctx) return
+    if (ok) playFile()
+    else startGenerative()
+  })
 }
 
 function stopMusic() {
   const c = ctx
   musicOn = false
   window.clearTimeout(chordTimer)
-  window.clearTimeout(bellTimer)
+  if (fileTrack) {
+    const a = fileTrack
+    window.setTimeout(() => {
+      if (!musicOn) a.pause()
+    }, 1400)
+  }
   if (!c) return
   musicBus.gain.cancelScheduledValues(c.currentTime)
   musicBus.gain.setValueAtTime(musicBus.gain.value, c.currentTime)
   musicBus.gain.linearRampToValueAtTime(0, c.currentTime + 1.2)
+}
+
+/** Coupe en douceur la musique pendant qu'une vidéo a du son, et la rétablit ensuite. */
+export function duckMusic(on: boolean) {
+  if (ducked === on) return
+  ducked = on
+  const c = ctx
+  if (!c || !musicOn) return
+  musicBus.gain.cancelScheduledValues(c.currentTime)
+  musicBus.gain.setValueAtTime(musicBus.gain.value, c.currentTime)
+  musicBus.gain.linearRampToValueAtTime(on ? 0 : MUSIC_LEVEL, c.currentTime + (on ? 0.6 : 2))
 }
 
 export function setSfx(on: boolean) {
@@ -497,7 +613,7 @@ if (typeof document !== "undefined") {
         if (musicOn) {
           musicBus.gain.cancelScheduledValues(c.currentTime)
           musicBus.gain.setValueAtTime(musicBus.gain.value, c.currentTime)
-          musicBus.gain.linearRampToValueAtTime(MUSIC_LEVEL, c.currentTime + 2.5)
+          musicBus.gain.linearRampToValueAtTime(ducked ? 0 : MUSIC_LEVEL, c.currentTime + 2.5)
         }
       })
     }
